@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30404.54
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit2", "StarFruit2\StarFruit2.csproj", "{CD93E299-475F-4B9A-A4C3-A4E4B6CA4873}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit2.Tests", "StarFruit2.Tests\StarFruit2.Tests.csproj", "{E08A1C63-F886-462A-9E43-CA3022ACF07C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarAuth", "StarAuth\StarAuth.csproj", "{047EA9B2-E275-42A2-8215-8A5560751B84}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit.Common", "StarFruit.Common\StarFruit.Common.csproj", "{6AAF9A66-9D3C-4807-B442-DA2B0858F2E0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Starfruit.Console", "Starfruit.Console\Starfruit.Console.csproj", "{78247A51-FD5D-4403-AECF-0BE7DE3AF374}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFruit.Samples", "StarFruit.Samples\StarFruit.Samples.csproj", "{467EC528-6329-4B64-8922-AED0E2E59071}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starfruit2_B", "Starfruit2_B\Starfruit2_B.csproj", "{08FCEEDC-54BC-4B63-BD36-D15C17D91778}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD93E299-475F-4B9A-A4C3-A4E4B6CA4873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD93E299-475F-4B9A-A4C3-A4E4B6CA4873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD93E299-475F-4B9A-A4C3-A4E4B6CA4873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD93E299-475F-4B9A-A4C3-A4E4B6CA4873}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E08A1C63-F886-462A-9E43-CA3022ACF07C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E08A1C63-F886-462A-9E43-CA3022ACF07C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E08A1C63-F886-462A-9E43-CA3022ACF07C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E08A1C63-F886-462A-9E43-CA3022ACF07C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{047EA9B2-E275-42A2-8215-8A5560751B84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{047EA9B2-E275-42A2-8215-8A5560751B84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{047EA9B2-E275-42A2-8215-8A5560751B84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{047EA9B2-E275-42A2-8215-8A5560751B84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AAF9A66-9D3C-4807-B442-DA2B0858F2E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AAF9A66-9D3C-4807-B442-DA2B0858F2E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AAF9A66-9D3C-4807-B442-DA2B0858F2E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AAF9A66-9D3C-4807-B442-DA2B0858F2E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78247A51-FD5D-4403-AECF-0BE7DE3AF374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78247A51-FD5D-4403-AECF-0BE7DE3AF374}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78247A51-FD5D-4403-AECF-0BE7DE3AF374}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78247A51-FD5D-4403-AECF-0BE7DE3AF374}.Release|Any CPU.Build.0 = Release|Any CPU
+		{467EC528-6329-4B64-8922-AED0E2E59071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{467EC528-6329-4B64-8922-AED0E2E59071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{467EC528-6329-4B64-8922-AED0E2E59071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{467EC528-6329-4B64-8922-AED0E2E59071}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08FCEEDC-54BC-4B63-BD36-D15C17D91778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08FCEEDC-54BC-4B63-BD36-D15C17D91778}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08FCEEDC-54BC-4B63-BD36-D15C17D91778}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08FCEEDC-54BC-4B63-BD36-D15C17D91778}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B016F2BA-2F89-45F3-86A1-E4FA9D992C1F}
+	EndGlobalSection
+EndGlobal
