@@ -1,7 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Starfruit2_B;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -18,11 +16,12 @@ namespace StarFruit2.Tests
         [InlineData("SeveralOptionsAndArgumentsSampleData.cs")]
         public void Parse_class(string fileName)
         {
-            var sample = FileSampleData.Samples.Data
+            var expected = FileSampleData.Samples.Data
                             .First(x => x.FileName == fileName);
-            CommandDescriptor command = GetCommand(fileName);
 
-            command.Should().Match(sample.CommandExpectedData);
+            CommandDescriptor actual = GetCommand(fileName);
+
+            actual.Should().Match(expected);
         }
 
         private static Common.Descriptors.CommandDescriptor GetCommand(string fileName)

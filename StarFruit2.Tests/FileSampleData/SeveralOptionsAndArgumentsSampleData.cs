@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace StarFruit2.Tests.FileSampleData.SeveralOptionsAndArgumentsSampleData
-{ 
+{
     public class MyClass
     {
         public string MyProperty { get; set; }

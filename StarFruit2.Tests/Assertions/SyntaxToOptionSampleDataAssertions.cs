@@ -16,7 +16,7 @@ namespace StarFruit2.Tests
 
         protected override string Identifier => "commanddesc2sample";
 
-        public AndConstraint<SyntaxToOptionSampleDataAssertions> Match(OptionSampleData sampleData)
+        public AndConstraint<SyntaxToOptionSampleDataAssertions> Match(OptionExpectedData sampleData)
         {
             var sampleArguments = sampleData.Arguments.ToArray();
             var commandArguments = Subject.Arguments.ToArray();

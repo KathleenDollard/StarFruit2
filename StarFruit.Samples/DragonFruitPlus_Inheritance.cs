@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StarFruit.Samples.DragonFruitPlus_Inheritance
+﻿namespace StarFruit.Samples.DragonFruitPlus_Inheritance
 {
     public class Program
     {

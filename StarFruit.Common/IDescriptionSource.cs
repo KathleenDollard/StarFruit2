@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace StarFruit2.Common
+﻿namespace StarFruit2.Common
 {
- public    interface IDescriptionSource
+    public    interface IDescriptionSource
     {
         string GetDescription(string route);
     }

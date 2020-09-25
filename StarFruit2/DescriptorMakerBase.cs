@@ -1,5 +1,4 @@
 ﻿using StarFruit2.Common.Descriptors;
-using System;
 using System.Collections.Generic;
 
 namespace StarFruit2

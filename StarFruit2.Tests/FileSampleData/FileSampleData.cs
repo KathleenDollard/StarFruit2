@@ -5,33 +5,36 @@ namespace StarFruit2.Tests.FileSampleData
 {
     public class Samples
     {
-        public static List<FileCommandSampleData> Data = new List<FileCommandSampleData>
+        public static List<CommandExpectedData> Data = new List<CommandExpectedData>
         {
-            new FileCommandSampleData("EmptySampleData.cs", new CommandExpectedData
+            new CommandExpectedData
             {
-                  Name = "my-class"
-            }),
-            new FileCommandSampleData("SingleArgumentSampleData.cs", new CommandExpectedData
+                FileName = "EmptySampleData.cs",
+                 Name = "my-class"
+            },
+            new CommandExpectedData
             {
+                FileName = "SingleArgumentSampleData.cs",
                 Name = "my-class",
-                Arguments = new List<ArgumentSampleData>
-                    { new ArgumentSampleData
+                Arguments = new List<ArgumentExpectedData>
+                    { new ArgumentExpectedData
                         {
                             Name = "my-property",
                             Type = "string",
                         }
                     }
-            }),
-            new FileCommandSampleData("SingleOptionWithArgumentSampleData.cs",new CommandExpectedData
+            },
+            new CommandExpectedData
             {
+                FileName = "SingleOptionWithArgumentSampleData.cs",
                 Name = "my-class",
-                Options = new List<OptionSampleData>
+                Options = new List<OptionExpectedData>
                 {
-                    new OptionSampleData
+                    new OptionExpectedData
                     {
                         Name = "--my-property",
-                        Arguments = new List<ArgumentSampleData>
-                            { new ArgumentSampleData
+                        Arguments = new List<ArgumentExpectedData>
+                            { new ArgumentExpectedData
                                 {
                                     Name = "my-property",
                                     Type = "string",
@@ -39,46 +42,47 @@ namespace StarFruit2.Tests.FileSampleData
                             },
                     }
                 }
-            }),
-             new FileCommandSampleData("SeveralOptionsAndArgumentsSampleData.cs", new CommandExpectedData
+            },
+             new CommandExpectedData
             {
+                FileName = "SeveralOptionsAndArgumentsSampleData.cs",
                 Name = "my-class",
-                Arguments = new List<ArgumentSampleData>
-                    { new ArgumentSampleData
+                Arguments = new List<ArgumentExpectedData>
+                    { new ArgumentExpectedData
                         {
                             Name = "my-arg-property",
                             Type =  "string",
                         }
                     },
-                Options = new List<OptionSampleData>
+                Options = new List<OptionExpectedData>
                 {
-                    new OptionSampleData
+                    new OptionExpectedData
                     {
                         Name ="--my-property",
-                        Arguments = new List<ArgumentSampleData>
-                            { new ArgumentSampleData
+                        Arguments = new List<ArgumentExpectedData>
+                            { new ArgumentExpectedData
                                 {
                                     Name = "my-property",
                                     Type =  "string",
                                 }
                             },
                     },
-                    new OptionSampleData
+                    new OptionExpectedData
                     {
                         Name = "--my-property2",
-                        Arguments = new List<ArgumentSampleData>
-                            { new ArgumentSampleData
+                        Arguments = new List<ArgumentExpectedData>
+                            { new ArgumentExpectedData
                                 {
                                     Name = "my-property2",
                                     Type =  "int",
                                 }
                             },
                     },
-                    new OptionSampleData
+                    new OptionExpectedData
                     {
                         Name = "--my-property3",
-                        Arguments = new List<ArgumentSampleData>
-                            { new ArgumentSampleData
+                        Arguments = new List<ArgumentExpectedData>
+                            { new ArgumentExpectedData
                                 {
                                     Name = "my-property3",
                                     Type =  "DateTime",
@@ -86,7 +90,7 @@ namespace StarFruit2.Tests.FileSampleData
                             },
                     }
                 }
-            }),
+            },
         };
     }
 }

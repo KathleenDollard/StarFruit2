@@ -1,5 +1,4 @@
 ﻿using StarFruit.Common;
-using StarFruit2.Common;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,7 +17,7 @@ namespace StarFruit2.Common.Descriptors
         public IEnumerable<string>? Aliases { get; }
         public string? Description { get; }
 
-          public string? Name { get; }
+        public string Name { get; }
 
         public string? CommandLineName { get; }
 
@@ -26,8 +25,8 @@ namespace StarFruit2.Common.Descriptors
 
         public bool IsHidden { get; set; }
 
-        public  string Report(int tabsCount, VerbosityLevel verbosity)
-            => "Empty SymbolDescriptor - used for testing";   
+        public string Report(int tabsCount, VerbosityLevel verbosity)
+            => "Empty SymbolDescriptor - used for testing";
     }
 
     public abstract class SymbolDescriptor : ISymbolDescriptor
@@ -50,7 +49,7 @@ namespace StarFruit2.Common.Descriptors
         public virtual string Report(int tabsCount, VerbosityLevel verbosity)
         {
             string whitespace = CommonExtensions.NewLineWithTabs(tabsCount);
-            string whitespace2 = CommonExtensions.NewLineWithTabs(tabsCount+1);
+            string whitespace2 = CommonExtensions.NewLineWithTabs(tabsCount + 1);
             return $"{whitespace}{Name}" +
                    $"{whitespace2}Kind:{SymbolType }" +
                    $"{whitespace2}Description:{Description }" +
@@ -58,7 +57,7 @@ namespace StarFruit2.Common.Descriptors
                    $"{whitespace2}IsHidden:{IsHidden  }" +
                    ReportInternal(tabsCount + 1, verbosity) +
                    $"{whitespace2}Raw:{ReportRaw(Raw)}";
-                   //$"{whitespace2}Symbol:{ReportBound(SymbolToBind)}";
+            //$"{whitespace2}Symbol:{ReportBound(SymbolToBind)}";
 
             static string ReportRaw(object? raw)
             {
@@ -115,7 +114,7 @@ namespace StarFruit2.Common.Descriptors
         /// removing Arg suffixes via rules (a standard scenario), then having an BlahArg and a BlahArgArg 
         /// argument woudl not be legal. 
         /// </remarks>
-        public virtual string? Name { get; set; }
+        public virtual string Name { get; set; }
 
         /// <summary>
         /// The name as used when System.CommandLine objects are created. This name includes option prefixes

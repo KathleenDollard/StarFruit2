@@ -17,7 +17,7 @@ namespace StarFruit2.Tests
 
         protected override string Identifier => "argumentDescriptor2sample";
 
-        public AndConstraint<SyntaxToArgumentSampleDataAssertions> Match(ArgumentSampleData sampleData)
+        public AndConstraint<SyntaxToArgumentSampleDataAssertions> Match(ArgumentExpectedData sampleData)
         {
             using var _ = new AssertionScope();
             Execute.Assertion

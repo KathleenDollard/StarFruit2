@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using StarFruit2;
-using System;
 using System.Linq;
 
 namespace Starfruit.Console
