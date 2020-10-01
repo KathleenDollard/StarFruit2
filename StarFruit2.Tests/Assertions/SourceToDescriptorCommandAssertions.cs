@@ -8,28 +8,28 @@ using System.Linq;
 namespace StarFruit2.Tests
 {
 
-    public class SyntaxToCommandSampleDataAssertions : ReferenceTypeAssertions<CommandDescriptor, SyntaxToCommandSampleDataAssertions>
+    public class SourceToDescriptorCommandAssertions : ReferenceTypeAssertions<CommandDescriptor, SourceToDescriptorCommandAssertions>
     {
-        public SyntaxToCommandSampleDataAssertions(CommandDescriptor instance)
+        public SourceToDescriptorCommandAssertions(CommandDescriptor instance)
             : base(instance)
         { }
 
         protected override string Identifier => "commandDescriptor2sample";
 
-        public AndConstraint<SyntaxToCommandSampleDataAssertions> Match(CommandExpectedData expectedData)
+        public AndConstraint<SourceToDescriptorCommandAssertions> Match(CommandDescriptor expected)
         {
-            var sampleOptions = expectedData.Options.ToArray();
+            var sampleOptions = expected.Options.ToArray();
             var commandOptions = Subject.Options.ToArray();
-            var sampleSubCommands = expectedData.SubCommands.ToArray();
+            var sampleSubCommands = expected.SubCommands.ToArray();
             var commandSubCommands = Subject.SubCommands.ToArray();
-            var sampleArguments = expectedData.Arguments.ToArray();
+            var sampleArguments = expected.Arguments.ToArray();
             var commandArguments = Subject.Arguments.ToArray();
 
             using var _ = new AssertionScope();
 
             Execute.Assertion
-                 .ForCondition(expectedData.Name == Subject.Name)
-                 .FailWith($"Command name does not match ({expectedData.Name} != {Subject.Name})")
+                 .ForCondition(expected.Name == Subject.Name)
+                 .FailWith($"Command name does not match ({Subject.Name}!= {expected.Name} )")
                  .Then
                  .ForCondition(sampleOptions.Length == commandOptions.Length)
                  .FailWith($"Command does not contain same number of options ({commandOptions.Length} vs {sampleOptions.Length}")
@@ -52,7 +52,7 @@ namespace StarFruit2.Tests
                 commandSubCommands[i].Should().Match(sampleSubCommands[i]);
             }
 
-            return new AndConstraint<SyntaxToCommandSampleDataAssertions>(this);
+            return new AndConstraint<SourceToDescriptorCommandAssertions>(this);
 
         }
 

@@ -1,5 +1,5 @@
 ﻿
-namespace StarFruit2.Tests.FileSampleData.SingleOptionSampleData
+namespace StarFruit2.Tests.TestSampleData.SingleOptionSampleData
 {
     public class MyClass
     {

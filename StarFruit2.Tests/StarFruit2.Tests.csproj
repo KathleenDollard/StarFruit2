@@ -8,8 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.0.0-alpha0001" />
+    <PackageReference Include="FluentAssertions" Version="5.10.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.7.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2">
@@ -20,24 +21,26 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.DotNet.Interactive.CSharp" Version="1.0.0-beta.20480.3" />
+    <PackageReference Include="System.Reactive" Version="4.4.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
     <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
-    <ProjectReference Include="..\Starfruit2_B\Starfruit2_B.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="FileSampleData\EmptySampleData.cs">
+    <Compile Update="TestData\Empty.Code.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="FileSampleData\SeveralOptionsAndArgumentsSampleData.cs">
+    <Compile Update="TestData\SeveralOptionsAndArgumentsSampleData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="FileSampleData\SingleArgumentSampleData.cs">
+    <Compile Update="TestData\SingleArgumentSampleData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="FileSampleData\SingleOptionWithArgumentSampleData.cs">
+    <Compile Update="TestData\SingleOptionWithArgumentSampleData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>

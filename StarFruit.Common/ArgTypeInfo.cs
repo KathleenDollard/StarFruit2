@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Mime;
 
 namespace StarFruit2.Common
 {
@@ -18,6 +19,7 @@ namespace StarFruit2.Common
 
         public object? TypeRepresentation { get; }
 
+
         public T GetArgumentType<T>()
             where T : class 
             => TypeRepresentation switch
@@ -25,5 +27,6 @@ namespace StarFruit2.Common
                 T t => t,
                 _ => throw new NotImplementedException("Add other outputs like a Roslyn SyntaxNode")
             };
-    }
+
+     }
 }

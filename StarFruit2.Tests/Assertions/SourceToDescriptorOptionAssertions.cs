@@ -8,23 +8,23 @@ using System.Linq;
 namespace StarFruit2.Tests
 {
 
-    public class SyntaxToOptionSampleDataAssertions : ReferenceTypeAssertions<OptionDescriptor, SyntaxToOptionSampleDataAssertions>
+    public class SourceToDescriptorOptionAssertions : ReferenceTypeAssertions<OptionDescriptor, SourceToDescriptorOptionAssertions>
     {
-        public SyntaxToOptionSampleDataAssertions(OptionDescriptor instance)
+        public SourceToDescriptorOptionAssertions(OptionDescriptor instance)
             : base(instance)
         { }
 
         protected override string Identifier => "commanddesc2sample";
 
-        public AndConstraint<SyntaxToOptionSampleDataAssertions> Match(OptionExpectedData sampleData)
+        public AndConstraint<SourceToDescriptorOptionAssertions> Match(OptionDescriptor expected)
         {
-            var sampleArguments = sampleData.Arguments.ToArray();
+            var sampleArguments = expected.Arguments.ToArray();
             var commandArguments = Subject.Arguments.ToArray();
 
             using var _ = new AssertionScope();
             Execute.Assertion
-                 .ForCondition(sampleData.Name == Subject.Name)
-                 .FailWith($"Option name does not match ({Subject.Name} !+ {sampleData.Name})")
+                 .ForCondition(expected.Name == Subject.Name)
+                 .FailWith($"Option name does not match ({Subject.Name} !+ {expected.Name})")
                  .Then
                  .ForCondition(sampleArguments.Length == commandArguments.Length)
                  .FailWith("Option does not contain same number of arguments");
@@ -35,7 +35,7 @@ namespace StarFruit2.Tests
             }
 
 
-            return new AndConstraint<SyntaxToOptionSampleDataAssertions>(this);
+            return new AndConstraint<SourceToDescriptorOptionAssertions>(this);
 
         }
 

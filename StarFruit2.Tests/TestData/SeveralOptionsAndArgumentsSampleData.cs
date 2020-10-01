@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StarFruit2.Tests.FileSampleData.SeveralOptionsAndArgumentsSampleData
+namespace StarFruit2.Tests.TestSampleData.SeveralOptionsAndArgumentsSampleData
 {
     public class MyClass
     {

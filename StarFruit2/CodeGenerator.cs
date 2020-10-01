@@ -1,41 +1,41 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using StarFruit2.Common.Descriptors;
-using System;
+﻿using StarFruit2.Common.Descriptors;
 using System.Collections.Generic;
-using System.CommandLine;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace StarFruit2
 {
-    public class CodeGenerator
+    public static class CodeGenerator
     {
-        public string GetSourceCode(CommandDescriptor commandDescriptor)
+        public static string GetSourceCode(CliDescriptor cliDescriptor)
         {
+            var commandDescriptor = cliDescriptor.CommandDescriptor;
             return $@"
-   internal static class CommandSource
+using System.CommandLine;
+
+namespace {cliDescriptor.GeneratedComandSourceNamespace}
+{{
+   public class {cliDescriptor.GeneratedCommandSourceClassName} : ICommandSource
    {{
         public Command GetCommand()
-        {{
-            {GetCommand(commandDescriptor)}
+        {{{GetCommand(commandDescriptor)}
         }}
    }}
+}}
   
 ";
 
          
         }
-        private string GetCommand(CommandDescriptor commandDescriptor )
+        private static string GetCommand(CommandDescriptor commandDescriptor )
         {
             return $@"
-            var command = new Command({commandDescriptor.Name}, {commandDescriptor.Description});
+            var command = new Command(""{commandDescriptor.Name}"", ""{commandDescriptor.Description}"");
             {AddArguments(commandDescriptor)}
-            {AddOptions(commandDescriptor)};
-            return command;         
-";
+            {AddOptions(commandDescriptor)}
+            return command;";
         }
 
-        public string AddArguments(CommandDescriptor commandDescriptor)
+        public static string AddArguments(CommandDescriptor commandDescriptor)
         {
             var ret = new List<string>();
             foreach (var argument in commandDescriptor.Arguments )
@@ -46,7 +46,7 @@ namespace StarFruit2
             return string.Join("\n", ret);
         }
 
-        public string AddOptions(CommandDescriptor commandDescriptor)
+        public static string AddOptions(CommandDescriptor commandDescriptor)
         {
             var ret = new List<string>();
             foreach (var option in commandDescriptor.Options)

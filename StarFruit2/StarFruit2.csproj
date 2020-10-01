@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
-  </ItemGroup>
+		<ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
+	  </ItemGroup>
 
-</Project>
+	</Project>
