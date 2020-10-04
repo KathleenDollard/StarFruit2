@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Linq;
-using StarFruit2;
 
 namespace StarFruit.Samples.Playspace
 {
@@ -10,9 +8,9 @@ namespace StarFruit.Samples.Playspace
     {
         public int Main2(string[] args)
         {
-            var CommandSource = new BazCommandSource();
-            var command = CommandSource.GetCommand(); // you only need this if you have customizations
-            return CommandSource.Run(args);
+            var commandSource = CommandSource.CreateFrom<Baz>();
+            var command = commandSource.GetCommand(); // you only need this if you have customizations
+            return commandSource.Run(args);
         }
     }
 
@@ -20,7 +18,7 @@ namespace StarFruit.Samples.Playspace
     public class Baz
     {
         private bool ctorParam;
-        public Baz(bool ctorParam) 
+        public Baz(bool ctorParam)
             => this.ctorParam = ctorParam;
 
         public string StringProperty { get; set; }
@@ -30,12 +28,15 @@ namespace StarFruit.Samples.Playspace
 
     }
 
+    public abstract class CommandSource
+    {
+        public static CommandSource CreateFrom<T>()
+            => new CommandSource_ABCD();
+        public abstract Command GetCommand();
+        public abstract int Run(string[] args);
+    }
 
-    public partial class BazCommandSource : ICommandSource<Baz>
-    { }
-
-
-    public partial class BazCommandSource : ICommandSource
+    public partial class CommandSource_ABCD : CommandSource
     {
         private Argument<int> intArg;
         private Option<string> stringOption;
@@ -45,7 +46,7 @@ namespace StarFruit.Samples.Playspace
 
         private Command rootCommand;
 
-        public Command GetCommand()
+        public override Command GetCommand()
         {
             rootCommand = new Command("my-command");
 
@@ -62,7 +63,7 @@ namespace StarFruit.Samples.Playspace
             return rootCommand;
 
         }
-        public int Run(string[] args)
+        public override int Run(string[] args)
         {
             var result = rootCommand.Parse(args);
             var commandResult = result.CommandResult;
@@ -80,10 +81,10 @@ namespace StarFruit.Samples.Playspace
 
     }
 
-    public partial class BazCommandSource
+    public partial class CommandSource_ABCD
     {
         public T GetValue<T>(CommandResult commandResult,
-                             Argument<T> argument) 
+                             Argument<T> argument)
             => commandResult.Children
                         .OfType<ArgumentResult>()
                         .Where(a => a.Argument == argument)
@@ -91,7 +92,7 @@ namespace StarFruit.Samples.Playspace
                         .FirstOrDefault();
 
         public T GetValue<T>(CommandResult commandResult,
-                             Option<T> option) 
+                             Option<T> option)
             => commandResult.Children
                         .OfType<OptionResult>()
                         .Where(o => o.Option == option)
