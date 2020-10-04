@@ -8,7 +8,7 @@ namespace TestData
     public class BaseTestData
     {
         public BaseTestData()
-        {  }
+        { }
 
         public BaseTestData(string testName)
         {
@@ -30,9 +30,7 @@ namespace TestData
         public IEnumerable<CommandDescriptor> SubCommandDescriptors { get; set; } = new List<CommandDescriptor>();
 
         public string GeneratedSource
-            => @$"{GeneratedSourceOpening}
-                  {CommandDefinitionSourceCode}
-                  {GeneratedSourceClosing }";
+            => CommandDefinitionSourceCode;
 
         public string CommandDefinitionSourceCode { get; set; }
 
@@ -43,9 +41,7 @@ namespace TestData
         protected string GeneratedSourceOpening
             => @$"using System.CommandLine;
 
-namespace {GeneratedNamespace}
-{{
-   public class {GeneratedSourceClassName} : ICommandSource
+   public class {GeneratedSourceClassName}
    {{
         public Command GetCommand()
         {{";
@@ -53,8 +49,7 @@ namespace {GeneratedNamespace}
         protected string GeneratedSourceClosing
             => $@"
         }}
-    }}
-}}";
+   }}";
 
 
     }

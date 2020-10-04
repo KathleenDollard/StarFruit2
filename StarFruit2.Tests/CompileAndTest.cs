@@ -17,105 +17,66 @@ using Microsoft.DotNet.Interactive.Tests.Utility;
 using System.Reactive.Linq;
 using Microsoft.DotNet.Interactive.Events;
 using System.CommandLine;
+using StarFruit2.Generator;
 
 namespace StarFruit2.Tests
 {
     public class CompileAndTest
     {
-        private readonly Assembly testAssembly;
-        public CompileAndTest()
+
+        [Theory]
+        [InlineData(typeof(EmptyTestData))]
+        public async Task Compile_succeeds_for_generated_code(Type testDataType)
         {
-            //testAssembly = CreateAssemblyFromCode();
+            // arrange
+            var className = "MyClass";
+            var methodName = "GetCommand";
+            var testData = Activator.CreateInstance(testDataType) as BaseTestData;
+            // TODO: Add null check
+            var generatedSource = testData.GeneratedSource
+                                    .WrapInMethod(methodName)
+                                    .WrapInClass(className)
+                                    .PrefaceWithUsing();
+
+            using var kernel = new CSharpKernel();
+
+            // act
+            var result = await kernel.SubmitCodeAsync(generatedSource);
+
+            // assert
+            result.KernelEvents.ToSubscribedList().Should().NotContainErrors();
         }
 
         [Theory]
         [InlineData(typeof(EmptyTestData))]
-        public void Generated_code_builds_for_Empty(Type testDataType)
+        public async Task Compiled_command_has_expect_values(Type testDataType)
         {
+            // arrange
+            var className = "MyClass";
+            var methodName = "GetCommand";
             var testData = Activator.CreateInstance(testDataType) as BaseTestData;
-            var type = testAssembly.GetTypes()
-                        .Where(x => x.Name == testDataType.Name)
-                        .FirstOrDefault();
-            type.Should().NotBeNull("The expected type was not found in the TestCompilation");
-            var instance = Activator.CreateInstance(type) as ICommandSource;
-            instance.Should().NotBeNull("The expected type was found but could not be instantiated or was not an ICommandSource");
-
-            var command = instance.GetCommand();
-            testData.TestAction(command);
-        }
-
-        [Fact]
-        public async Task Demo_dotnet_interactive_test()
-        {
-            string x = @"using System.CommandLine;
-public class Foo
-{ 
-  public Command Bar() 
-  {
-    return new Command(""Fred"");
-  }
-}";
+            // TODO: Add null check
+            var generatedSource = testData.GeneratedSource
+                                    .WrapInMethod(methodName)
+                                    .WrapInClass(className)
+                                    .PrefaceWithUsing();
 
             using var kernel = new CSharpKernel();
-            var result = await kernel.SubmitCodeAsync(x);
+
+            var result = await kernel.SubmitCodeAsync(generatedSource);
+            // While assert in arrange is unusual, if this goes bad, the test is toast. 
             result.KernelEvents.ToSubscribedList().Should().NotContainErrors();
-            var result2 = await kernel.SubmitCodeAsync("new Foo().Bar()");
-            result2.KernelEvents.ToSubscribedList().Should().NotContainErrors();
-            var returnValue = await result2.KernelEvents.OfType<ReturnValueProduced>().SingleAsync();
+
+            // act
+            var resultWithInstance = await kernel.SubmitCodeAsync($"new {className}().{methodName}()");
+            resultWithInstance.KernelEvents.ToSubscribedList().Should().NotContainErrors();
+ 
+            // assert
+            var returnValue = await resultWithInstance.KernelEvents.OfType<ReturnValueProduced>().SingleAsync();
             var foo = returnValue.Value;
             var cmd = foo as Command;
-            cmd.Name.Should().Be("Fred");
+            cmd.Name.Should().Be("my-class");
 
-        }
-
-
-
-        private Assembly CreateAssemblyFromCode()
-        {
-            var dllName = "TestCompilation";
-            var testDirectory = $"../../../../../CompilationTests";
-            CreateAndWriteProject(testDirectory);
-
-            CreateAndWriteClass(new EmptyTestData(), testDirectory, "Empty");
-            // More classes
-            var processInfo = new ProcessStartInfo("dotnet.exe")
-            {
-                WorkingDirectory = new FileInfo(testDirectory).FullName,
-                Arguments = $"build"
-            };
-            var process = Process.Start(processInfo);
-            process.WaitForExit();
-            if (process.ExitCode != 0)
-            {
-                throw new InvalidOperationException($"Build Failed: {process.ProcessName}");
-            }
-            var assemblyFileInfo = new FileInfo($"{testDirectory}/{dllName}.dll");
-            var assembly = Assembly.LoadFile(assemblyFileInfo.FullName);
-            Console.WriteLine(assembly.Location);
-            return assembly;
-        }
-
-        private void CreateAndWriteProject(string testDirectory)
-        {
-            var code = $@"<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-	  <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include=""System.CommandLine"" Version=""2.0.0-beta1.20371.2""/>   
-  </ItemGroup>
-
-</Project>";
-            var fileInfo = new FileInfo($"{testDirectory}/TestCompilation.csproj");
-            File.WriteAllText(fileInfo.FullName, code);
-        }
-
-        private void CreateAndWriteClass(BaseTestData testData, string testDirectory, string fileName)
-        {
-            var fileInfo = new FileInfo($"{testDirectory}/{fileName}.cs");
-            File.WriteAllText(fileInfo.FullName, testData.GeneratedSource);
         }
     }
 }

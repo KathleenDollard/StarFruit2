@@ -9,6 +9,7 @@ using System;
 using FluentAssertions;
 using Starfruit2_B;
 using Microsoft.CodeAnalysis;
+using StarFruit2.Generator;
 
 namespace StarFruit2.Tests
 {
@@ -31,28 +32,13 @@ namespace StarFruit2.Tests
         {
             var testData = Activator.CreateInstance(type) as BaseTestData;
 
-            var actual = CodeGenerator.GetSourceCode (testData.CliDescriptor);
+            var actual = CodeGenerator.GetSourceCode(testData.CliDescriptor, CodeGenerator.Include.CommandCode );
 
             actual.Should().NotBeNullOrEmpty();
             var normActual = Utils.Normalize(actual);
             var normExpected = Utils.Normalize(testData.GeneratedSource);
             normActual.Should().Be(normExpected);
         }
-
-        [Theory]
-        [InlineData(typeof(EmptyTestData))]
-        public void SourceToSystemCommandLine(Type type)
-        {
-            var testData = Activator.CreateInstance(type) as BaseTestData;
-
-            var actual = CodeGenerator.GetSourceCode(testData.CliDescriptor);
-
-            actual.Should().NotBeNullOrEmpty();
-            var normActual = Utils.Normalize(actual);
-            var normExpected = Utils.Normalize(testData.GeneratedSource);
-            normActual.Should().Be(normExpected);
-        }
-
 
         private static CliDescriptor GetCli(string fileName)
         {
