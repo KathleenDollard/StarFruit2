@@ -17,6 +17,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarAuth", "Samples\StarAut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit.Samples", "Samples\StarFruit.Samples\StarFruit.Samples.csproj", "{3AE711CF-63EF-4B28-AD33-247DA9792FC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingleLayerCli", "SingleLayerCli\SingleLayerCli.csproj", "{04224FCE-FFA0-45B4-B709-C2D57A0FF779}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoLayerCli", "TwoLayerCli\TwoLayerCli.csproj", "{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5802615E-80FF-45B6-8279-7856A3B92C25}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +57,14 @@ Global
 		{3AE711CF-63EF-4B28-AD33-247DA9792FC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AE711CF-63EF-4B28-AD33-247DA9792FC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AE711CF-63EF-4B28-AD33-247DA9792FC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04224FCE-FFA0-45B4-B709-C2D57A0FF779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04224FCE-FFA0-45B4-B709-C2D57A0FF779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04224FCE-FFA0-45B4-B709-C2D57A0FF779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04224FCE-FFA0-45B4-B709-C2D57A0FF779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +72,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{788F5496-5296-4ED7-B6BC-11EA5A3D5749} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
 		{3AE711CF-63EF-4B28-AD33-247DA9792FC2} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
+		{04224FCE-FFA0-45B4-B709-C2D57A0FF779} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
+		{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B016F2BA-2F89-45F3-86A1-E4FA9D992C1F}

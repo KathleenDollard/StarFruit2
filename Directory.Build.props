@@ -1,0 +1,15 @@
+<Project>
+
+  <!--<ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20303.1" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <Reference Include="System.CommandLine">
+      <!--<HintPath>..\..\artifacts\System.CommandLine\System.CommandLine.dll</HintPath>-->
+      <HintPath>C:\Users\kdollard\source\repos\cla-starfruit2\artifacts\System.CommandLine\System.CommandLine.dll</HintPath>
+      <!--<HintPath>..\..\..\command-line-api\command-line-api\artifacts\bin\System.CommandLine\Debug\netstandard2.0\System.CommandLine.dll</HintPath>-->
+    </Reference>
+  </ItemGroup>
+
+</Project>
