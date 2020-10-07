@@ -1,11 +1,14 @@
 ﻿using System.Threading.Tasks;
 
-namespace TwoLayerCli
+namespace MultiLayerCli
 {
     public class CliRoot
+    { }
+
+    public class Tool : CliRoot
     {
         private bool ctorParam;
-        public CliRoot(bool ctorParam)
+        public Tool(bool ctorParam)
             => this.ctorParam = ctorParam;
 
         public string StringProperty { get; set; }

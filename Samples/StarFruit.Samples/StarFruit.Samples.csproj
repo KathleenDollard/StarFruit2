@@ -2,11 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\StarFruit.Common\StarFruit.Common.csproj" />
     <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Playspace\" />
   </ItemGroup>
   
   <!--<ItemGroup>

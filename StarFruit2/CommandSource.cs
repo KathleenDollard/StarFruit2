@@ -1,4 +1,6 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.CommandLine;
+using System.CommandLine.Binding;
 using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -72,24 +74,56 @@ namespace StarFruit2
     /// </remarks>
     public abstract class CommandSource<T>
     {
-        public abstract Command GetCommand();
-        public abstract Task<int> RunAsync(string[] args);
+        protected T? NewInstance { get; set; } // exposed through CommandSourceResult
+        public Command Command { get; set; }
 
-        public T GetValue<T>(CommandResult commandResult,
-                          Argument<T> argument)
-         => commandResult.Children
-                     .OfType<ArgumentResult>()
-                     .Where(a => a.Argument == argument)
-                     .Select(a => a.GetValueOrDefault<T>())
-                     .FirstOrDefault();
+        protected CommandSource(Command command)
+            => Command = command;
 
-        public T GetValue<T>(CommandResult commandResult,
-                             Option<T> option)
-            => commandResult.Children
+        protected TValue? GetValue<TValue>(BindingContext bindingContext,
+                      Argument<TValue> argument)
+            => bindingContext.ParseResult.CommandResult.Children
+                 .OfType<ArgumentResult>()
+                 .Where(a => a.Argument == argument)
+                 .Select(a => a.GetValueOrDefault<TValue>())
+                 .FirstOrDefault();
+
+        protected TValue? GetValue<TValue>(BindingContext bindingContext,
+                             Option<TValue> option)
+            => bindingContext.ParseResult.CommandResult.Children
                         .OfType<OptionResult>()
                         .Where(o => o.Option == option)
-                        .Select(o => o.GetValueOrDefault<T>())
+                        .Select(o => o.GetValueOrDefault<TValue>())
                         .FirstOrDefault();
     }
+
+    public abstract class RootCommandSource<T> : CommandSource<T>
+    {
+        public RootCommandSource(Command command)
+            : base(command)
+        { }
+
+
+        public async Task<CommandSourceResult> RunAsync(string[] args)
+        {
+            // to support configuration of the invocation pipeline, add a builder
+            var parseResult = Command.Parse(args);
+            if (parseResult is null)
+            {
+                throw new InvalidOperationException("Parsing catostrphically failed.");
+            }
+            if (parseResult.Errors.Any())
+            {
+                // report errors
+            }
+
+            var exitCode = await parseResult.InvokeAsync();
+            return new CommandSourceResult(NewInstance, parseResult, exitCode);
+        }
+
+        public async Task<int> RunAndExitAsync(string[] args)
+            => (await RunAsync(args)).ExitCode;
+    }
+
 
 }
