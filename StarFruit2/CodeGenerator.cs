@@ -82,7 +82,7 @@ namespace StarFruit2.Generator
             foreach (var argument in commandDescriptor.Arguments)
             {
                 ret.Add($@"Command.Arguments.Add(new Argument({argument.Name})
-                                {{ArgumentType = typeof({argument.ArgumentType.GetArgumentType<string>()}}});");
+                                {{ArgumentType = typeof({argument.ArgumentType.TypeAsString()}}});");
             }
             return string.Join("\n", ret);
         }
@@ -95,7 +95,7 @@ namespace StarFruit2.Generator
 
                 ret.Add($@"Command.Options.Add(new Option({option.Name}, {option.Description})
                               Argument = new Argument({option.Name})
-                                 {{ArgumentType = typeof({option.Arguments.First().ArgumentType.GetArgumentType<string>()}}});");
+                                 {{ArgumentType = typeof({option.Arguments.First().ArgumentType.TypeAsString()}}});");
             }
             return string.Join("\n", ret);
         }

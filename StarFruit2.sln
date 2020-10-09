@@ -17,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarAuth", "Samples\StarAut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit.Samples", "Samples\StarFruit.Samples\StarFruit.Samples.csproj", "{3AE711CF-63EF-4B28-AD33-247DA9792FC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingleLayerCli", "SingleLayerCli\SingleLayerCli.csproj", "{04224FCE-FFA0-45B4-B709-C2D57A0FF779}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleLayerCli", "SingleLayerCli\SingleLayerCli.csproj", "{04224FCE-FFA0-45B4-B709-C2D57A0FF779}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoLayerCli", "TwoLayerCli\TwoLayerCli.csproj", "{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwoLayerCli", "TwoLayerCli\TwoLayerCli.csproj", "{AB7D428F-21AE-4AA2-8D14-0CB252BC2CB5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5802615E-80FF-45B6-8279-7856A3B92C25}"
 	ProjectSection(SolutionItems) = preProject
@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiLayerCli", "MultiLayerCli\MultiLayerCli.csproj", "{EC68E495-8BAF-4D63-8789-510A2606953A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiLayerCli", "MultiLayerCli\MultiLayerCli.csproj", "{EC68E495-8BAF-4D63-8789-510A2606953A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
