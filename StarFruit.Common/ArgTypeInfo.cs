@@ -3,6 +3,8 @@ using System.Net.Mime;
 
 namespace StarFruit2.Common
 {
+
+
     /// <summary>
     /// Derived classes supply specific technology implementation for the 
     /// ArgumentType. 
@@ -19,14 +21,12 @@ namespace StarFruit2.Common
 
         public object? TypeRepresentation { get; }
 
+        public virtual string TypeAsString()
+        => TypeRepresentation switch
+        {
+            Type t => t.Name,
+            _ => TypeRepresentation?.ToString() ?? ""
+        };
+    }
 
-        public T GetArgumentType<T>()
-            where T : class 
-            => TypeRepresentation switch
-            {
-                T t => t,
-                _ => throw new NotImplementedException("Add other outputs like a Roslyn SyntaxNode")
-            };
-
-     }
 }
