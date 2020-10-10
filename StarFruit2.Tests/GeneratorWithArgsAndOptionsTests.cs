@@ -16,8 +16,8 @@ namespace StarFruit2.Tests
         [InlineData(typeof(SingleIntArgTestData))]
         [InlineData(typeof(SingleBoolArgTestData))]
         [InlineData(typeof(SingleStringOptionTestData))]
-        //[InlineData(typeof(SingleIntOptionTestData))]
-        //[InlineData(typeof(SingleBoolOptionTestData))]
+        [InlineData(typeof(SingleIntOptionTestData))]
+        [InlineData(typeof(SingleBoolOptionTestData))]
         //[InlineData(typeof(SingleArgAndSingleOptionOptionTestData))]
 
         public void Include_commandCode_outputs_command_code(Type testDataType)
