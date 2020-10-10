@@ -8,7 +8,8 @@ namespace TestData
 {
     public class SingleArgTestData<T> : BaseTestData
     {
-        public virtual CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
+        public CommandDescriptor CommandDescriptor 
+            => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
 
         public SingleArgTestData(string testName,
                                  string originalName,
