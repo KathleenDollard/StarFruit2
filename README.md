@@ -16,4 +16,4 @@ Separaring these concerns lets you fully test each part. And in the case of Star
 
 The current status is that thought went into the interim structure as part of StarFruit(1). Much of the effort so far on StarFruit2 was to build a testable maintainable pipeline. Much work is still needed to have this actually be useful for creating System.CommandLine classes. 
 
-
+_Using .NET Interactive to test generated source code (as shown in the Community standup) is in StarFruit2.Tests.CompileAndTest.cs_
