@@ -2,9 +2,9 @@
 
 StarFruit is a way to define a System.CommandLine CLI, without having to know much, or anything, about System.CommandLine. If you want to build a CLI today, you want to use System.CommandLine directly. StarFruit aims to simplify this.
 
-This is the source generated version of StarFruit. I expect to abandon StarFruit because I think source generation is a better tool for this problem than reflection. 
+This is currently in an early prototype stage, and contributors are welcome. I am working on issues, but if you are interested in something, post an issue. The focus is on creating a mechanism for a complex source code generators that isolate the sections to allow folks to portion on only one part. I talked about how  thought about and built this in the [.NET Community Standup Oct 8, 2020](https://www.youtube.com/watch?v=A4479Etdx4I&list=PL1rZQsJPBU2St9-Mz1Kaa7rofciyrwWVx&index=0).
 
-This is currently in an early prototype stage, and contributors are welcome. I am working on issues, but if you are interested in something, post an issue. 
+This is the source generated version of StarFruit. I expect to abandon StarFruit because I think source generation is a better tool for this problem than reflection. 
 
 The goal is to allow users to build [System.CommandLine](https://github.com/dotnet/command-line-api) systems without having too know much about System.CommandLine. 
 
