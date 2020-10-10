@@ -6,80 +6,93 @@ using System.Collections.Generic;
 
 namespace TestData
 {
-    public class SingleArgTestData : BaseTestData
+    public class SingleArgTestData<T> : BaseTestData
     {
-        private const string testName = "SingleStringArg";
-        private const string generatedNamespace = "StarFruit2.Tests.TestSampleData.SingleStringArg";
-        private const string generatedClassName = testName + "CommandSource";
-
-        // this feels wrong name since it leads to ambiguity between the class and the property
-        // it works but probably should have better name
         public virtual CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
 
-        public SingleArgTestData(string originalName, string commandLineName, string SourceCode, Type argType, string? description, object? defaultValue)
+        public SingleArgTestData(string testName,
+                                 string originalName,
+                                 string commandLineName,
+                                 string typeStringRepresentation,
+                                 string? description,
+                                 DefaultValueDescriptor? defaultValue)
             : base(testName)
         {
-            GeneratedNamespace = generatedNamespace;
-            GeneratedSourceClassName = generatedClassName;
+            string sourceCode = $@"
+                var command = new Command(""my-class"", """");
+                command.Arguments.Add(GetArg<{typeStringRepresentation}>(""{commandLineName}"", ""{description}"", {defaultValue.CodeRepresentation}));
+                return command;
+            ";
+
+            GeneratedNamespace = "StarFruit2.Tests.TestSampleData" + testName;
+            GeneratedSourceClassName = testName + "CommandSource";
 
             var commandDescriptor = CommandDescriptor;
 
             commandDescriptor.AddArguments(arguments: new List<ArgumentDescriptor>(){
-                new ArgumentDescriptor(new ArgTypeInfo(argType), null, originalName, null)
+                new ArgumentDescriptor(new ArgTypeInfo(typeof(T)), null, originalName, null)
                 {
                     Name = originalName,
                     CommandLineName = commandLineName,
                     Description = description,
-                    DefaultValue = new DefaultValueDescriptor(defaultValue),
+                    DefaultValue = defaultValue,
                 }
             });
 
             CliDescriptor = new CliDescriptor
             {
-                GeneratedComandSourceNamespace = generatedNamespace,
-                GeneratedCommandSourceClassName = generatedClassName,
+                GeneratedComandSourceNamespace = GeneratedNamespace,
+                GeneratedCommandSourceClassName = GeneratedSourceClassName,
                 CommandDescriptor = commandDescriptor,
             };
 
-            CommandDefinitionSourceCode = SourceCode;
+            CommandDefinitionSourceCode = sourceCode;
 
             // TODO: figure out appropriate test action for use in dotnet interactive
+            //       it might be an action passed into constructor
 
         }
     }
-    public class SingleStringArgTestData : SingleArgTestData
+    public class SingleStringArgTestData : SingleArgTestData<string>
     {
-        //private const string testName = "SingleStringArg";
-        //private const string generatedNamespace = "StarFruit2.Tests.TestSampleData.SingleStringArg";
-        //private const string generatedClassName = testName + "CommandSource";
-        private const string SourceCode = @"
-            var command = new Command(""my-class"", """");
-            command.Arguments.Add(GetArg<String>(""str-arg"", ""this is a description"", ""this is a default value""));
-            return command;";
-
+        // TODO: named params across the board
         public SingleStringArgTestData()
-            : base("StrArg", "str-arg", SourceCode, typeof(string), "this is a description", "this is a default value") { }
+            : base(testName: "SingleStringArg",
+                   "StrArg",
+                   "str-arg",
+                   "String",
+                   "this is a description",
+                   new DefaultValueDescriptor("this is a default value"))
+        { }
     }
 
-    public class SingleIntArgTestData : SingleArgTestData
+    public class SingleIntArgTestData : SingleArgTestData<int>
     {
-        private const string SourceCode = @"
-            var command = new Command(""my-class"", """");
-            command.Arguments.Add(GetArg<Int32>(""int-arg"", ""this is a description"", 42));
-            return command;";
+        private const string testName = "SingleIntArg";
 
         public SingleIntArgTestData()
-            : base("IntArg", "int-arg", SourceCode, typeof(int), "this is a description", 42) { }
+            : base(testName,
+                   "IntArg",
+                   "int-arg",
+                   "Int32",
+                   "this is a description",
+                   new DefaultValueDescriptor(42))
+        { }
     }
 
-    public class SingleBoolArgTestData : SingleArgTestData
+    public class SingleBoolArgTestData : SingleArgTestData<bool>
     {
-        private const string SourceCode = @"
-            var command = new Command(""my-class"", """");
-            command.Arguments.Add(GetArg<Boolean>(""bool-arg"", ""this is a description"", True));
-            return command;";
-
+        private const string testName = "SingleBoolArg";
+        //private const string generatedNamespace = "StarFruit2.Tests.TestSampleData.SingleBoolArg";
+        //private const string generatedClassName = testName + "CommandSource";
+     
         public SingleBoolArgTestData()
-            : base("BoolArg", "bool-arg", SourceCode, typeof(bool), "this is a description", true) { }
+            : base(testName,
+                   "BoolArg",
+                   "bool-arg",
+                   "Boolean",
+                   "this is a description",
+                   new DefaultValueDescriptor(true))
+        { }
     }
 }

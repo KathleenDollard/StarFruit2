@@ -91,7 +91,7 @@ namespace StarFruit2.Generator
 
         private static string GetArgument(ArgumentDescriptor argument)
         {
-            return $@"GetArg<{argument.ArgumentType.TypeAsString()}>(""{argument.CommandLineName}"", ""{argument.Description}"", {argument.DefaultValue.DefaultValue})";
+            return $@"GetArg<{argument.ArgumentType.TypeAsString()}>(""{argument.CommandLineName}"", ""{argument.Description}"", {argument.DefaultValue.CodeRepresentation})";
         }
 
         private static string AddOptions(CommandDescriptor commandDescriptor)
