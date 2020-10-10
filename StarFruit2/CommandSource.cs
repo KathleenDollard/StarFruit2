@@ -74,13 +74,13 @@ namespace StarFruit2
     /// </remarks>
     public abstract class CommandSource<T>
     {
-        protected T? NewInstance { get; set; } // exposed through CommandSourceResult
+        protected T NewInstance { get; set; } // exposed through CommandSourceResult
         public Command Command { get; set; }
 
         protected CommandSource(Command command)
             => Command = command;
 
-        protected TValue? GetValue<TValue>(BindingContext bindingContext,
+        protected TValue GetValue<TValue>(BindingContext bindingContext,
                       Argument<TValue> argument)
             => bindingContext.ParseResult.CommandResult.Children
                  .OfType<ArgumentResult>()
@@ -88,7 +88,7 @@ namespace StarFruit2
                  .Select(a => a.GetValueOrDefault<TValue>())
                  .FirstOrDefault();
 
-        protected TValue? GetValue<TValue>(BindingContext bindingContext,
+        protected TValue GetValue<TValue>(BindingContext bindingContext,
                              Option<TValue> option)
             => bindingContext.ParseResult.CommandResult.Children
                         .OfType<OptionResult>()

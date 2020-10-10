@@ -10,7 +10,8 @@ namespace StarFruit2.Common.Descriptors
                                 object? raw)
             : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Option) { }
 
-        public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
+        // I think I have to put a set on this, or put it into constructor
+        public List<ArgumentDescriptor> Arguments { get; set; } = new List<ArgumentDescriptor>();
         public bool Required { get; set; }
         public string? Prefix { get; set; }
 

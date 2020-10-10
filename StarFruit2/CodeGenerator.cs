@@ -81,10 +81,17 @@ namespace StarFruit2.Generator
             var ret = new List<string>();
             foreach (var argument in commandDescriptor.Arguments)
             {
-                ret.Add($@"Command.Arguments.Add(new Argument({argument.Name})
-                                {{ArgumentType = typeof({argument.ArgumentType.TypeAsString()}}});");
+                var arg = GetArgument(argument);
+                //ret.Add($@"Command.Arguments.Add(new Argument({argument.Description})
+                //                {{ArgumentType = typeof({argument.ArgumentType.TypeAsString()}}});");
+                ret.Add($@"command.Arguments.Add({arg});");
             }
             return string.Join("\n", ret);
+        }
+
+        private static string GetArgument(ArgumentDescriptor argument)
+        {
+            return $@"GetArg<{argument.ArgumentType.TypeAsString()}>(""{argument.CommandLineName}"", ""{argument.Description}"", {argument.DefaultValue.DefaultValue})";
         }
 
         private static string AddOptions(CommandDescriptor commandDescriptor)

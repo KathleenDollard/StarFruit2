@@ -45,8 +45,9 @@ namespace TwoLayerCli
 
         private Command GetFindCommand()
         {
-
-            Find_IntArg = new Argument<int>("int-arg"); // This would actually be a lot more involved.
+            // how would we handle this changing frequently?
+            // might do find this command preamble
+            Find_IntArg = GetArg<int>("int-arg", "this is a description" /* pass stuff here, taken from descriptor within GENERATOR*/);
             Find_StringOption = new Option<string>("string-option");
             Find_BoolOption = new Option<bool>("bool-option");
 
@@ -59,6 +60,15 @@ namespace TwoLayerCli
             FindCommand.Handler = new CommandSourceCommandHandler(InvokeFindAsync);
 
             return FindCommand;
+        }
+
+        private Argument<T> GetArg<T>(string name, string description /* ... more stuff */)
+        {
+            var arg = new Argument<T>(name) // This would actually be a lot more involved.
+            { Description = description, };
+            arg.SetDefaultValue(1);
+
+            return arg;
         }
 
         private Command GetListCommand()
