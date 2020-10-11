@@ -6,16 +6,16 @@ using System.Collections.Generic;
 
 namespace TestData
 {
-    public class SingleOptionTestData<T> : BaseTestData
+    public class SingleOptionTestCommand<T> : BaseTestData
     {
         public CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
 
-        public SingleOptionTestData(string testName,
-                                    string originalName,
-                                    string commandLineName,
-                                    string typeStringRepresentation,
-                                    string? description,
-                                    DefaultValueDescriptor? defaultValue)
+        public SingleOptionTestCommand(string testName,
+                                       string originalName,
+                                       string commandLineName,
+                                       string typeStringRepresentation,
+                                       string? description,
+                                       DefaultValueDescriptor? defaultValue)
             : base(testName)
         {
 
@@ -72,45 +72,39 @@ namespace TestData
 
         }
     }
-    public class SingleStringOptionTestData : SingleOptionTestData<string>
+    public class SingleStringOptionTestData : SingleOptionTestCommand<string>
     {
-        private const string testName = "SingleStringOpt";
-
         public SingleStringOptionTestData()
-            : base(testName,
-                   "StrOption",
-                   "str-option",
-                   "String",
-                   "this is a description",
-                   new DefaultValueDescriptor("this is a default value"))
+            : base(testName: "SingleStringOpt",
+                   originalName: "StrOption",
+                   commandLineName: "str-option",
+                   typeStringRepresentation: "String",
+                   description: "this is a description",
+                   defaultValue: new DefaultValueDescriptor("this is a default value"))
         { }
     }
 
-    public class SingleIntOptionTestData : SingleOptionTestData<int>
+    public class SingleIntOptionTestData : SingleOptionTestCommand<int>
     {
-        private const string testName = "SingleIntOpt";
-
         public SingleIntOptionTestData()
-            : base(testName,
-                   "IntOption",
-                   "int-option",
-                   "Int32",
-                   "this is a description",
-                   new DefaultValueDescriptor(42))
+            : base(testName: "SingleIntOpt",
+                   originalName: "IntOption",
+                   commandLineName: "int-option",
+                   typeStringRepresentation: "Int32",
+                   description: "this is a description",
+                   defaultValue: new DefaultValueDescriptor(42))
         { }
     }
 
-    public class SingleBoolOptionTestData : SingleOptionTestData<bool>
+    public class SingleBoolOptionTestData : SingleOptionTestCommand<bool>
     {
-        private const string testName = "SingleBoolOpt";
-
         public SingleBoolOptionTestData()
-            : base(testName,
-                   "BoolOption",
-                   "bool-option",
-                   "Boolean",
-                   "this is a description",
-                   new DefaultValueDescriptor(true))
+            : base(testName: "SingleBoolOpt",
+                   originalName: "BoolOption",
+                   commandLineName: "bool-option",
+                   typeStringRepresentation: "Boolean",
+                   description: "this is a description",
+                   defaultValue: new DefaultValueDescriptor(true))
         { }
     }
 

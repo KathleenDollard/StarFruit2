@@ -34,13 +34,13 @@
     <Compile Update="TestData\Empty.Code.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="TestData\SeveralOptionsAndArgumentsSampleData.cs">
+    <Compile Update="TestData\SeveralOptionsAndArgumentsTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestData\SingleArgumentSampleData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="TestData\SingleOptionWithArgumentSampleData.cs">
+    <Compile Update="TestData\SingleOptionWithArgumentTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>

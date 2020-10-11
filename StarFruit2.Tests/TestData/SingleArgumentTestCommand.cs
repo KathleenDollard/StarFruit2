@@ -1,29 +1,26 @@
-﻿using FluentAssertions;
-using StarFruit2.Common;
+﻿using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
-using System;
 using System.Collections.Generic;
 
 namespace TestData
 {
-    public class SingleArgTestData<T> : BaseTestData
+    public class SingleArgumentTestCommand<T> : BaseTestData
     {
-        public CommandDescriptor CommandDescriptor 
+        public CommandDescriptor CommandDescriptor
             => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
 
-        public SingleArgTestData(string testName,
-                                 string originalName,
-                                 string commandLineName,
-                                 string typeStringRepresentation,
-                                 string? description,
-                                 DefaultValueDescriptor? defaultValue)
+        public SingleArgumentTestCommand(string testName,
+                                         string originalName,
+                                         string commandLineName,
+                                         string typeStringRepresentation,
+                                         string? description,
+                                         DefaultValueDescriptor? defaultValue)
             : base(testName)
         {
             string sourceCode = $@"
                 var command = new Command(""my-class"", """");
                 command.Arguments.Add(GetArg<{typeStringRepresentation}>(""{commandLineName}"", ""{description}"", {defaultValue.CodeRepresentation}));
-                return command;
-            ";
+                return command;";
 
             GeneratedNamespace = "StarFruit2.Tests.TestSampleData" + testName;
             GeneratedSourceClassName = testName + "CommandSource";
@@ -54,46 +51,40 @@ namespace TestData
 
         }
     }
-    public class SingleStringArgTestData : SingleArgTestData<string>
+    public class SingleStringArgTestData : SingleArgumentTestCommand<string>
     {
         // TODO: named params across the board
         public SingleStringArgTestData()
             : base(testName: "SingleStringArg",
-                   "StrArg",
-                   "str-arg",
-                   "String",
-                   "this is a description",
-                   new DefaultValueDescriptor("this is a default value"))
+                   originalName: "StrArg",
+                   commandLineName: "str-arg",
+                   typeStringRepresentation: "String",
+                   description: "this is a description",
+                   defaultValue: new DefaultValueDescriptor("this is a default value"))
         { }
     }
 
-    public class SingleIntArgTestData : SingleArgTestData<int>
+    public class SingleIntArgTestData : SingleArgumentTestCommand<int>
     {
-        private const string testName = "SingleIntArg";
-
         public SingleIntArgTestData()
-            : base(testName,
-                   "IntArg",
-                   "int-arg",
-                   "Int32",
-                   "this is a description",
-                   new DefaultValueDescriptor(42))
+            : base(testName: "SingleIntArg",
+                   originalName: "IntArg",
+                   commandLineName: "int-arg",
+                   typeStringRepresentation: "Int32",
+                   description: "this is a description",
+                   defaultValue: new DefaultValueDescriptor(42))
         { }
     }
 
-    public class SingleBoolArgTestData : SingleArgTestData<bool>
+    public class SingleBoolArgTestData : SingleArgumentTestCommand<bool>
     {
-        private const string testName = "SingleBoolArg";
-        //private const string generatedNamespace = "StarFruit2.Tests.TestSampleData.SingleBoolArg";
-        //private const string generatedClassName = testName + "CommandSource";
-     
         public SingleBoolArgTestData()
-            : base(testName,
-                   "BoolArg",
-                   "bool-arg",
-                   "Boolean",
-                   "this is a description",
-                   new DefaultValueDescriptor(true))
+            : base(testName: "SingleBoolArg",
+                   originalName: "BoolArg",
+                   commandLineName: "bool-arg",
+                   typeStringRepresentation: "Boolean",
+                   description: "this is a description",
+                   defaultValue: new DefaultValueDescriptor(true))
         { }
     }
 }
