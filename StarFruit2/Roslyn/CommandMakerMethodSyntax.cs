@@ -6,78 +6,49 @@ using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Starfruit2_B
 {
-    public class MethodSyntaxCommandMaker : DescriptorMakerBase<MethodDeclarationSyntax, ParameterSyntax, CSharpCompilation>
+    public class MethodSyntaxCommandMaker : DescriptorMakerBase<IMethodSymbol, IParameterSymbol>
     {
-        protected internal override CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent,
-                                                                      MethodDeclarationSyntax source,
-                                                                      CSharpCompilation? compilation = null)
-        {
-            var semanticModel = GetSemanticModel(source, compilation);
-            var methodSymbol = semanticModel.GetDeclaredSymbol(source);
-            if (methodSymbol is null)
-            {
-                throw new InvalidOperationException("Symbol not found");
-            }
-            var cliDesriptor = new CliDescriptor
-            {
-                GeneratedComandSourceNamespace = methodSymbol.ContainingNamespace.ToString() ?? "",
-                CommandDescriptor = CreateCommandDescriptor(parent, source, semanticModel)
-            };
-            return cliDesriptor;
+        private readonly MakerConfigurationBase config;
+        private readonly SemanticModel semanticModel;
 
-        }
+        public MethodSyntaxCommandMaker(MakerConfigurationBase config, SemanticModel semanticModel)
+          : base(config, semanticModel)
+        { }
 
-        protected CommandDescriptor CreateCommandDescriptor(ISymbolDescriptor? parent,
-                                                           MethodDeclarationSyntax methodDeclaration,
-                                                           SemanticModel semanticModel)
+        protected override OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
+                                                                   IParameterSymbol parameterSymbol)
         {
-            var command = new CommandDescriptor(parent, methodDeclaration.Identifier.ToString(), methodDeclaration)
+            var option = new OptionDescriptor(parent, parameterSymbol.Name, parameterSymbol)
             {
-                Name = SourceToCommandName(methodDeclaration.Identifier.ToString()),
+                Name = SourceToOptionName(parameterSymbol.Name)
             };
-            command.AddArguments(methodDeclaration.ParameterList.Parameters
-                                    .Where(p => IsArgument(p))
-                                    .Select(p => CreateArgumentDescriptor(parent, p, semanticModel)));
-            command.AddOptions(methodDeclaration.ParameterList.Parameters
-                                    .Where(p => IsOption(p))
-                                    .Select(p => CreateOptionDescriptor(parent, p, semanticModel)));
-            return command;
-        }
-
-        protected OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor? parent,
-                                                          ParameterSyntax parameterDeclaration,
-                                                          SemanticModel semanticModel)
-        {
-            var option = new OptionDescriptor(parent, parameterDeclaration.Identifier.ToString(), parameterDeclaration)
-            {
-                Name = SourceToOptionName(parameterDeclaration.Identifier.ToString())
-            };
-            option.Arguments.Add(CreateOptionArgumentDescriptor(parent, parameterDeclaration, semanticModel));
+            option.Arguments.Add(CreateOptionArgumentDescriptor(parent, parameterSymbol));
             return option;
         }
 
-        private ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor? parent,
-                                                            ParameterSyntax parameterDeclaration,
-                                                            SemanticModel semanticModel)
-        => new ArgumentDescriptor(new ArgTypeInfo(parameterDeclaration.Type), parent, parameterDeclaration.Identifier.ToString(), parameterDeclaration)
+        protected override ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
+                                                                       IParameterSymbol parameterSymbol)
+        => new ArgumentDescriptor(new ArgTypeInfo(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol)
         {
-            Name = SourceToArgumentName(parameterDeclaration.Identifier.ToString())
+            Name = SourceToArgumentName(parameterSymbol.Name)
         };
 
-        private ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor? parent,
-                                                                  ParameterSyntax parameterDeclaration,
-                                                                  SemanticModel semanticModel)
-        => new ArgumentDescriptor(new ArgTypeInfo(parameterDeclaration.Type), parent, parameterDeclaration.Identifier.ToString(), parameterDeclaration)
+        private ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor parent,
+                                                                  IParameterSymbol parameterSymbol)
+        => new ArgumentDescriptor(new ArgTypeInfo(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol.Name)
         {
-            Name = SourceToArgumentName(parameterDeclaration.Identifier.ToString())
+            Name = SourceToArgumentName(parameterSymbol.Name)
         };
 
-        protected internal override bool IsArgument(ParameterSyntax parameter)
-        => parameter.Identifier.ToString().EndsWith("Arg")
-            || parameter.HasAttribute(typeof(ArgumentAttribute));
+        protected override IEnumerable<IParameterSymbol> GetMembers(IMethodSymbol parentSymbol)
+        => parentSymbol.Parameters;
+
+        protected override IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent, IMethodSymbol parentSymbol) 
+        => new List<CommandDescriptor> { };
     }
 }
