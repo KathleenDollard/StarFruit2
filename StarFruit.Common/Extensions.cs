@@ -1,5 +1,9 @@
 ﻿using StarFruit2.Common.Descriptors;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace StarFruit2.Common
 {
@@ -29,5 +33,7 @@ namespace StarFruit2.Common
             }
         }
 
-     }
+     
+
+    }
 }

@@ -6,7 +6,7 @@ namespace StarFruit2.Common.Descriptors
 {
     public class CommandDescriptor : SymbolDescriptor
     {
-        public CommandDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
+        public CommandDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                  string originalName,
                                  object? raw)
             : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Command) { }

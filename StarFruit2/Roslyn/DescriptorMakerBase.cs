@@ -1,7 +1,5 @@
 ﻿using System.CommandLine.Parsing;
 using StarFruit2.Common.Descriptors;
-using StarFruit2.Common;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
 using System;
 
@@ -31,7 +29,7 @@ namespace Starfruit2_B
 
     public abstract class DescriptorMakerBase<TCommandSource, TOptionArgSource, TExtra> : DescriptorMakerBase
     {
-        protected internal abstract CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent, TCommandSource source, TExtra extra);
+        protected internal abstract CliDescriptor CreateCliDescriptor();
         protected internal abstract bool IsArgument(TOptionArgSource source);
         protected internal bool IsOption(TOptionArgSource source)
         => !IsArgument(source);

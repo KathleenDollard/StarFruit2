@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Starfruit2_B
 {
-    public class CommandMakerMethodSyntax : DescriptorMakerBase<MethodDeclarationSyntax, ParameterSyntax, CSharpCompilation>
+    public class MethodSyntaxCommandMaker : DescriptorMakerBase<MethodDeclarationSyntax, ParameterSyntax, CSharpCompilation>
     {
         protected internal override CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent,
                                                                       MethodDeclarationSyntax source,
