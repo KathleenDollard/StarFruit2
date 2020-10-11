@@ -33,14 +33,14 @@ namespace Starfruit2_B
 
         protected override ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
                                                                        IParameterSymbol parameterSymbol)
-        => new ArgumentDescriptor(new ArgTypeInfo(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol)
+        => new ArgumentDescriptor(new ArgTypeInfoRoslyn(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol)
         {
             Name = SourceToArgumentName(parameterSymbol.Name)
         };
 
         private ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor parent,
                                                                   IParameterSymbol parameterSymbol)
-        => new ArgumentDescriptor(new ArgTypeInfo(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol.Name)
+        => new ArgumentDescriptor(new ArgTypeInfoRoslyn(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol.Name)
         {
             Name = SourceToArgumentName(parameterSymbol.Name)
         };

@@ -12,9 +12,9 @@ namespace StarFruit2.Common
     /// For exmple: In Reflection, this provides a Type object. In Roslyn it provides
     /// a syntax node that represents the type.
     /// </summary>
-    public class ArgTypeInfo
+    public abstract class ArgTypeInfoBase
     {
-        public ArgTypeInfo(object? typeRepresentation)
+        public ArgTypeInfoBase(object? typeRepresentation)
         {
             TypeRepresentation = typeRepresentation;
         }

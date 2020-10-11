@@ -19,7 +19,7 @@ namespace StarFruit2.Common.Descriptors
 
         public string Name { get; }
 
-        public string? CommandLineName { get; }
+        public string? CliName { get; }
 
         public string OriginalName { get; }
 
@@ -110,7 +110,7 @@ namespace StarFruit2.Common.Descriptors
         /// but the option prefix is not included.
         /// </summary>
         /// <remarks>
-        /// The Name should not be ambiguous with an OriginalName and vice versa. For example, if you are 
+        /// The Name should not be ambiguous with a different OriginalName and vice versa. For example, if you are 
         /// removing Arg suffixes via rules (a standard scenario), then having an BlahArg and a BlahArgArg 
         /// argument woudl not be legal. 
         /// </remarks>
@@ -120,7 +120,7 @@ namespace StarFruit2.Common.Descriptors
         /// The name as used when System.CommandLine objects are created. This name includes option prefixes
         /// and is the name as it should appear in automated help. 
         /// </summary>
-        public string? CommandLineName { get; set; }
+        public string? CliName { get; set; }
 
         /// <summary>
         /// The original name in the model. This is used for DescriptionSource (which recognizes either Name or 

@@ -42,11 +42,12 @@ namespace Starfruit2_B
                                                                         IPropertySymbol propertySymbol)
         {
             // I think for properties this is always a single value
-            var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
-            Assert.NotNull(propertyDeclaration);
-            return new ArgumentDescriptor(new ArgTypeInfo(propertyDeclaration.Type), parent, propertyDeclaration.Identifier.ToString(), propertyDeclaration)
+            // ** How to find something: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
+            return new ArgumentDescriptor(new ArgTypeInfoRoslyn(propertySymbol.Type), parent, propertySymbol.Name, propertySymbol)
             {
-                Name = SourceToArgumentName(propertyDeclaration.Identifier.ToString())
+                CliName = SourceToArgumentName(propertySymbol.Name),
+                Name = propertySymbol.Name,
+
             };
         }
 
@@ -58,14 +59,14 @@ namespace Starfruit2_B
             Assert.NotNull(propertyDeclaration);
             var option = new OptionDescriptor(parent, propertyDeclaration.Identifier.ToString(), propertyDeclaration)
             {
-                Name = SourceToOptionName(propertyDeclaration.Identifier.ToString())
+                CliName = SourceToOptionName(propertyDeclaration.Identifier.ToString())
             };
             option.Arguments.Add(CreateOptionArgumentDescriptor(parent, propertyDeclaration));
             return option;
         }
 
         private ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor? parent, PropertyDeclarationSyntax propertyDeclaration)
-        => new ArgumentDescriptor(new ArgTypeInfo(propertyDeclaration.Type), parent, propertyDeclaration.Identifier.ToString(), propertyDeclaration)
+        => new ArgumentDescriptor(new ArgTypeInfoRoslyn(propertyDeclaration.Type), parent, propertyDeclaration.Identifier.ToString(), propertyDeclaration)
         {
             Name = SourceToArgumentName(propertyDeclaration.Identifier.ToString())
         };

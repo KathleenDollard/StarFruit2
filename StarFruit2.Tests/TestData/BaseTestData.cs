@@ -13,7 +13,7 @@ namespace TestData
         public BaseTestData(string testName)
         {
             TestName = testName;
-            ModelCodeFileName = $"{testName}.Code.cs";
+            ModelCodeFileName = $"{testName}TestModel.cs";
             SystemCommandLineName = "my-class";
 
             CompiledClassName = testName;

@@ -31,13 +31,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="TestData\Empty.Code.cs">
+    <Compile Update="TestData\EmptyTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestData\SeveralOptionsAndArgumentsSampleData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="TestData\SingleArgumentSampleData.cs">
+    <Compile Update="TestData\SingleArgStringTestModel.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="TestData\SingleArgIntTestModel.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="TestData\SingleArgBoolTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestData\SingleOptionWithArgumentSampleData.cs">

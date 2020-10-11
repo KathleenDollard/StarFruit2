@@ -10,7 +10,7 @@ namespace StarFruit2.Common.Descriptors
         //TODO: Understand raw aliases: public IReadOnlyList<string> RawAliases { get; }
         string? Description { get; }
         string? Name { get; }
-        string? CommandLineName { get; }
+        string? CliName { get; }
         string OriginalName { get; }
         bool IsHidden { get; set; }
         string Report(int tabsCount, VerbosityLevel verbosity);

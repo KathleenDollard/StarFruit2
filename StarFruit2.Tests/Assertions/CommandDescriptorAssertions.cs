@@ -8,15 +8,15 @@ using System.Linq;
 namespace StarFruit2.Tests
 {
 
-    public class SourceToDescriptorCommandAssertions : ReferenceTypeAssertions<CommandDescriptor, SourceToDescriptorCommandAssertions>
+    public class CommandDescriptorAssertions : ReferenceTypeAssertions<CommandDescriptor, CommandDescriptorAssertions>
     {
-        public SourceToDescriptorCommandAssertions(CommandDescriptor instance)
+        public CommandDescriptorAssertions(CommandDescriptor instance)
             : base(instance)
         { }
 
         protected override string Identifier => "commandDescriptor2sample";
 
-        public AndConstraint<SourceToDescriptorCommandAssertions> Match(CommandDescriptor expected)
+        public AndConstraint<CommandDescriptorAssertions> Match(CommandDescriptor expected)
         {
             var sampleOptions = expected.Options.ToArray();
             var commandOptions = Subject.Options.ToArray();
@@ -52,7 +52,7 @@ namespace StarFruit2.Tests
                 commandSubCommands[i].Should().Match(sampleSubCommands[i]);
             }
 
-            return new AndConstraint<SourceToDescriptorCommandAssertions>(this);
+            return new AndConstraint<CommandDescriptorAssertions>(this);
 
         }
 

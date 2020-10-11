@@ -5,10 +5,10 @@ namespace StarFruit2.Common.Descriptors
 {
     public class ArgumentDescriptor : SymbolDescriptor
     {
-        public ArgumentDescriptor(ArgTypeInfo argumentTypeInfo, ISymbolDescriptor parentSymbolDescriptorBase,
+        public ArgumentDescriptor(ArgTypeInfoBase argumentTypeInfo, ISymbolDescriptor parentSymbolDescriptorBase,
                                    string originalName,
                                    object? raw)
-            : base(parentSymbolDescriptorBase, originalName,raw,  SymbolType.Argument)
+            : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Argument)
         {
             ArgumentType = argumentTypeInfo;
         }
@@ -17,7 +17,7 @@ namespace StarFruit2.Common.Descriptors
         //TODO: AllowedValues aren't yet supported in DescriptorMakerBase or tests
         public List<object> AllowedValues { get; } = new List<object>();
         // TODO: Consider how ArgumentType works when coming from JSON. If we do Json
-        public ArgTypeInfo ArgumentType { get; }
+        public ArgTypeInfoBase ArgumentType { get; }
         public DefaultValueDescriptor? DefaultValue { get; set; }
         public bool Required { get; set; }
 

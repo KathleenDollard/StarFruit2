@@ -17,6 +17,9 @@ namespace StarFruit2.Tests
     {
         [Theory]
         [InlineData(typeof(EmptyTestData))]
+        [InlineData(typeof(SingleArgStringTestData))]
+        [InlineData(typeof(SingleIntArgTestData))]
+        [InlineData(typeof(SingleBoolArgTestData))]
         public void Model_to_descriptor(Type type)
         {
             var testData = Activator.CreateInstance(type) as BaseTestData;
