@@ -1,7 +1,7 @@
 ﻿namespace StarFruit2.Common
 {
-    public    interface IDescriptionSource
+    public interface IDescriptionProvider
     {
-        string GetDescription(string route);
+        string? GetDescription<T>(T source, string route=null);
     }
 }

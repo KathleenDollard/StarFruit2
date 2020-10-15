@@ -14,7 +14,7 @@ namespace StarFruit2.Common.Descriptors
         }
         public SymbolType SymbolType { get; }
         public object? Raw { get; }
-        public IEnumerable<string>? Aliases { get; }
+        public List<string> Aliases { get; } = new List<string>();
         public string? Description { get; }
 
         public string Name { get; }
@@ -101,8 +101,7 @@ namespace StarFruit2.Common.Descriptors
         /// </summary>
         public object? Raw { get; }
         public SymbolType SymbolType { get; }
-        public IEnumerable<string>? Aliases { get; set; }
-        // TODO: Understand raw aliases: public IReadOnlyList<string> RawAliases { get; }
+        public List<string> Aliases { get; } = new List<string>();
         public string? Description { get; set; }
 
         /// <summary>

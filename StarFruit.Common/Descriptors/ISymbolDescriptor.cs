@@ -6,8 +6,7 @@ namespace StarFruit2.Common.Descriptors
     {
         SymbolType SymbolType { get; }
         object? Raw { get; }
-        IEnumerable<string>? Aliases { get; }
-        //TODO: Understand raw aliases: public IReadOnlyList<string> RawAliases { get; }
+        List<string> Aliases { get; }
         string? Description { get; }
         string? Name { get; }
         string? CliName { get; }

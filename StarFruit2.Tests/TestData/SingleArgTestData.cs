@@ -57,7 +57,7 @@ namespace TestData
             : base(testName: "SingleArgString",
                    originalName: "MyPropertyArg",
                    commandLineName: "my-property",
-                   description: "this is a description",
+                   description: "",
                    defaultValue: new DefaultValueDescriptor("this is a default value"))
         { }
     }
@@ -68,7 +68,7 @@ namespace TestData
             : base(testName: "SingleArgInt",
                    originalName: "MyPropertyArg",
                    commandLineName: "my-property",
-                   description: "this is a description",
+                   description: "This is an int description",
                    defaultValue: new DefaultValueDescriptor(42))
         { }
     }
@@ -79,7 +79,7 @@ namespace TestData
             : base(testName: "SingleArgBool",
                    originalName: "MyPropertyArg",
                    commandLineName: "my-property",
-                   description: "this is a description",
+                   description: "This is a bool description",
                    defaultValue: new DefaultValueDescriptor(true))
         { }
     }

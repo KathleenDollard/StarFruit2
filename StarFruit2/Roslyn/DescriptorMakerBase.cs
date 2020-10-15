@@ -7,42 +7,53 @@ using System.Linq;
 using StarFruit2;
 using StarFruit2.Common;
 
-namespace Starfruit2_B
+namespace Starfruit2
 {
+    // Implementation notes:
+    // Arguments:
+    // * Name/CliName/OriginalName:    DONE
+    // * Description:                  Needs tests
+    // * IsHidden:                     Will support
+    // * ArgumentType:                 DONE
+    // * Arity:                        Will only support as descriptive scenarios when understood. May need backdoor for cases not generally supported like this.
+    // * AllowedValues:                Will support
+    // * DefaultValue:                 Will support
+    // * Required:                     Will support
+
+    // Options:                      
+    // * Name/CliName/OriginalName:    DONE
+    // * Description:                  Needs tests
+    // * IsHidden:                     Will support
+    // * Aliases:                      Will support
+    // * Prefix:                       Remove and make part of config. Individual choices will be hard (consistency encouraged)
+    // * Required:                     Will support
+
+    // Comamnds                      
+    // * Name/CliName/OriginalName:    DONE
+    // * Description:                  Needs tests
+    // * IsHidden:                     Will support
+    // * Aliases:                      Will support
+    // * TreatUnmatchedTokensAsErrors  What scenarios need this command specific?
+
+    // Explore putting unique name for fields into descripriptor
 
     public class DescriptorMakerBase
     {
-        protected readonly MakerConfigurationBase config;
+        protected readonly MakerConfiguration config;
         protected readonly SemanticModel semanticModel;
 
-        public DescriptorMakerBase(MakerConfigurationBase config, SemanticModel semanticModel)
+        public DescriptorMakerBase(MakerConfiguration config, SemanticModel semanticModel)
         {
-            this.config = config;
+            this.config = config ?? new MakerConfiguration();
             this.semanticModel = semanticModel;
         }
-
-        protected internal string SourceToOptionName(string sourceName)
-        => $"--{sourceName.ToKebabCase()}";
-
-        protected internal string SourceToArgumentName(string sourceName)
-        {
-            if (sourceName.EndsWith("Arg"))
-            {
-                sourceName = sourceName[..^3];
-            }
-            return sourceName.ToKebabCase();
-        }
-
-        protected internal string SourceToCommandName(string sourceName)
-            => sourceName.ToKebabCase();
-
     }
 
     public abstract class DescriptorMakerBase<TCommandSymbol, TMemberSymbol> : DescriptorMakerBase
         where TCommandSymbol : class, ISymbol
         where TMemberSymbol : class, ISymbol
     {
-        public DescriptorMakerBase(MakerConfigurationBase config, SemanticModel semanticModel)
+        public DescriptorMakerBase(MakerConfiguration config, SemanticModel semanticModel)
            : base(config, semanticModel)
         { }
 
@@ -71,7 +82,7 @@ namespace Starfruit2_B
             Assert.NotNull(symbol);
             var command = new CommandDescriptor(parent, symbol.Name, symbol)
             {
-                Name = SourceToCommandName(symbol.Name),
+                Name = config.CommandNameToCliName(symbol.Name),
             };
             command.AddArguments(GetArguments(command, symbol));
             command.AddOptions(GetOptions(command, symbol));

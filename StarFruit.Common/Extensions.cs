@@ -32,8 +32,14 @@ namespace StarFruit2.Common
                 command.Arguments.Add(argument);
             }
         }
+        public static void AddAliases(this OptionDescriptor option, IEnumerable<string> aliases)
+        {
+            foreach (var alias in aliases)
+            {
+                option.Aliases.Add(alias);
+            }
+        }
 
-     
 
     }
 }

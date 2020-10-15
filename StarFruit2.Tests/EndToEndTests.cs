@@ -7,9 +7,9 @@ using StarFruit2.Common.Descriptors;
 using TestData;
 using System;
 using FluentAssertions;
-using Starfruit2_B;
 using Microsoft.CodeAnalysis;
 using StarFruit2.Generator;
+using Starfruit2;
 
 namespace StarFruit2.Tests
 {

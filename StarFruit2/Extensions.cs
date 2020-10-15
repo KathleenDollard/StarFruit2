@@ -16,13 +16,24 @@ namespace StarFruit2
         public static bool HasAttribute<T>(this ParameterSyntax param)
             => param.AttributeLists.Any(x => x.Attributes.Any(a => a.Name.ToString() == typeof(T).Name));
 
-        public static bool HasAttribute(this IPropertySymbol prop, Type attributeType)
-            => prop.GetAttributes().Any(x => x.AttributeClass?.Name == attributeType.Name);
-        public static bool HasAttribute(this IParameterSymbol param, Type attributeType)
-            => param.GetAttributes().Any(x => x.AttributeClass?.Name == attributeType.Name);
-        public static bool HasAttribute<T>(this IPropertySymbol prop)
-            => prop.GetAttributes().Any(x => x.AttributeClass?.Name == typeof(T).Name);
-        public static bool HasAttribute<T>(this IParameterSymbol param)
-            => param.GetAttributes().Any(x => x.AttributeClass?.Name == typeof(T).Name);
+        public static bool HasAttribute(this ISymbol prop, Type attributeType)
+            => prop.GetAttributes()
+                   .Any(x => x.AttributeClass?.Name == attributeType.Name);
+        public static bool HasAttribute<TAttribute>(this ISymbol prop)
+            => prop.GetAttributes()
+                   .Any(x => x.AttributeClass?.Name == typeof(TAttribute).Name);
+
+        public static object? AttributeValue<TAttribute>(ISymbol symbol)
+        {
+            var attribute = symbol.GetAttributes()
+                                  .Where(x => x is TAttribute)
+                                  .FirstOrDefault();
+            if (attribute is null)
+            {
+                return default;
+            }
+            var valueConst = attribute.ConstructorArguments.FirstOrDefault();
+            return valueConst.Value;
+        }
     }
 }

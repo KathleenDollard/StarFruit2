@@ -7,7 +7,7 @@ namespace TwoLayerCli
 {
     public partial class CliRootCommandSource
     {
-        public Argument<int> Find_IntArg { get; set; }
+        public Argument<int> Find_IntArg { get; private set; }
         public Option<string> Find_StringOption { get; set; }
         public Option<bool> Find_BoolOption { get; set; }
         public Option<bool> List_BoolOption { get; set; }
@@ -45,7 +45,6 @@ namespace TwoLayerCli
 
         private Command GetFindCommand()
         {
-
             Find_IntArg = new Argument<int>("int-arg"); // This would actually be a lot more involved.
             Find_StringOption = new Option<string>("string-option");
             Find_BoolOption = new Option<bool>("bool-option");

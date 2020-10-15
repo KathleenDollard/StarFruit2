@@ -6,7 +6,7 @@ using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
 using System;
 
-namespace Starfruit2_B
+namespace Starfruit2
 {
     public static class RoslyDescriptorMakerFactory
     {
@@ -14,7 +14,7 @@ namespace Starfruit2_B
             where T : Microsoft.CodeAnalysis.SyntaxNode
         {
             var semanticModel = GetSemanticModel(source, compilation);
-            var config = new MakerConfigurationBase();
+            var config = new MakerConfiguration();
             return source switch
             {
                 // The common case is a class declaration. If a method declaration is used, any properties in the contained class are ignored. 
@@ -25,7 +25,7 @@ namespace Starfruit2_B
             };
         }
 
-        private static CliDescriptor CliDescriptorFromClassDeclaration(MakerConfigurationBase config,
+        private static CliDescriptor CliDescriptorFromClassDeclaration(MakerConfiguration config,
                                                                        SemanticModel semanticModel,
                                                                        ClassDeclarationSyntax source)
         {
@@ -35,7 +35,7 @@ namespace Starfruit2_B
             return maker.CreateCliDescriptor(null, typeSymbol);
         }
 
-        private static CliDescriptor CliDescriptorFromMethodDeclaration(MakerConfigurationBase config,
+        private static CliDescriptor CliDescriptorFromMethodDeclaration(MakerConfiguration config,
                                                                         SemanticModel semanticModel,
                                                                         MethodDeclarationSyntax source)
         {
