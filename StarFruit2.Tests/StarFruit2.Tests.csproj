@@ -33,9 +33,6 @@
     <Compile Update="TestData\EmptyTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="TestData\RequiredHIddenAliasedTestModel.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <Compile Update="TestData\SeveralOptionsAndArgumentsSampleData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
