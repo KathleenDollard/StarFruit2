@@ -22,6 +22,9 @@ namespace StarFruit2.Tests
             Subject.CliName.Should().Be(expected.CliName);
             Subject.Name.Should().Be(expected.Name);
             Subject.Description.Should().Be(expected.Description);
+            Subject.Required.Should().Be(expected.Required);
+            Subject.IsHidden.Should().Be(expected.IsHidden);
+            //Subject.Aliases.Should().Be(expected.Aliases);
             Subject.ArgumentType.TypeAsString().Should().Be(expected.ArgumentType.TypeAsString());
 
             return new AndConstraint<ArgumentDescriptorAssertions>(this);

@@ -29,7 +29,9 @@ namespace Starfruit2
             {
                 Name = parameterSymbol.Name,
                 CliName = config.OptionNameToCliName(parameterSymbol.Name),
-                Description = config.GetDescription(parameterSymbol) ?? ""
+                Description = config.GetDescription(parameterSymbol) ?? "",
+                Required = config.GetIsRequired(parameterSymbol),
+                IsHidden = config.GetIsHidden(parameterSymbol),
             };
             option.Aliases.AddRange(config.GetAliases(parameterSymbol));
             option.Arguments.Add(CreateOptionArgumentDescriptor(parent, parameterSymbol));

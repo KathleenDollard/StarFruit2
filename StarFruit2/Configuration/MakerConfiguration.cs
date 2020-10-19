@@ -28,7 +28,7 @@ namespace StarFruit2
         public virtual string ArgumentNameToCliName(string name)
         {
             name = name.EndsWith("Arg")
-                   ? name = name[^3..]
+                   ? name = name[..^3]
                    : name;
             return name.ToKebabCase().ToLowerInvariant();
         }
@@ -36,21 +36,23 @@ namespace StarFruit2
         public virtual string OptionNameToCliName(string name)
         {
             name = name.EndsWith("Option")
-                   ? name = name[^6..]
+                   ? name = name[..^6]
                    : name;
             return $"--{name.ToKebabCase().ToLowerInvariant()}";
         }
 
-        internal bool GetIsHidden(IPropertySymbol propertySymbol)
-        {
-            throw new NotImplementedException();
-        }
+        internal bool GetIsHidden(IPropertySymbol symbol) 
+            => symbol.BoolAttributeValue<HiddenAttribute>();
 
-        internal bool GetIsRequired(IPropertySymbol propertySymbol)
-        {
-            throw new NotImplementedException();
-        }
+        internal bool GetIsRequired(IPropertySymbol symbol)
+            => symbol.BoolAttributeValue<RequiredAttribute>();
 
+        internal bool GetIsHidden(IParameterSymbol  symbol)
+           => symbol.BoolAttributeValue<HiddenAttribute>();
+
+        internal bool GetIsRequired(IParameterSymbol symbol)
+            => symbol.BoolAttributeValue<RequiredAttribute>();
+        
         public virtual string OptionArgumentNameToCliName(string name)
         {
             name = name.EndsWith("Option")
@@ -59,10 +61,11 @@ namespace StarFruit2
             return $"--{name.ToKebabCase().ToLowerInvariant()}";
         }
 
-        internal IEnumerable<string> GetAliases(IParameterSymbol parameterSymbol)
-        {
-            throw new NotImplementedException();
-        }
+        internal IEnumerable<string> GetAliases(IParameterSymbol symbol)
+            => symbol.AttributeValueForList<AliasAttribute, string>();
+
+        internal IEnumerable<string> GetAliases(IPropertySymbol  symbol)
+           => symbol.AttributeValueForList<AliasesAttribute, string>();
 
         public virtual string CommandNameToCliName(string name)
         {
@@ -74,12 +77,12 @@ namespace StarFruit2
 
         private List<IDescriptionProvider> AdditionalDescriptionSources = new List<IDescriptionProvider>();
 
-        public void AddDescriptionProvider(IDescriptionProvider descriptionProvider )
+        public void AddDescriptionProvider(IDescriptionProvider descriptionProvider)
         {
             AdditionalDescriptionSources.Add(descriptionProvider);
         }
 
-        public bool UseXmlCommentsForDescription { get; set; }
+        public bool UseXmlCommentsForDescription { get; set; } = true;
 
         public string? GetDescription<T>(T source)
         {
@@ -94,7 +97,7 @@ namespace StarFruit2
             foreach (var provider in descriptionSources)
             {
                 var desc = provider.GetDescription(source);
-                if(!string.IsNullOrWhiteSpace(desc))
+                if (!string.IsNullOrWhiteSpace(desc))
                 {
                     return desc;
                 }

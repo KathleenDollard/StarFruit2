@@ -34,8 +34,12 @@ namespace StarFruit2.Tests
                  .ForCondition(sampleOptions.Length == commandOptions.Length)
                  .FailWith($"Command does not contain same number of options ({commandOptions.Length} vs {sampleOptions.Length}")
                  .Then
+                 .ForCondition(sampleArguments.Length == commandOptions.Length)
+                 .FailWith($"Command does not contain same number of arguments ({commandOptions.Length} vs {sampleOptions.Length}")
+                 .Then
                  .ForCondition(sampleSubCommands.Length == commandSubCommands.Length)
                  .FailWith("Command does not contain same number of sub-commands");
+
 
             for (int i = 0; i < sampleArguments.Length; i++)
             {

@@ -16,8 +16,8 @@ namespace StarFruit2.Generator
             => include.HasFlag(match)
                     ? wrapOperation(code)
                     : code;
-        public static string PrefaceWithUsing(this string code)
-            =>  $"using System.CommandLine;\n{code}";
+        public static string PrefaceWithUsing(this string code, params string[] usingNamespaces)
+            =>  String.Join("\n",usingNamespaces.Select(x=>$"using {x};")) + $"\n{code}";
 
         public static string WrapInNamespace(this string code, string namespaceName)
             =>  $"\nnamespace {namespaceName}\n{{\n{code}\n}}";

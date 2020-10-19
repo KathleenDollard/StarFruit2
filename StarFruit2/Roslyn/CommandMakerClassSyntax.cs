@@ -16,8 +16,9 @@ namespace Starfruit2
 
         protected override ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
                                                                         IPropertySymbol propertySymbol)
-            // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
-            => new ArgumentDescriptor(new ArgTypeInfoRoslyn(propertySymbol.Type), parent, propertySymbol.Name, propertySymbol)
+        // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
+        {
+            var arg = new ArgumentDescriptor(new ArgTypeInfoRoslyn(propertySymbol.Type), parent, propertySymbol.Name, propertySymbol)
             {
                 Name = propertySymbol.Name,
                 CliName = config.ArgumentNameToCliName(propertySymbol.Name),
@@ -25,6 +26,9 @@ namespace Starfruit2
                 Required = config.GetIsRequired(propertySymbol),
                 IsHidden = config.GetIsHidden(propertySymbol),
             };
+            arg.Aliases.AddRange(config.GetAliases(propertySymbol));
+            return arg;
+        }
 
         protected override OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
                                                                    IPropertySymbol propertySymbol)

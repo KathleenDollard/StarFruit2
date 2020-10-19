@@ -1,4 +1,5 @@
 ﻿using StarFruit.Common;
+using StarFruit.Common.Descriptors;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,6 +12,7 @@ namespace StarFruit2.Common.Descriptors
                                  object? raw)
             : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Command) { }
 
+        public CommandDescriptorSource DescriptorSource { get; set; }
         public bool TreatUnmatchedTokensAsErrors { get; set; } = true;
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public List<OptionDescriptor> Options { get; } = new List<OptionDescriptor>();

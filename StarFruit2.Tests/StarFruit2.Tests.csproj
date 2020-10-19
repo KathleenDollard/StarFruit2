@@ -2,9 +2,8 @@
 
   <PropertyGroup>
 	  <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <LangVersion>9.0</LangVersion>
-
-	  <IsPackable>false</IsPackable>
+    <LangVersion>Latest</LangVersion>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +31,9 @@
 
   <ItemGroup>
     <Compile Update="TestData\EmptyTestModel.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="TestData\RequiredHIddenAliasedTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestData\SeveralOptionsAndArgumentsSampleData.cs">

@@ -30,7 +30,7 @@ namespace Starfruit2
                                                                        ClassDeclarationSyntax source)
         {
             var maker = new ClassSyntaxCommandMaker(config, semanticModel);
-            var typeSymbol = semanticModel.GetDeclaredSymbol(source);
+            var typeSymbol = semanticModel.GetDeclaredSymbol(source) as INamedTypeSymbol ;
             Assert.NotNull(typeSymbol);
             return maker.CreateCliDescriptor(null, typeSymbol);
         }

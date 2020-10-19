@@ -21,10 +21,10 @@ namespace StarFruit2.Tests
             Subject.CommandDescriptor.Should().NotBeNull();
             Execute.Assertion
                  .ForCondition(expected.GeneratedCommandSourceClassName == Subject.GeneratedCommandSourceClassName)
-                 .FailWith($"Command source class name does not match ({Subject.GeneratedCommandSourceClassName} != {expected.GeneratedCommandSourceClassName} )")
+                 .FailWith($"CommandSourceClassName does not match ({Subject.GeneratedCommandSourceClassName} != {expected.GeneratedCommandSourceClassName} )")
                  .Then
                  .ForCondition(expected.GeneratedComandSourceNamespace == Subject.GeneratedComandSourceNamespace)
-                 .FailWith($"Command source class namespace name does not match ({Subject.GeneratedComandSourceNamespace} != {expected.GeneratedComandSourceNamespace} )");
+                 .FailWith($"CommandSourceNamespace does not match ({Subject.GeneratedComandSourceNamespace} != {expected.GeneratedComandSourceNamespace} )");
 
             Subject.CommandDescriptor.Should().Match(expected.CommandDescriptor);
 

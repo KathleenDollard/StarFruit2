@@ -1,4 +1,5 @@
 ﻿using StarFruit.Common;
+using StarFruit.Common.Descriptors;
 using System.Collections.Generic;
 
 namespace StarFruit2.Common.Descriptors
@@ -10,6 +11,7 @@ namespace StarFruit2.Common.Descriptors
                                 object? raw)
             : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Option) { }
 
+        public OptionOrArgDescriptorSource DescriptorSource { get; set; }
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public bool Required { get; set; }
         public string? Prefix { get; set; }

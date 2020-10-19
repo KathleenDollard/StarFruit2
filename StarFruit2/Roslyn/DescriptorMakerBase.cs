@@ -93,13 +93,13 @@ namespace Starfruit2
         protected IEnumerable<OptionDescriptor> GetOptions(ISymbolDescriptor parent,
                                                            TCommandSymbol parentSymbol)
         => GetMembers(parentSymbol).OfType<TMemberSymbol>()
-                  .Where(p => config.IsOption(p.Name, p.GetAttributes()))
+                  .Where(p => config.IsOption(p.Name, p))
                   .Select(p => CreateOptionDescriptor(parent, p));
 
         protected IEnumerable<ArgumentDescriptor> GetArguments(ISymbolDescriptor parent,
                                                                TCommandSymbol parentSymbol)
          => GetMembers(parentSymbol).OfType<TMemberSymbol>()
-                   .Where(p => config.IsArgument(p.Name, p.GetAttributes()))
+                   .Where(p => config.IsArgument(p.Name, p))
                    .Select(p => CreateArgumentDescriptor(parent, p));
     }
 }
