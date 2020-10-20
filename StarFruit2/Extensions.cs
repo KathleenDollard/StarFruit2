@@ -67,7 +67,10 @@ namespace StarFruit2
             var attributeArgs = attribute.ConstructorArguments;
             if (attributeArgs.Any() && !attributeArgs.First().IsNull)
             {
-                return attributeArgs.Select(x => x.Value).OfType<T>();
+                return attributeArgs.Where(x=>x.Kind == TypedConstantKind.Array )
+                                    .SelectMany(x => x.Values)
+                                    .Select(x=>x.Value)
+                                    .OfType<T>();
             }
 
             return Enumerable.Empty<T>(); 
