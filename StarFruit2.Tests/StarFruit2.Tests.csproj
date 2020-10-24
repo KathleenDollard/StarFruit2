@@ -34,7 +34,7 @@
     <Compile Update="TestData\EmptyTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="TestData\SeveralOptionsAndArgumentsSampleData.cs">
+    <Compile Update="TestData\SeveralOptionsAndArgumentsTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestData\SingleArgStringTestModel.cs">
@@ -46,7 +46,7 @@
     <Compile Update="TestData\SingleArgBoolTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="TestData\SingleOptionWithArgumentSampleData.cs">
+    <Compile Update="TestData\SingleOptionWithArgumentTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="XmlCommentTestCode.cs">
