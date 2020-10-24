@@ -28,6 +28,10 @@ namespace StarFruit2.Tests
             return value.Trim();
         }
 
+        // only question about this: can I implent this so the return value is the same type as param, assuming it implements IEEnumerable<string> interface?
+        internal static IEnumerable<string> Normalize(IEnumerable<string> values) 
+            => values.Select(v => Normalize(v));
+
         private static string ReplaceWithRepeating(string value,  string oldValue, string newValue)
         {
             var len = value.Length + 1; // plus one forces this to run at least once

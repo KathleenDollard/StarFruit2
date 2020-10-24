@@ -32,6 +32,7 @@ namespace TwoLayerCli
         public async Task<int> InvokeFindAsync(BindingContext bindingContext)
         {
             NewInstance = GetNewInstance(bindingContext);
+            // gen by looping over subcommand opt and args
             return await NewInstance.FindAsync(GetValue(bindingContext, Find_IntArg),
                                                GetValue(bindingContext, Find_StringOption),
                                                GetValue(bindingContext, Find_BoolOption));
@@ -60,6 +61,7 @@ namespace TwoLayerCli
             return FindCommand;
         }
 
+        // TODO: consider putting me in the base class, maybe GetOpt<T> as well, see CodeGenerator.cs GetArgument
         private Argument<T> GetArg<T>(string name, string description /* ... more stuff */)
         {
             var arg = new Argument<T>(name) // This would actually be a lot more involved.
@@ -73,7 +75,7 @@ namespace TwoLayerCli
         {
 
             List_BoolOption = new Option<bool>("bool-option");
-            ListCommand = new Command("find")
+            ListCommand = new Command("list")
             { 
                 List_BoolOption 
             };
@@ -83,6 +85,7 @@ namespace TwoLayerCli
 
         }
 
+        // must be here, since we have to gen 89 and 91
         private CliRoot GetNewInstance(BindingContext bindingContext)
             => new CliRoot(GetValue(bindingContext, CtorParam))
             {

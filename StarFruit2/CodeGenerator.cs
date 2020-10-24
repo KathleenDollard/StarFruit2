@@ -89,6 +89,8 @@ namespace StarFruit2.Generator
             return string.Join("\n", ret);
         }
 
+        // this is very c#, lang dependent should be in Generate
+        // may not be needed, same with GetOption<>, GetOptions
         private static string GetArgument(ArgumentDescriptor argument) 
             => $@"GetArg<{argument.ArgumentType.TypeAsString()}>(""{argument.CliName}"", ""{argument.Description}"", {argument.DefaultValue.CodeRepresentation})";
 

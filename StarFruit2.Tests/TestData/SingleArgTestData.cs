@@ -12,13 +12,14 @@ namespace TestData
         public SingleArgTestData(string testName,
                                          string originalName,
                                          string commandLineName,
+                                         string typeStringRepresentation,
                                          string? description,
                                          DefaultValueDescriptor? defaultValue)
             : base(testName)
         {
             string sourceCode = $@"
                 var command = new Command(""my-class"", """");
-                command.Arguments.Add(GetArg<{typeof(T).ToString()}>(""{commandLineName}"", ""{description}"", {defaultValue.CodeRepresentation}));
+                command.Arguments.Add(GetArg<{typeStringRepresentation}>(""{commandLineName}"", ""{description}"", {defaultValue.CodeRepresentation}));
                 return command;";
 
             GeneratedNamespace = "StarFruit2.Tests.TestSampleData." + testName;
@@ -57,6 +58,7 @@ namespace TestData
             : base(testName: "SingleArgString",
                    originalName: "MyPropertyArg",
                    commandLineName: "my-property",
+                   typeStringRepresentation: "String",
                    description: "",
                    defaultValue: new DefaultValueDescriptor("this is a default value"))
         { }
@@ -68,6 +70,7 @@ namespace TestData
             : base(testName: "SingleArgInt",
                    originalName: "MyPropertyArg",
                    commandLineName: "my-property",
+                   typeStringRepresentation: "Int32",
                    description: "This is an int description",
                    defaultValue: new DefaultValueDescriptor(42))
         { }
@@ -79,6 +82,7 @@ namespace TestData
             : base(testName: "SingleArgBool",
                    originalName: "MyPropertyArg",
                    commandLineName: "my-property",
+                   typeStringRepresentation: "Boolean",
                    description: "This is a bool description",
                    defaultValue: new DefaultValueDescriptor(true))
         { }
