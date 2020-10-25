@@ -14,29 +14,29 @@ namespace StarFruit2.Tests
         public void Argument_names_are_as_expected()
         {
             var code = @"
-                public int MyMethod(int myParam)"
+                public int MyMethod(int myParamArg)"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
-            actual.OriginalName.Should().Be("MyPropertyArg");
-            actual.Name.Should().Be("MyProperty");
-            actual.CliName.Should().Be("my-property");
+            actual.OriginalName.Should().Be("myParamArg");
+            actual.Name.Should().Be("myParam");
+            actual.CliName.Should().Be("my-param");
         }
 
-        //        [Fact]
-        //        public void ArgumentType_is_int_when_int_on_argument()
-        //        {
-        //            var code = @"
-        //                public int MyPropertyArg { get; set; }"
-        //                .WrapInStandardClass();
+        [Fact]
+        public void ArgumentType_is_int_when_int_on_argument()
+        {
+            var code = @"
+                public int MyMethod(int myParamArg)"
+                .WrapInStandardClass();
 
-        //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
-        //            actual.ArgumentType.TypeAsString().Should().Be("Int32");
-        //        }
+            actual.ArgumentType.TypeAsString().Should().Be("Int32");
+        }
 
         //        [Fact]
         //        public void ArgumentType_is_bool_when_int_on_argument()
@@ -46,7 +46,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.ArgumentType.TypeAsString().Should().Be("Boolean");
         //        }
@@ -60,7 +60,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.Required.Should().Be(true);
         //        }
@@ -74,7 +74,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.Required.Should().Be(true);
         //        }
@@ -87,7 +87,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.Required.Should().Be(false);
         //        }
@@ -101,7 +101,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.Required.Should().Be(false);
         //        }
@@ -115,7 +115,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.IsHidden.Should().Be(true);
         //        }
@@ -129,7 +129,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.IsHidden.Should().Be(true);
         //        }
@@ -142,7 +142,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.IsHidden.Should().Be(false);
         //        }
@@ -156,7 +156,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.IsHidden.Should().Be(false);
         //        }
@@ -173,7 +173,7 @@ namespace StarFruit2.Tests
         //                public int MyPropertyArg {{ get; set; }}"
         //                .WrapInStandardClass();
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.Description.Should().Be(desc);
         //        }
@@ -188,7 +188,7 @@ namespace StarFruit2.Tests
         //            CliDescriptor actualCli = Utils.GetCli(code);
         //            var actual = actualCli.CommandDescriptor.Arguments.First();
 
-        //            actual.DefaultValue.CodeRepresentation.Should().Be("42");
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
         //        }
 
         //        [Fact]
@@ -199,7 +199,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.DefaultValue.CodeRepresentation.Should().Be("new DateTime(2020, 12, 31)");
         //        }
@@ -212,7 +212,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.DefaultValue.CodeRepresentation.Should().Be("Int32.MinValue");
         //        }
@@ -226,7 +226,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Arguments.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
         //            actual.AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
         //        }
@@ -241,7 +241,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.OriginalName.Should().Be("MyProperty");
         //            actual.Name.Should().Be("MyProperty");
@@ -257,7 +257,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Arguments.First().ArgumentType.TypeAsString().Should().Be("Int32");
         //        }
@@ -271,7 +271,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Arguments.First().ArgumentType.TypeAsString().Should().Be("Boolean");
         //        }
@@ -285,7 +285,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Required.Should().Be(true);
         //        }
@@ -299,7 +299,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Required.Should().Be(true);
         //        }
@@ -312,7 +312,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Required.Should().Be(false);
         //        }
@@ -326,7 +326,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Required.Should().Be(false);
         //        }
@@ -340,7 +340,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(true);
         //        }
@@ -354,7 +354,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(true);
         //        }
@@ -367,7 +367,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(false);
         //        }
@@ -381,7 +381,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(false);
         //        }
@@ -395,7 +395,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Aliases.Count().Should().Be(1);
         //            actual.Aliases.First().Should().Be("x");
@@ -410,7 +410,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Aliases.Count().Should().Be(2);
         //            actual.Aliases.First().Should().Be("x");
@@ -426,7 +426,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Aliases.Count().Should().Be(0);
         //        }
@@ -443,7 +443,7 @@ namespace StarFruit2.Tests
         //                public int MyProperty {{ get; set; }}"
         //                .WrapInStandardClass();
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Description.Should().Be(desc);
         //        }
@@ -456,7 +456,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Arguments.First().DefaultValue.CodeRepresentation.Should().Be("42");
         //        }
@@ -469,7 +469,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Arguments.First().DefaultValue.CodeRepresentation.Should().Be("new DateTime(2020, 12, 31)");
         //        }
@@ -482,7 +482,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Arguments.First().DefaultValue.CodeRepresentation.Should().Be("Int32.MinValue");
         //        }
@@ -496,7 +496,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardClass();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor.Options.First();
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Arguments.First().AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
         //        }
@@ -514,7 +514,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.OriginalName.Should().Be("MyClass");
         //            actual.Name.Should().Be("MyClass");
@@ -533,7 +533,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(true);
         //        }
@@ -550,7 +550,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(true);
         //        }
@@ -566,7 +566,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(false);
         //        }
@@ -583,7 +583,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.IsHidden.Should().Be(false);
         //        }
@@ -600,7 +600,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Aliases.Count().Should().Be(1);
         //            actual.Aliases.First().Should().Be("x");
@@ -618,7 +618,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Aliases.Count().Should().Be(2);
         //            actual.Aliases.First().Should().Be("xyz");
@@ -636,7 +636,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Aliases.Count().Should().Be(0);
         //        }
@@ -655,7 +655,7 @@ namespace StarFruit2.Tests
         //                }}"
         //                .WrapInStandardNamespace();
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.Description.Should().Be(desc);
         //        }
@@ -672,7 +672,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.TreatUnmatchedTokensAsErrors.Should().BeTrue();
         //        }
@@ -689,7 +689,7 @@ namespace StarFruit2.Tests
 
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.TreatUnmatchedTokensAsErrors.Should().BeTrue();
         //        }
@@ -706,7 +706,7 @@ namespace StarFruit2.Tests
         //                .WrapInStandardNamespace();
 
         //            CliDescriptor actualCli = Utils.GetCli(code);
-        //            var actual = actualCli.CommandDescriptor;
+        //            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
         //            actual.TreatUnmatchedTokensAsErrors.Should().BeFalse();
         //        }

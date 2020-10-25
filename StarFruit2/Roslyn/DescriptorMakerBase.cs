@@ -94,7 +94,8 @@ namespace Starfruit2
             command.AddOptions(GetOptions(command, symbol));
             if (symbol is INamedTypeSymbol s)
             {
-                command.AddCommands(GetSubCommands(command, s));
+                IEnumerable<CommandDescriptor> subCommands = GetSubCommands(command, s);
+                command.AddCommands(subCommands);
             }
             return command;
         }

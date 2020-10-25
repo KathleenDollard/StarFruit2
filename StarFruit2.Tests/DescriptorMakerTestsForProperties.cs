@@ -714,5 +714,47 @@ namespace StarFruit2.Tests
 
         #endregion
 
+        #region SubCommands
+        [Fact]
+        public void Single_SubCommand_is_found_and_names_are_as_expected()
+        {
+            var code = @"
+                public int MyMethod(int myParam) {}"
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual = actualCli.CommandDescriptor.SubCommands.First() ;
+
+            actual.OriginalName.Should().Be("MyMethod");
+            actual.Name.Should().Be("MyMethod");
+            actual.CliName.Should().Be("my-method");
+        }
+
+        [Fact]
+        public void Multiple_SubCommanda_are_found_and_names_are_as_expected()
+        {
+            var code = @"
+                public int MyMethod1() {}
+                public int MyMethod2(int myParam) { }
+                public int MyMethod3() { }"
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual1 = actualCli.CommandDescriptor.SubCommands.First();
+            var actual2 = actualCli.CommandDescriptor.SubCommands.First();
+            var actual3 = actualCli.CommandDescriptor.SubCommands.First();
+
+            actual1.OriginalName.Should().Be("MyMethod1");
+            actual1.Name.Should().Be("MyMethod1");
+            actual1.CliName.Should().Be("my-method1");
+            actual2.OriginalName.Should().Be("MyMethod2");
+            actual2.Name.Should().Be("MyMethod2");
+            actual2.CliName.Should().Be("my-method2");
+            actual3.OriginalName.Should().Be("MyMethod3");
+            actual3.Name.Should().Be("MyMethod3");
+            actual3.CliName.Should().Be("my-method3");
+        }
+
+        #endregion 
     }
 }

@@ -63,7 +63,7 @@ namespace StarFruit2
             {
                 IPropertySymbol s => new ArgTypeInfoRoslyn(s.Type),
                 // TODO: get type from parameter
-                IParameterSymbol s => new ArgTypeInfoRoslyn(typeof(DateTime)),
+                IParameterSymbol s => new ArgTypeInfoRoslyn(s.Type),
                 _ => null
             };
 
@@ -108,10 +108,10 @@ namespace StarFruit2
                 : (DefaultValueDescriptor)new ExplicitDefaultValueDescriptor(defaultValue);
         }
 
-        private DefaultValueDescriptor? GetDefaultValueForProperty(IParameterSymbol propertySymbol)
-        {
-            throw new NotImplementedException();
-        }
+        private DefaultValueDescriptor? GetDefaultValueForProperty(IParameterSymbol symbol) 
+            => !symbol.HasExplicitDefaultValue
+                ? null
+                : new DefaultValueDescriptor(symbol.ExplicitDefaultValue);
 
         internal bool GetIsHidden<TSymbol>(TSymbol symbol)
             where TSymbol : ISymbol
