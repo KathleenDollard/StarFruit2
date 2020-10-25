@@ -37,8 +37,11 @@ namespace Starfruit2
     // * IsHidden:                     DONE
     // * Aliases:                      DONE
     // * TreatUnmatchedTokensAsErrors  DONE
+    // * SubCommands                   Will do
 
-    // Explore putting unique name for fields into descripriptor
+    // * Duplicate testing for methods/parameters
+
+    // * Explore putting unique name for fields into descripriptor
 
     public class DescriptorMakerBase
     {

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace StarFruit2.Tests
 {
-    public class DescriptorMakerTests
+    public class DescriptorMakerTestsForProperties
     {
         #region Arguments
         [Fact]
