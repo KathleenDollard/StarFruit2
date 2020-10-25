@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StarFruit2;
 using StarFruit2.Common;
+using System.Diagnostics;
 
 namespace Starfruit2
 {
@@ -55,21 +56,29 @@ namespace Starfruit2
         }
     }
 
-    public abstract class DescriptorMakerBase<TCommandSymbol, TMemberSymbol> : DescriptorMakerBase
-        where TCommandSymbol : class, ISymbol
-        where TMemberSymbol : class, ISymbol
+    public abstract class DescriptorMaker : DescriptorMakerBase
+    //where TCommandSymbol : class, ISymbol
+    //where TMemberSymbol : class, ISymbol
     {
-        public DescriptorMakerBase(MakerConfiguration config, SemanticModel semanticModel)
+        public DescriptorMaker(MakerConfiguration config, SemanticModel semanticModel)
            : base(config, semanticModel)
         { }
 
-        protected abstract IEnumerable<TMemberSymbol> GetMembers(TCommandSymbol parentSymbol);
+        protected virtual IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent,
+                                                                        INamedTypeSymbol parentSymbol)
+        {
+            IEnumerable<ISymbol> members = config.GetSubCommandMembers(parentSymbol);
+            return members.Select(s => s switch
+                {
+                    IMethodSymbol x => CreateCommandDescriptor(parent, x),
+                    INamedTypeSymbol x => CreateCommandDescriptor(parent, x),
+                    _ => throw new NotImplementedException()
+                });
+        }
 
-        protected abstract IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent,
-                                                                         TCommandSymbol parentSymbol);
-
-        protected virtual CommandDescriptor CreateCommandDescriptor(ISymbolDescriptor? parent,
+        protected virtual CommandDescriptor CreateCommandDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
                                                                     TCommandSymbol symbol)
+            where TCommandSymbol : class, ISymbol
         {
             Assert.NotNull(symbol);
             var command = new CommandDescriptor(parent, symbol.Name, symbol)
@@ -83,13 +92,17 @@ namespace Starfruit2
             command.Aliases.AddRange(config.GetAliases(symbol));
             command.AddArguments(GetArguments(command, symbol));
             command.AddOptions(GetOptions(command, symbol));
-            command.AddCommands(GetSubCommands(command, symbol));
+            if (symbol is INamedTypeSymbol s)
+            {
+                command.AddCommands(GetSubCommands(command, s));
+            }
             return command;
         }
 
-        protected virtual ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
+        protected virtual ArgumentDescriptor CreateArgumentDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
                                                                       TMemberSymbol symbol)
-        // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
+        where TMemberSymbol : class, ISymbol
+            // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
         {
             var argType = config.GetArgTypeInfo(symbol);
             Assert.NotNull(argType, "argType");
@@ -107,8 +120,9 @@ namespace Starfruit2
         }
 
 
-        protected virtual  OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
+        protected virtual OptionDescriptor CreateOptionDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
                                                                    TMemberSymbol symbol)
+        where TMemberSymbol : class, ISymbol
         {
             var option = new OptionDescriptor(parent, symbol.Name, symbol)
             {
@@ -124,8 +138,9 @@ namespace Starfruit2
             return option;
         }
 
-        protected virtual ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor parent,
+        protected virtual ArgumentDescriptor CreateOptionArgumentDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
                                                                             TMemberSymbol symbol)
+        where TMemberSymbol : class, ISymbol
         {
             var argType = config.GetArgTypeInfo(symbol)
                             ?? new ArgTypeInfoRoslyn(typeof(bool));
@@ -145,8 +160,9 @@ namespace Starfruit2
             return arg;
         }
 
-        protected internal virtual CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent,
+        protected internal virtual CliDescriptor CreateCliDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
                                                                      TCommandSymbol symbol)
+        where TCommandSymbol : class, ISymbol
         {
             var cliDesriptor = new CliDescriptor
             {
@@ -156,16 +172,33 @@ namespace Starfruit2
             return cliDesriptor;
         }
 
-        protected IEnumerable<OptionDescriptor> GetOptions(ISymbolDescriptor parent,
+        protected IEnumerable<OptionDescriptor> GetOptions<TCommandSymbol>(ISymbolDescriptor parent,
                                                            TCommandSymbol parentSymbol)
-            => GetMembers(parentSymbol).OfType<TMemberSymbol>()
-                                       .Where(p => config.IsOption(p.Name, p))
-                                       .Select(p => CreateOptionDescriptor(parent, p));
+           where TCommandSymbol : class, ISymbol
+            => parentSymbol switch
+            {
+                INamedTypeSymbol s => s.GetMembers().OfType<IPropertySymbol>()
+                                         .Where(p => config.IsOption(p.Name, p))
+                                         .Select(p => CreateOptionDescriptor(parent, p)),
+                IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
+                                         .Where(p => config.IsOption(p.Name, p))
+                                         .Select(p => CreateOptionDescriptor(parent, p)),
+                _ => throw new NotImplementedException()
+            };
 
-        protected IEnumerable<ArgumentDescriptor> GetArguments(ISymbolDescriptor parent,
+        protected IEnumerable<ArgumentDescriptor> GetArguments<TCommandSymbol>(ISymbolDescriptor parent,
                                                                TCommandSymbol parentSymbol)
-            => GetMembers(parentSymbol).OfType<TMemberSymbol>()
+          where TCommandSymbol : class, ISymbol
+          => parentSymbol switch
+          {
+              INamedTypeSymbol s => s.GetMembers().OfType<IPropertySymbol>()
                                        .Where(p => config.IsArgument(p.Name, p))
-                                       .Select(p => CreateArgumentDescriptor(parent, p));
+                                       .Select(p => CreateArgumentDescriptor(parent, p)),
+              IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
+                                       .Where(p => config.IsArgument(p.Name, p))
+                                       .Select(p => CreateArgumentDescriptor(parent, p)),
+              _ => throw new NotImplementedException()
+          }; 
+        
     }
 }

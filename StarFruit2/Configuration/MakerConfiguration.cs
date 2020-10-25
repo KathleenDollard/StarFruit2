@@ -58,16 +58,14 @@ namespace StarFruit2
         public virtual string OptionNameToCliName(string name)
         => $"--{OptionNameToName(name).ToKebabCase().ToLowerInvariant()}";
 
-        public virtual ArgTypeInfoBase GetArgTypeInfo<TMemberSymbol>(TMemberSymbol symbol)
-        {
-            return symbol switch
+        public virtual ArgTypeInfoBase? GetArgTypeInfo<TMemberSymbol>(TMemberSymbol symbol)
+            => symbol switch
             {
                 IPropertySymbol s => new ArgTypeInfoRoslyn(s.Type),
                 // TODO: get type from parameter
                 IParameterSymbol s => new ArgTypeInfoRoslyn(typeof(DateTime)),
                 _ => null
             };
-        }
 
         internal IEnumerable<object> GetAllowedValues<TMemberSymbol>(TMemberSymbol symbol)
            where TMemberSymbol : class, ISymbol
@@ -191,6 +189,19 @@ namespace StarFruit2
                 }
             }
             return null;
+        }
+
+        public IEnumerable<ISymbol> GetSubCommandMembers(INamedTypeSymbol parentSymbol)
+        {
+            IEnumerable<ISymbol> derivedClasses = parentSymbol.ContainingNamespace
+                                    .GetTypeMembers()
+                                    .Where(x => SymbolEqualityComparer.Default.Equals(x.BaseType, parentSymbol));
+            IEnumerable<ISymbol> methods = parentSymbol.GetMembers()
+                                    .OfType<IMethodSymbol>()
+                                    .Where(x => x.MethodKind != MethodKind.Constructor &&
+                                                x.MethodKind != MethodKind.PropertyGet &&
+                                                x.MethodKind != MethodKind.PropertySet);
+            return derivedClasses.Union(methods);
         }
     }
 }
