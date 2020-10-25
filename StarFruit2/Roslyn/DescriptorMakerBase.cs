@@ -60,10 +60,6 @@ namespace Starfruit2
            : base(config, semanticModel)
         { }
 
-        protected abstract OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
-                                                                   TMemberSymbol symbol);
-        protected abstract ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
-                                                                       TMemberSymbol symbol);
         protected abstract IEnumerable<TMemberSymbol> GetMembers(TCommandSymbol parentSymbol);
 
         protected abstract IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent,
@@ -79,13 +75,71 @@ namespace Starfruit2
                 CliName = config.CommandNameToCliName(symbol.Name),
                 Description = config.GetDescription(symbol) ?? "",
                 IsHidden = config.GetIsHidden(symbol),
-                TreatUnmatchedTokensAsErrors=config.GetTreatUnmatchedTokensAsErrors(symbol),
+                TreatUnmatchedTokensAsErrors = config.GetTreatUnmatchedTokensAsErrors(symbol),
             };
             command.Aliases.AddRange(config.GetAliases(symbol));
             command.AddArguments(GetArguments(command, symbol));
             command.AddOptions(GetOptions(command, symbol));
             command.AddCommands(GetSubCommands(command, symbol));
             return command;
+        }
+
+        protected virtual ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
+                                                                      TMemberSymbol symbol)
+        // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
+        {
+            var argType = config.GetArgTypeInfo(symbol);
+            Assert.NotNull(argType, "argType");
+            var arg = new ArgumentDescriptor(argType, parent, symbol.Name, symbol)
+            {
+                Name = config.ArgumentNameToName(symbol.Name),
+                CliName = config.ArgumentNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                Required = config.GetIsRequired(symbol),
+                IsHidden = config.GetIsHidden(symbol),
+                DefaultValue = config.GetDefaultValue(symbol),
+            };
+            arg.AllowedValues.AddRange(config.GetAllowedValues(symbol));
+            return arg;
+        }
+
+
+        protected virtual  OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
+                                                                   TMemberSymbol symbol)
+        {
+            var option = new OptionDescriptor(parent, symbol.Name, symbol)
+            {
+                Name = config.OptionNameToName(symbol.Name),
+                CliName = config.OptionNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                Required = config.GetIsRequired(symbol),
+                IsHidden = config.GetIsHidden(symbol),
+            };
+
+            option.Aliases.AddRange(config.GetAliases(symbol));
+            option.Arguments.Add(CreateOptionArgumentDescriptor(option, symbol));
+            return option;
+        }
+
+        protected virtual ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor parent,
+                                                                            TMemberSymbol symbol)
+        {
+            var argType = config.GetArgTypeInfo(symbol)
+                            ?? new ArgTypeInfoRoslyn(typeof(bool));
+            var arg = new ArgumentDescriptor(argType,
+                                             parent,
+                                             symbol.Name,
+                                             symbol)
+            {
+                Name = symbol.Name,
+                CliName = config.OptionArgumentNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                DefaultValue = config.GetDefaultValue(symbol),
+                Required = config.GetIsRequired(symbol),
+                IsHidden = config.GetIsHidden(symbol),
+            };
+            arg.AllowedValues.AddRange(config.GetAllowedValues(symbol));
+            return arg;
         }
 
         protected internal virtual CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent,

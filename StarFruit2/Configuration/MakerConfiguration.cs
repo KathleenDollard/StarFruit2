@@ -58,12 +58,41 @@ namespace StarFruit2
         public virtual string OptionNameToCliName(string name)
         => $"--{OptionNameToName(name).ToKebabCase().ToLowerInvariant()}";
 
-        internal IEnumerable<object> GetAllowedValues(IPropertySymbol propertySymbol)
+        public virtual ArgTypeInfoBase GetArgTypeInfo<TMemberSymbol>(TMemberSymbol symbol)
+        {
+            return symbol switch
+            {
+                IPropertySymbol s => new ArgTypeInfoRoslyn(s.Type),
+                // TODO: get type from parameter
+                IParameterSymbol s => new ArgTypeInfoRoslyn(typeof(DateTime)),
+                _ => null
+            };
+        }
+
+        internal IEnumerable<object> GetAllowedValues<TMemberSymbol>(TMemberSymbol symbol)
+           where TMemberSymbol : class, ISymbol
+        => symbol switch
+        {
+            IPropertySymbol s => GetAllowedValues(s),
+            IParameterSymbol s => GetAllowedValues(s),
+            _ => Enumerable.Empty<object>()
+        };
+        private IEnumerable<object> GetAllowedValues(IPropertySymbol propertySymbol)
         => propertySymbol.AttributeValueForList<AllowedValuesAttribute, object>();
 
-        private DateTime Foo = DateTime.Now;
+        private IEnumerable<object> GetAllowedValues(IParameterSymbol propertySymbol)
+        => propertySymbol.AttributeValueForList<AllowedValuesAttribute, object>();
 
-        internal DefaultValueDescriptor? GetDefaultValue(IPropertySymbol propertySymbol)
+        internal DefaultValueDescriptor? GetDefaultValue<TMemberSymbol>(TMemberSymbol symbol)
+           where TMemberSymbol : class, ISymbol
+          => symbol switch
+          {
+              IPropertySymbol s => GetDefaultValueForProperty(s),
+              IParameterSymbol s => GetDefaultValueForProperty(s),
+              _ => null
+          };
+
+        private DefaultValueDescriptor? GetDefaultValueForProperty(IPropertySymbol propertySymbol)
         {
             var field = propertySymbol.ContainingType.GetMembers()
                                                       .OfType<IFieldSymbol>()
@@ -76,9 +105,14 @@ namespace StarFruit2
             }
 
             string defaultValue = languageHelper.GetDefaultValue(propertySymbol);
-            return defaultValue is null 
-                ? null 
+            return defaultValue is null
+                ? null
                 : (DefaultValueDescriptor)new ExplicitDefaultValueDescriptor(defaultValue);
+        }
+
+        private DefaultValueDescriptor? GetDefaultValueForProperty(IParameterSymbol propertySymbol)
+        {
+            throw new NotImplementedException();
         }
 
         internal bool GetIsHidden<TSymbol>(TSymbol symbol)
@@ -107,7 +141,7 @@ namespace StarFruit2
                 INamedTypeSymbol s => s.BoolAttributeValue<TreatUnmatchedTokensAsErrorsAttribute>(true),
                 _ => false
             };
-    
+
         public virtual string OptionArgumentNameToCliName(string name)
         {
             name = name.EndsWith("Option")

@@ -13,14 +13,14 @@ namespace Starfruit2
           : base(config, semanticModel)
         { }
 
-        protected override ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
-                                                                       IParameterSymbol parameterSymbol)
-        => new ArgumentDescriptor(new ArgTypeInfoRoslyn(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol)
-        {
-            Name = parameterSymbol.Name,
-            CliName = config.ArgumentNameToCliName(parameterSymbol.Name),
-            Description = config.GetDescription(parameterSymbol) ?? ""
-        };
+        //protected override ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
+        //                                                               IParameterSymbol parameterSymbol)
+        //=> new ArgumentDescriptor(new ArgTypeInfoRoslyn(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol)
+        //{
+        //    Name = parameterSymbol.Name,
+        //    CliName = config.ArgumentNameToCliName(parameterSymbol.Name),
+        //    Description = config.GetDescription(parameterSymbol) ?? ""
+        //};
 
         protected override OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
                                                                    IParameterSymbol parameterSymbol)
