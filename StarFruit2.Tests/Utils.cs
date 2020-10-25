@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Starfruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Generator;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -130,5 +131,14 @@ namespace StarFruit2.Tests
             option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(type), null, name, null));
             return option;
         }
+
+        internal static string WrapInStandardClass(this string code)
+       => code.WrapInClass("MyClass")
+              .WrapInNamespace("MyNamespace")
+              .PrefaceWithUsing("StarFruit2");
+
+        internal static string WrapInStandardNamespace(this string code)
+        => code.WrapInNamespace("MyNamespace")
+               .PrefaceWithUsing("StarFruit2");
     }
 }
