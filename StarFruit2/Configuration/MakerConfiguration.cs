@@ -5,11 +5,19 @@ using System.Collections.Generic;
 using System.CommandLine.Parsing;
 using StarFruit2.Common;
 using System.Linq;
+using StarFruit2.Common.Descriptors;
 
 namespace StarFruit2
 {
     public class MakerConfiguration
     {
+        private readonly LanguageHelper languageHelper;
+
+        public MakerConfiguration(LanguageHelper languageHelper)
+        {
+            this.languageHelper = languageHelper;
+        }
+
         public virtual bool IsOption<T>(string name, T source) => !IsArgument(name, source);
         public virtual bool IsArgument<T>(string name, T source)
         {
@@ -25,34 +33,81 @@ namespace StarFruit2
             };
         }
 
-        public virtual string ArgumentNameToCliName(string name)
-        {
-            name = name.EndsWith("Arg")
+        internal string CommandNameToName(string name)
+        => name = name.EndsWith("Command")
+                   ? name = name[..^7]
+                   : name;
+
+        internal string CommandNameToCliName(string name)
+        => CommandNameToName(name).ToKebabCase().ToLowerInvariant();
+
+
+        public virtual string ArgumentNameToName(string name)
+        => name.EndsWith("Arg")
                    ? name = name[..^3]
                    : name;
-            return name.ToKebabCase().ToLowerInvariant();
-        }
 
-        public virtual string OptionNameToCliName(string name)
-        {
-            name = name.EndsWith("Option")
+        public virtual string ArgumentNameToCliName(string name)
+        => ArgumentNameToName(name).ToKebabCase().ToLowerInvariant();
+
+        public virtual string OptionNameToName(string name)
+        => name = name.EndsWith("Option")
                    ? name = name[..^6]
                    : name;
-            return $"--{name.ToKebabCase().ToLowerInvariant()}";
+
+        public virtual string OptionNameToCliName(string name)
+        => $"--{OptionNameToName(name).ToKebabCase().ToLowerInvariant()}";
+
+        internal IEnumerable<object> GetAllowedValues(IPropertySymbol propertySymbol)
+        => propertySymbol.AttributeValueForList<AllowedValuesAttribute, object>();
+
+        private DateTime Foo = DateTime.Now;
+
+        internal DefaultValueDescriptor? GetDefaultValue(IPropertySymbol propertySymbol)
+        {
+            var field = propertySymbol.ContainingType.GetMembers()
+                                                      .OfType<IFieldSymbol>()
+                                                      .Where(field => SymbolEqualityComparer.Default.Equals(field.AssociatedSymbol, propertySymbol))
+                                                      .FirstOrDefault();
+            if (field is null)
+            {
+                // it isn't an auto-property
+                return null;
+            }
+
+            string defaultValue = languageHelper.GetDefaultValue(propertySymbol);
+            return defaultValue is null 
+                ? null 
+                : (DefaultValueDescriptor)new ExplicitDefaultValueDescriptor(defaultValue);
         }
 
-        internal bool GetIsHidden(IPropertySymbol symbol) 
-            => symbol.BoolAttributeValue<HiddenAttribute>();
+        internal bool GetIsHidden<TSymbol>(TSymbol symbol)
+            where TSymbol : ISymbol
+            => symbol switch
+            {
+                IPropertySymbol s => s.BoolAttributeValue<HiddenAttribute>(),
+                IParameterSymbol s => s.BoolAttributeValue<HiddenAttribute>(),
+                INamedTypeSymbol s => s.BoolAttributeValue<HiddenAttribute>(),
+                _ => false
+            };
 
-        internal bool GetIsRequired(IPropertySymbol symbol)
-            => symbol.BoolAttributeValue<RequiredAttribute>();
+        internal bool GetIsRequired<TSymbol>(TSymbol symbol)
+            where TSymbol : ISymbol
+            => symbol switch
+            {
+                IPropertySymbol s => s.BoolAttributeValue<RequiredAttribute>(),
+                IParameterSymbol s => s.BoolAttributeValue<RequiredAttribute>(),
+                _ => false
+            };
 
-        internal bool GetIsHidden(IParameterSymbol  symbol)
-           => symbol.BoolAttributeValue<HiddenAttribute>();
-
-        internal bool GetIsRequired(IParameterSymbol symbol)
-            => symbol.BoolAttributeValue<RequiredAttribute>();
-        
+        internal bool GetTreatUnmatchedTokensAsErrors<TSymbol>(TSymbol symbol)
+            where TSymbol : class, ISymbol
+            => symbol switch
+            {
+                INamedTypeSymbol s => s.BoolAttributeValue<TreatUnmatchedTokensAsErrorsAttribute>(true),
+                _ => false
+            };
+    
         public virtual string OptionArgumentNameToCliName(string name)
         {
             name = name.EndsWith("Option")
@@ -61,19 +116,18 @@ namespace StarFruit2
             return $"--{name.ToKebabCase().ToLowerInvariant()}";
         }
 
+        internal IEnumerable<string> GetAliases<TSymbol>(TSymbol symbol)
+             where TSymbol : ISymbol
+             => symbol switch
+             {
+                 IPropertySymbol s => s.AttributeValueForList<AliasesAttribute, string>(),
+                 IParameterSymbol s => s.AttributeValueForList<AliasesAttribute, string>(),
+                 INamedTypeSymbol s => s.AttributeValueForList<AliasesAttribute, string>(),
+                 _ => new List<string>()
+             };
+
         internal IEnumerable<string> GetAliases(IParameterSymbol symbol)
             => symbol.AttributeValueForList<AliasAttribute, string>();
-
-        internal IEnumerable<string> GetAliases(IPropertySymbol  symbol)
-           => symbol.AttributeValueForList<AliasesAttribute, string>();
-
-        public virtual string CommandNameToCliName(string name)
-        {
-            name = name.EndsWith("Command")
-                   ? name = name[^7..]
-                   : name;
-            return name.ToKebabCase().ToLowerInvariant();
-        }
 
         private List<IDescriptionProvider> AdditionalDescriptionSources = new List<IDescriptionProvider>();
 

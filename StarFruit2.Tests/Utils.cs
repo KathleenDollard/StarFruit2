@@ -59,8 +59,11 @@ namespace StarFruit2.Tests
             var compilation = GetCompilation(tree);
             var rootCommand = tree.GetRoot().DescendantNodes()
                                .OfType<ClassDeclarationSyntax>()
-                               .Single();
-
+                               .FirstOrDefault();
+            if (rootCommand is null)
+            {
+                return null;
+            }
             var cli = RoslyDescriptorMakerFactory.CreateCliDescriptor(rootCommand, compilation);
             return cli;
         }
@@ -68,17 +71,17 @@ namespace StarFruit2.Tests
         internal static CSharpCompilation GetCompilation(SyntaxTree tree)
         {
             const string longName = "System.Runtime, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-            var systemCollectionsAssembly = Assembly.Load(longName); 
-            
+            var systemCollectionsAssembly = Assembly.Load(longName);
+
             MetadataReference fixcCS0012 =
                        MetadataReference.CreateFromFile(systemCollectionsAssembly.Location);
             MetadataReference mscorlib =
                        MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-            MetadataReference starFruit2Common = 
-                       MetadataReference.CreateFromFile(typeof(RequiredAttribute  ).Assembly.Location);
+            MetadataReference starFruit2Common =
+                       MetadataReference.CreateFromFile(typeof(RequiredAttribute).Assembly.Location);
             MetadataReference systemRuntime =
                         MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
-            MetadataReference[] references = { mscorlib, starFruit2Common , systemRuntime , fixcCS0012  };
+            MetadataReference[] references = { mscorlib, starFruit2Common, systemRuntime, fixcCS0012 };
 
             var compilation = CSharpCompilation.Create("TransformationCS",
                                             new SyntaxTree[] { tree },

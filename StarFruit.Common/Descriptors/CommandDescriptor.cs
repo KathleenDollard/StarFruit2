@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace StarFruit2.Common.Descriptors
 {
-    public class CommandDescriptor : SymbolDescriptor
+    public class CommandDescriptor : IdentitySymbolDescriptor
     {
         public CommandDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                  string originalName,
@@ -18,6 +18,7 @@ namespace StarFruit2.Common.Descriptors
         public List<OptionDescriptor> Options { get; } = new List<OptionDescriptor>();
         public InvokeMethodInfo? InvokeMethod { get; set; } // in Reflection models, this is a MethodInfo, in Roslyn it will be something else
         public List<CommandDescriptor> SubCommands { get; } = new List<CommandDescriptor>();
+        public bool IsAsync { get; }
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {

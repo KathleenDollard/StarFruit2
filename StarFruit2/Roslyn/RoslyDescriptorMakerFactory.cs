@@ -14,7 +14,7 @@ namespace Starfruit2
             where T : Microsoft.CodeAnalysis.SyntaxNode
         {
             var semanticModel = GetSemanticModel(source, compilation);
-            var config = new MakerConfiguration();
+            var config = new MakerConfiguration(new CSharpLanguageHelper());
             return source switch
             {
                 // The common case is a class declaration. If a method declaration is used, any properties in the contained class are ignored. 

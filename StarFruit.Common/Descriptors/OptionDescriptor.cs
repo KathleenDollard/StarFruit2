@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace StarFruit2.Common.Descriptors
 {
-    public class OptionDescriptor : SymbolDescriptor
+    public class OptionDescriptor : IdentitySymbolDescriptor
     {
         public OptionDescriptor(ISymbolDescriptor parentSymbolDescriptorBase, 
                                 string originalName,
@@ -14,7 +14,6 @@ namespace StarFruit2.Common.Descriptors
         public OptionOrArgDescriptorSource DescriptorSource { get; set; }
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public bool Required { get; set; }
-        public string? Prefix { get; set; }
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {

@@ -25,15 +25,15 @@ namespace StarFruit2
             => prop.GetAttributes()
                    .Any(x => x.AttributeClass?.Name == typeof(TAttribute).Name);
 
-        public static bool BoolAttributeValue(this ISymbol symbol, Type attributeType)
+        public static bool BoolAttributeValue(this ISymbol symbol, Type attributeType, bool defaultValue = false)
         {
             var attribute = symbol.GetAttributes()
                                           .Where(x => symbol.GetAttributes().First().AttributeClass?.Name == attributeType.Name)
-                                                   //|| symbol.GetAttributes().First().AttributeClass?.Name + "Attribute" == attributeType.Name)
+                                          //|| symbol.GetAttributes().First().AttributeClass?.Name + "Attribute" == attributeType.Name)
                                           .FirstOrDefault();
             if (attribute is null)
             {
-                return false;
+                return defaultValue;
             }
 
             var attributeArgs = attribute.ConstructorArguments;
@@ -41,24 +41,24 @@ namespace StarFruit2
             {
                 var value = attributeArgs.First().Value;
                 return value is null
-                    ? false
+                    ? defaultValue
                     : (bool)value;
             }
 
             return true; // attribute is present, lacks a value, which indicates true
         }
 
-        public static bool BoolAttributeValue<TAttribute>(this ISymbol symbol)
+        public static bool BoolAttributeValue<TAttribute>(this ISymbol symbol, bool defaultValue = false)
         {
-            return symbol.BoolAttributeValue(typeof(TAttribute));
+            return symbol.BoolAttributeValue(typeof(TAttribute), defaultValue);
         }
 
         public static IEnumerable<T> AttributeValueForList<T>(this ISymbol symbol, Type attributeType)
         {
             var attribute = symbol.GetAttributes()
-                                          .Where(x => symbol.GetAttributes().First().AttributeClass?.Name == attributeType.Name)
-                                          //|| symbol.GetAttributes().First().AttributeClass?.Name + "Attribute" == attributeType.Name)
-                                          .FirstOrDefault();
+                                  .Where(x => symbol.GetAttributes().First().AttributeClass?.Name == attributeType.Name)
+                                  //|| symbol.GetAttributes().First().AttributeClass?.Name + "Attribute" == attributeType.Name)
+                                  .FirstOrDefault();
             if (attribute is null)
             {
                 return Enumerable.Empty<T>();
@@ -67,16 +67,16 @@ namespace StarFruit2
             var attributeArgs = attribute.ConstructorArguments;
             if (attributeArgs.Any() && !attributeArgs.First().IsNull)
             {
-                return attributeArgs.Where(x=>x.Kind == TypedConstantKind.Array )
+                return attributeArgs.Where(x => x.Kind == TypedConstantKind.Array)
                                     .SelectMany(x => x.Values)
-                                    .Select(x=>x.Value)
+                                    .Select(x => x.Value)
                                     .OfType<T>();
             }
 
-            return Enumerable.Empty<T>(); 
+            return Enumerable.Empty<T>();
         }
 
-        public static IEnumerable<T> AttributeValueForList<TAttribute,T>(this ISymbol symbol)
+        public static IEnumerable<T> AttributeValueForList<TAttribute, T>(this ISymbol symbol)
         {
             return symbol.AttributeValueForList<T>(typeof(TAttribute));
         }

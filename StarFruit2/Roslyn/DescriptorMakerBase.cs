@@ -12,28 +12,31 @@ namespace Starfruit2
     // Implementation notes:
     // Arguments:
     // * Name/CliName/OriginalName:    DONE
-    // * Description:                  Needs tests
-    // * IsHidden:                     Will support
+    // * Description:                  DONE
+    // * IsHidden:                     DONE
     // * ArgumentType:                 DONE
     // * Arity:                        Will only support as descriptive scenarios when understood. May need backdoor for cases not generally supported like this.
-    // * AllowedValues:                Will support
-    // * DefaultValue:                 Will support
-    // * Required:                     Will support
+    // * AllowedValues:                DONE
+    // * DefaultValue:                 DONE
+    // * Required:                     DONE
 
     // Options:                      
     // * Name/CliName/OriginalName:    DONE
-    // * Description:                  Needs tests
-    // * IsHidden:                     Will support
-    // * Aliases:                      Will support
-    // * Prefix:                       Remove and make part of config. Individual choices will be hard (consistency encouraged)
-    // * Required:                     Will support
+    // * Description:                  DONE
+    // * IsHidden:                     DONE
+    // * Aliases:                      DONE
+    // * ArgumentType:                 DONE
+    // * Arity:                        Will only support as descriptive scenarios when understood. May need backdoor for cases not generally supported like this.
+    // * AllowedValues:                DONE
+    // * DefaultValue:                 DONE
+    // * Required:                     DONE
 
     // Comamnds                      
     // * Name/CliName/OriginalName:    DONE
-    // * Description:                  Needs tests
-    // * IsHidden:                     Will support
-    // * Aliases:                      Will support
-    // * TreatUnmatchedTokensAsErrors  What scenarios need this command specific?
+    // * Description:                  DONE
+    // * IsHidden:                     DONE
+    // * Aliases:                      DONE
+    // * TreatUnmatchedTokensAsErrors  DONE
 
     // Explore putting unique name for fields into descripriptor
 
@@ -44,7 +47,7 @@ namespace Starfruit2
 
         public DescriptorMakerBase(MakerConfiguration config, SemanticModel semanticModel)
         {
-            this.config = config ?? new MakerConfiguration();
+            this.config = config ?? new MakerConfiguration(new CSharpLanguageHelper());
             this.semanticModel = semanticModel;
         }
     }
@@ -66,6 +69,25 @@ namespace Starfruit2
         protected abstract IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent,
                                                                          TCommandSymbol parentSymbol);
 
+        protected virtual CommandDescriptor CreateCommandDescriptor(ISymbolDescriptor? parent,
+                                                                    TCommandSymbol symbol)
+        {
+            Assert.NotNull(symbol);
+            var command = new CommandDescriptor(parent, symbol.Name, symbol)
+            {
+                Name = config.CommandNameToName(symbol.Name),
+                CliName = config.CommandNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                IsHidden = config.GetIsHidden(symbol),
+                TreatUnmatchedTokensAsErrors=config.GetTreatUnmatchedTokensAsErrors(symbol),
+            };
+            command.Aliases.AddRange(config.GetAliases(symbol));
+            command.AddArguments(GetArguments(command, symbol));
+            command.AddOptions(GetOptions(command, symbol));
+            command.AddCommands(GetSubCommands(command, symbol));
+            return command;
+        }
+
         protected internal virtual CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent,
                                                                      TCommandSymbol symbol)
         {
@@ -76,30 +98,17 @@ namespace Starfruit2
             };
             return cliDesriptor;
         }
-        protected CommandDescriptor CreateCommandDescriptor(ISymbolDescriptor? parent,
-                                                            TCommandSymbol symbol)
-        {
-            Assert.NotNull(symbol);
-            var command = new CommandDescriptor(parent, symbol.Name, symbol)
-            {
-                Name = config.CommandNameToCliName(symbol.Name),
-            };
-            command.AddArguments(GetArguments(command, symbol));
-            command.AddOptions(GetOptions(command, symbol));
-            command.AddCommands(GetSubCommands(command, symbol));
-            return command;
-        }
 
         protected IEnumerable<OptionDescriptor> GetOptions(ISymbolDescriptor parent,
                                                            TCommandSymbol parentSymbol)
-        => GetMembers(parentSymbol).OfType<TMemberSymbol>()
-                  .Where(p => config.IsOption(p.Name, p))
-                  .Select(p => CreateOptionDescriptor(parent, p));
+            => GetMembers(parentSymbol).OfType<TMemberSymbol>()
+                                       .Where(p => config.IsOption(p.Name, p))
+                                       .Select(p => CreateOptionDescriptor(parent, p));
 
         protected IEnumerable<ArgumentDescriptor> GetArguments(ISymbolDescriptor parent,
                                                                TCommandSymbol parentSymbol)
-         => GetMembers(parentSymbol).OfType<TMemberSymbol>()
-                   .Where(p => config.IsArgument(p.Name, p))
-                   .Select(p => CreateArgumentDescriptor(parent, p));
+            => GetMembers(parentSymbol).OfType<TMemberSymbol>()
+                                       .Where(p => config.IsArgument(p.Name, p))
+                                       .Select(p => CreateArgumentDescriptor(parent, p));
     }
 }

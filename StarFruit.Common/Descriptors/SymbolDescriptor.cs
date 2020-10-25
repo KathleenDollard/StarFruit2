@@ -53,7 +53,6 @@ namespace StarFruit2.Common.Descriptors
             return $"{whitespace}{Name}" +
                    $"{whitespace2}Kind:{SymbolType }" +
                    $"{whitespace2}Description:{Description }" +
-                   $"{whitespace2}Aliases:{Aliases }" +
                    $"{whitespace2}IsHidden:{IsHidden  }" +
                    ReportInternal(tabsCount + 1, verbosity) +
                    $"{whitespace2}Raw:{ReportRaw(Raw)}";
@@ -101,7 +100,6 @@ namespace StarFruit2.Common.Descriptors
         /// </summary>
         public object? Raw { get; }
         public SymbolType SymbolType { get; }
-        public List<string> Aliases { get; } = new List<string>();
         public string? Description { get; set; }
 
         /// <summary>
@@ -133,5 +131,25 @@ namespace StarFruit2.Common.Descriptors
         public string OriginalName { get; }
 
         public bool IsHidden { get; set; }
+    }
+
+    public abstract class IdentitySymbolDescriptor : SymbolDescriptor
+    {
+        public IdentitySymbolDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
+                                     string originalName,
+                                     object? raw,
+                                     SymbolType symbolType)
+            : base(parentSymbolDescriptorBase, originalName, raw, symbolType)
+        { }
+        public List<string> Aliases { get; } = new List<string>();
+
+        public override string Report(int tabsCount, VerbosityLevel verbosity)
+        {
+            string whitespace2 = CommonExtensions.NewLineWithTabs(tabsCount + 1);
+            return $"{base.Report(tabsCount + 1, verbosity)}" +
+                   $"{whitespace2}Aliases:{Aliases }";
+        }
+
+
     }
 }
