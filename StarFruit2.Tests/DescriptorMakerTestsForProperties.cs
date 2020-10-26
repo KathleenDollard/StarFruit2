@@ -208,7 +208,7 @@ namespace StarFruit2.Tests
         public void DefaultValue_as_property_from_property_initialize_on_argument()
         {
             var code = @"
-                public DateTime MyPropertyArg { get; set; } = Int32.MinValue"
+                public int { get; set; } = Int32.MinValue"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
@@ -478,7 +478,7 @@ namespace StarFruit2.Tests
         public void DefaultValue_as_property_from_property_initialize_on_option()
         {
             var code = @"
-                public DateTime MyProperty { get; set; } = Int32.MinValue"
+                public int MyProperty { get; set; } = Int32.MinValue"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
