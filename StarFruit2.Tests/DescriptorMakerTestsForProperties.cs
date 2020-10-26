@@ -208,7 +208,7 @@ namespace StarFruit2.Tests
         public void DefaultValue_as_property_from_property_initialize_on_argument()
         {
             var code = @"
-                public int { get; set; } = Int32.MinValue"
+                public int MyPropertyArg { get; set; } = Int32.MinValue"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
@@ -731,7 +731,7 @@ namespace StarFruit2.Tests
         }
 
         [Fact]
-        public void Multiple_SubCommanda_are_found_and_names_are_as_expected()
+        public void Multiple_SubCommands_are_found_and_names_are_as_expected()
         {
             var code = @"
                 public int MyMethod1() {}
@@ -741,8 +741,8 @@ namespace StarFruit2.Tests
 
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual1 = actualCli.CommandDescriptor.SubCommands.First();
-            var actual2 = actualCli.CommandDescriptor.SubCommands.First();
-            var actual3 = actualCli.CommandDescriptor.SubCommands.First();
+            var actual2 = actualCli.CommandDescriptor.SubCommands.Skip(1).First();
+            var actual3 = actualCli.CommandDescriptor.SubCommands.Last();
 
             actual1.OriginalName.Should().Be("MyMethod1");
             actual1.Name.Should().Be("MyMethod1");

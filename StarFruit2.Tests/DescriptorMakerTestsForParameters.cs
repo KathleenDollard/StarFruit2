@@ -180,7 +180,7 @@ namespace StarFruit2.Tests
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.Arguments.First();
+            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("42");
         }
@@ -194,7 +194,7 @@ namespace StarFruit2.Tests
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.Arguments.First();
+            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
             actual.DefaultValue.Should().BeNull();
         }

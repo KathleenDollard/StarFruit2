@@ -86,7 +86,7 @@ namespace StarFruit2
           => symbol switch
           {
               IPropertySymbol s => GetDefaultValueForProperty(s),
-              IParameterSymbol s => GetDefaultValueForProperty(s),
+              IParameterSymbol s => GetDefaultValueForParameter(s),
               _ => null
           };
 
@@ -108,7 +108,7 @@ namespace StarFruit2
                 : (DefaultValueDescriptor)new ExplicitDefaultValueDescriptor(defaultValue);
         }
 
-        private DefaultValueDescriptor? GetDefaultValueForProperty(IParameterSymbol symbol) 
+        private DefaultValueDescriptor? GetDefaultValueForParameter(IParameterSymbol symbol) 
             => !symbol.HasExplicitDefaultValue
                 ? null
                 : new DefaultValueDescriptor(symbol.ExplicitDefaultValue);

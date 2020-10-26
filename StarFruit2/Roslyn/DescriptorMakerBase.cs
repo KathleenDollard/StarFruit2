@@ -38,9 +38,13 @@ namespace Starfruit2
     // * IsHidden:                     DONE
     // * Aliases:                      DONE
     // * TreatUnmatchedTokensAsErrors  DONE
-    // * SubCommands                   Will do
+    // * SubCommands                   Will do - done and tested for methods, not tested for derived classes, but probably done
 
-    // * Duplicate testing for methods/parameters
+    // * Duplicate testing for methods/parameters  DONE
+
+    // Add ordering for params
+    // Mark async
+    // For options/args mark as parameter, ctor param or property
 
     // * Explore putting unique name for fields into descripriptor
 
