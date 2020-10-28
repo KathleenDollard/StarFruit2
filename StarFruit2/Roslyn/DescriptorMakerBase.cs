@@ -7,6 +7,7 @@ using System.Linq;
 using StarFruit2;
 using StarFruit2.Common;
 using System.Diagnostics;
+using StarFruit.Common;
 
 namespace Starfruit2
 {
@@ -22,31 +23,32 @@ namespace Starfruit2
     // * Required:                     DONE
 
     // Options:                      
-    // * Name/CliName/OriginalName:    DONE
-    // * Description:                  DONE
-    // * IsHidden:                     DONE
-    // * Aliases:                      DONE
-    // * ArgumentType:                 DONE
-    // * Arity:                        Will only support as descriptive scenarios when understood. May need backdoor for cases not generally supported like this.
-    // * AllowedValues:                DONE
-    // * DefaultValue:                 DONE
-    // * Required:                     DONE
+    // * Name/CliName/OriginalName:         DONE
+    // * Description:                       DONE
+    // * IsHidden:                          DONE
+    // * Aliases:                           DONE
+    // * ArgumentType:                      DONE
+    // * Arity:                             Will only support as descriptive scenarios when understood. May need backdoor for cases not generally supported like this.
+    // * AllowedValues:                     DONE
+    // * DefaultValue:                      DONE
+    // * Required:                          DONE
 
-    // Comamnds                      
-    // * Name/CliName/OriginalName:    DONE
-    // * Description:                  DONE
-    // * IsHidden:                     DONE
-    // * Aliases:                      DONE
-    // * TreatUnmatchedTokensAsErrors  DONE
-    // * SubCommands                   Will do - done and tested for methods, not tested for derived classes, but probably done
+    // Comamnds                           
+    // * Name/CliName/OriginalName:         DONE
+    // * Description:                       DONE
+    // * IsHidden:                          DONE
+    // * Aliases:                           DONE
+    // * TreatUnmatchedTokensAsErrors       DONE
+    // * SubCommands                        Will do - done and tested for methods, not tested for derived classes, but probably done
 
-    // * Duplicate testing for methods/parameters  DONE
+    // * Test methods/parameters            DONE
 
-    // Add ordering for params
-    // Mark async
-    // For options/args mark as parameter, ctor param or property
+    // Add ordering for params              ToDo
+    // Mark async                           ToDo
+    // Member/Command Source (prop/parm)    ToDo
+    // Constructors                         ToDo
 
-    // * Explore putting unique name for fields into descripriptor
+    // Unique fieldname in descripriptor    Probably to do
 
     public class DescriptorMakerBase
     {
@@ -105,7 +107,9 @@ namespace Starfruit2
         }
 
         protected virtual ArgumentDescriptor CreateArgumentDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
-                                                                      TMemberSymbol symbol)
+                                                                                     TMemberSymbol symbol,
+                                                                                     MemberSource memberSource,
+                                                                                     int position)
         where TMemberSymbol : class, ISymbol
             // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
         {
@@ -119,6 +123,8 @@ namespace Starfruit2
                 Required = config.GetIsRequired(symbol),
                 IsHidden = config.GetIsHidden(symbol),
                 DefaultValue = config.GetDefaultValue(symbol),
+                Source = memberSource,
+                Position = position,
             };
             arg.AllowedValues.AddRange(config.GetAllowedValues(symbol));
             return arg;
@@ -126,7 +132,9 @@ namespace Starfruit2
 
 
         protected virtual OptionDescriptor CreateOptionDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
-                                                                   TMemberSymbol symbol)
+                                                                                 TMemberSymbol symbol,
+                                                                                 MemberSource memberSource,
+                                                                                 int position)
         where TMemberSymbol : class, ISymbol
         {
             var option = new OptionDescriptor(parent, symbol.Name, symbol)
@@ -136,6 +144,8 @@ namespace Starfruit2
                 Description = config.GetDescription(symbol) ?? "",
                 Required = config.GetIsRequired(symbol),
                 IsHidden = config.GetIsHidden(symbol),
+                Source = memberSource,
+                Position = position,
             };
 
             option.Aliases.AddRange(config.GetAliases(symbol));
@@ -180,30 +190,98 @@ namespace Starfruit2
         protected IEnumerable<OptionDescriptor> GetOptions<TCommandSymbol>(ISymbolDescriptor parent,
                                                            TCommandSymbol parentSymbol)
            where TCommandSymbol : class, ISymbol
-            => parentSymbol switch
-            {
-                INamedTypeSymbol s => s.GetMembers().OfType<IPropertySymbol>()
-                                         .Where(p => config.IsOption(p.Name, p))
-                                         .Select(p => CreateOptionDescriptor(parent, p)),
-                IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
-                                         .Where(p => config.IsOption(p.Name, p))
-                                         .Select(p => CreateOptionDescriptor(parent, p)),
-                _ => throw new NotImplementedException()
-            };
+           => parentSymbol switch
+           {
+               INamedTypeSymbol s => GetOptionDescriptors(parent, s),
+               IMethodSymbol s => GetOptionDescriptors(parent, s),
+               _ => throw new NotImplementedException()
+           };
 
         protected IEnumerable<ArgumentDescriptor> GetArguments<TCommandSymbol>(ISymbolDescriptor parent,
                                                                TCommandSymbol parentSymbol)
           where TCommandSymbol : class, ISymbol
           => parentSymbol switch
           {
-              INamedTypeSymbol s => s.GetMembers().OfType<IPropertySymbol>()
-                                       .Where(p => config.IsArgument(p.Name, p))
-                                       .Select(p => CreateArgumentDescriptor(parent, p)),
-              IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
-                                       .Where(p => config.IsArgument(p.Name, p))
-                                       .Select(p => CreateArgumentDescriptor(parent, p)),
+              INamedTypeSymbol s => GetArgumentDescriptors(parent, s),
+              IMethodSymbol s => GetArgumentDescriptors(parent, s),
               _ => throw new NotImplementedException()
-          }; 
-        
+          };
+
+        private IEnumerable<ArgumentDescriptor> GetArgumentDescriptors(ISymbolDescriptor parent,
+                                                                       INamedTypeSymbol parentSymbol) =>
+            // make tuple to capture index
+            parentSymbol.GetMembers()
+                        .Where(x=>x is I)
+                        .Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
+                        .OfType<MemberWrapper<IPropertySymbol>>()
+                        .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+                        .Select(p => CreateArgumentDescriptor(parent,
+                                                              p.Symbol,
+                                                              MemberSource.Property,
+                                                              p.Position));
+
+        private IEnumerable<ArgumentDescriptor> GetArgumentDescriptors(ISymbolDescriptor parent,
+                                                                      IMethodSymbol parentSymbol)
+            =>
+          // make tuple to capture index
+          parentSymbol.Parameters.Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
+                                 .OfType<MemberWrapper<IParameterSymbol>>()
+                                 .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+                                 .Select(p => CreateArgumentDescriptor(parent,
+                                                                       p.Symbol,
+                                                                       MemberSource.MethodParameter,
+                                                                       p.Position));
+
+
+        private IEnumerable<OptionDescriptor> GetOptionDescriptors(ISymbolDescriptor parent,
+                                                                   INamedTypeSymbol parentSymbol) =>
+            // make tuple to capture index
+            parentSymbol.GetMembers()
+                        .Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
+                        .OfType<MemberWrapper<IPropertySymbol>>()
+                        .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+                        .Select(p => CreateOptionDescriptor(parent,
+                                                            p.Symbol,
+                                                            MemberSource.Property,
+                                                            p.Position));
+
+        private IEnumerable<OptionDescriptor> GetOptionDescriptors(ISymbolDescriptor parent,
+                                                                   IMethodSymbol parentSymbol)
+            =>
+          // make tuple to capture index
+          parentSymbol.Parameters.Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
+                                 .OfType<MemberWrapper<IParameterSymbol>>()
+                                 .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+                                 .Select(p => CreateOptionDescriptor(parent,
+                                                                       p.Symbol,
+                                                                       MemberSource.MethodParameter,
+                                                                       p.Position));
+
+
+        private class MemberWrapper
+        {
+            public static MemberWrapper Create(ISymbol symbol, int position)
+            => symbol switch
+            {
+                IPropertySymbol s => new MemberWrapper<IPropertySymbol>(s, position),
+                IParameterSymbol s => new MemberWrapper<IParameterSymbol>(s, position),
+                ISymbol s => new MemberWrapper<ISymbol>(s, position)
+            };
+        }
+
+        private class MemberWrapper<T> : MemberWrapper
+            where T : ISymbol
+        {
+            public MemberWrapper(T? symbol, int position)
+            {
+                Symbol = symbol;
+                Position = position;
+            }
+            public T Symbol;
+
+
+            public int Position;
+        }
+
     }
 }

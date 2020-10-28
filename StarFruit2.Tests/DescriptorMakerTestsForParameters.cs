@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
+using StarFruit.Common;
 using StarFruit2.Common.Descriptors;
 using StarFruit2.Generator;
 using System;
@@ -224,6 +226,38 @@ namespace StarFruit2.Tests
 
             actual.AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
         }
+
+        [Fact]
+        public void Parameter_position_correct_for_arguments_and_options()
+        {
+            var code = @"                       
+                       public int MyMethod(int first, string secondArg, int third)"
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual1 = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual2 = actualCli.CommandDescriptor.SubCommands.First().Options.First();
+            var actual3 = actualCli.CommandDescriptor.SubCommands.First().Options.Skip(1).First();
+
+            using var x = new AssertionScope();
+            actual1.Position.Should().Be(1);
+            actual2.Position.Should().Be(0);
+            actual3.Position.Should().Be(2);
+        }
+
+        [Fact]
+        public void MemberSource_correct_for_argument()
+        {
+            var code = @"
+                        public int MyMethod(int myParamArg)"
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual = actualCli.CommandDescriptor.Arguments.First();
+
+            actual.Source.Should().Be(MemberSource.MethodParameter);
+        }
+
         #endregion
 
         #region Options
@@ -470,6 +504,19 @@ namespace StarFruit2.Tests
             actual.Arguments.First().AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
         }
 
+
+        [Fact]
+        public void MemberSource_correct_for_option()
+        {
+            var code = @"
+                        public int MyMethod(int myParam)"
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual = actualCli.CommandDescriptor.Options.First();
+
+            actual.Source.Should().Be(MemberSource.MethodParameter);
+        }
         #endregion
     }
 }

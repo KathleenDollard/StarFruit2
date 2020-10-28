@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using StarFruit2.Common.Descriptors;
 using StarFruit2.Generator;
+using StarFruit.Common;
 using System;
 using System.Linq;
 using Xunit;
@@ -230,6 +231,39 @@ namespace StarFruit2.Tests
 
             actual.AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
         }
+
+        [Fact]
+        public void MemberSource_correct_for_argument()
+        {
+            var code = @"
+                public int MyPropertyArg { get; set; } "
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual = actualCli.CommandDescriptor.Arguments.First();
+
+            actual.Source.Should().Be(MemberSource.Property);
+        }
+
+        [Fact]
+        public void Parameter_position_correct_for_arguments_and_options()
+        {
+            var code = @"                       
+                       public int First{get;set;}
+                       public int SecondArg{get;set;}
+                       public int Third{get;set;}"
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual1 = actualCli.CommandDescriptor.Arguments.First();
+            var actual2 = actualCli.CommandDescriptor.Options.First();
+            var actual3 = actualCli.CommandDescriptor.Options.Skip(1).First();
+
+            actual1.Position.Should().Be(2);
+            actual2.Position.Should().Be(1);
+            actual3.Position.Should().Be(3);
+        }
+
         #endregion
 
         #region Options
@@ -711,6 +745,18 @@ namespace StarFruit2.Tests
             actual.TreatUnmatchedTokensAsErrors.Should().BeFalse();
         }
 
+        [Fact]
+        public void MemberSource_correct_for_option()
+        {
+            var code = @"
+                public int MyProperty { get; set; } "
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual = actualCli.CommandDescriptor.Options.First();
+
+            actual.Source.Should().Be(MemberSource.Property);
+        }
 
         #endregion
 
@@ -753,6 +799,23 @@ namespace StarFruit2.Tests
             actual3.OriginalName.Should().Be("MyMethod3");
             actual3.Name.Should().Be("MyMethod3");
             actual3.CliName.Should().Be("my-method3");
+        }
+
+        [Fact]
+        public void SubCommand_marked_as_async_as_expected()
+        {
+            var code = @"
+                public async int MyMethod(int myParam) {}
+                public int MyMethod2(int myParam) { }"     
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual1 = actualCli.CommandDescriptor.SubCommands.First();
+            var actual2 = actualCli.CommandDescriptor.SubCommands.Skip(1).First();
+
+            actual1.IsAsync.Should().BeTrue();
+            actual2.IsAsync.Should().BeFalse();
+
         }
 
         #endregion 
