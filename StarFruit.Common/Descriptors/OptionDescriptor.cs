@@ -14,7 +14,7 @@ namespace StarFruit2.Common.Descriptors
         public OptionOrArgDescriptorSource DescriptorSource { get; set; }
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public bool Required { get; set; }
-        public MemberSource Source { get; set; }
+        public CodeElement CodeElement { get; set; }
         public int Position { get; set; }
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)

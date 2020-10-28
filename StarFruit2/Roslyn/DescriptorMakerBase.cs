@@ -83,7 +83,7 @@ namespace Starfruit2
         }
 
         protected virtual CommandDescriptor CreateCommandDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
-                                                                    TCommandSymbol symbol)
+                                                                                    TCommandSymbol symbol)
             where TCommandSymbol : class, ISymbol
         {
             Assert.NotNull(symbol);
@@ -94,6 +94,7 @@ namespace Starfruit2
                 Description = config.GetDescription(symbol) ?? "",
                 IsHidden = config.GetIsHidden(symbol),
                 TreatUnmatchedTokensAsErrors = config.GetTreatUnmatchedTokensAsErrors(symbol),
+                IsAsync = config.GetAsync(symbol)
             };
             command.Aliases.AddRange(config.GetAliases(symbol));
             command.AddArguments(GetArguments(command, symbol));
@@ -108,7 +109,7 @@ namespace Starfruit2
 
         protected virtual ArgumentDescriptor CreateArgumentDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
                                                                                      TMemberSymbol symbol,
-                                                                                     MemberSource memberSource,
+                                                                                     CodeElement memberSource,
                                                                                      int position)
         where TMemberSymbol : class, ISymbol
             // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
@@ -123,7 +124,7 @@ namespace Starfruit2
                 Required = config.GetIsRequired(symbol),
                 IsHidden = config.GetIsHidden(symbol),
                 DefaultValue = config.GetDefaultValue(symbol),
-                Source = memberSource,
+                CodeElement = memberSource,
                 Position = position,
             };
             arg.AllowedValues.AddRange(config.GetAllowedValues(symbol));
@@ -133,7 +134,7 @@ namespace Starfruit2
 
         protected virtual OptionDescriptor CreateOptionDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
                                                                                  TMemberSymbol symbol,
-                                                                                 MemberSource memberSource,
+                                                                                 CodeElement memberSource,
                                                                                  int position)
         where TMemberSymbol : class, ISymbol
         {
@@ -144,7 +145,7 @@ namespace Starfruit2
                 Description = config.GetDescription(symbol) ?? "",
                 Required = config.GetIsRequired(symbol),
                 IsHidden = config.GetIsHidden(symbol),
-                Source = memberSource,
+                CodeElement = memberSource,
                 Position = position,
             };
 
@@ -198,14 +199,14 @@ namespace Starfruit2
                                       .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
                                       .Select(p => CreateOptionDescriptor(parent,
                                                                           p.Symbol,
-                                                                          MemberSource.Property,
+                                                                          CodeElement.Property,
                                                                           p.Position)),
                IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
                                               .Select((Symbol, Position) => (Symbol, Position))
                                               .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
                                               .Select(p => CreateOptionDescriptor(parent,
                                                                                   p.Symbol,
-                                                                                  MemberSource.MethodParameter,
+                                                                                  CodeElement.MethodParameter,
                                                                                   p.Position)),
                                        
                _ => throw new NotImplementedException()
@@ -222,14 +223,14 @@ namespace Starfruit2
                                      .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
                                      .Select(p => CreateArgumentDescriptor(parent,
                                                                            p.Symbol,
-                                                                           MemberSource.Property,
+                                                                           CodeElement.Property,
                                                                            p.Position)),
               IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
                                              .Select((Symbol, Position) => (Symbol, Position))
                                              .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
                                              .Select(p => CreateArgumentDescriptor(parent,
                                                                                    p.Symbol,
-                                                                                   MemberSource.MethodParameter,
+                                                                                   CodeElement.MethodParameter,
                                                                                    p.Position)),
               _ => throw new NotImplementedException()
           };

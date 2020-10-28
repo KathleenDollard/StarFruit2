@@ -1,16 +1,11 @@
 ﻿namespace StarFruit.Common
 {
-    public enum MemberSource
+    public enum CodeElement
     {
         Unknown,
         Property,
         MethodParameter,
-        CtorParameter
-    }
-
-    public enum CommandSource
-    {
-        Unknown,
+        CtorParameter,
         Class,
         Method,
     }

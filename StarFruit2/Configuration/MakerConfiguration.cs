@@ -108,6 +108,16 @@ namespace StarFruit2
                 : (DefaultValueDescriptor)new ExplicitDefaultValueDescriptor(defaultValue);
         }
 
+        internal bool GetAsync<TCommandSymbol>(TCommandSymbol symbol) where TCommandSymbol : class, ISymbol
+        {
+            return symbol switch
+            {
+                INamedTypeSymbol _ => false,
+                IMethodSymbol s => s.IsAsync,
+                _ => throw new NotImplementedException()
+            };
+        }
+
         private DefaultValueDescriptor? GetDefaultValueForParameter(IParameterSymbol symbol) 
             => !symbol.HasExplicitDefaultValue
                 ? null

@@ -243,7 +243,7 @@ namespace StarFruit2.Tests
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
-            actual.Source.Should().Be(MemberSource.Property);
+            actual.CodeElement.Should().Be(CodeElement.Property);
         }
 
         [Fact]
@@ -757,7 +757,7 @@ namespace StarFruit2.Tests
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.Options.First();
 
-            actual.Source.Should().Be(MemberSource.Property);
+            actual.CodeElement.Should().Be(CodeElement.Property);
         }
 
         #endregion
