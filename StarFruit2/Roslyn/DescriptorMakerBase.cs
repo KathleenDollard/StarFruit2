@@ -192,8 +192,22 @@ namespace Starfruit2
            where TCommandSymbol : class, ISymbol
            => parentSymbol switch
            {
-               INamedTypeSymbol s => GetOptionDescriptors(parent, s),
-               IMethodSymbol s => GetOptionDescriptors(parent, s),
+               INamedTypeSymbol s => s.GetMembers()
+                                      .OfType<IPropertySymbol>()
+                                      .Select((Symbol, Position) => (Symbol, Position))
+                                      .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+                                      .Select(p => CreateOptionDescriptor(parent,
+                                                                          p.Symbol,
+                                                                          MemberSource.Property,
+                                                                          p.Position)),
+               IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
+                                              .Select((Symbol, Position) => (Symbol, Position))
+                                              .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+                                              .Select(p => CreateOptionDescriptor(parent,
+                                                                                  p.Symbol,
+                                                                                  MemberSource.MethodParameter,
+                                                                                  p.Position)),
+                                       
                _ => throw new NotImplementedException()
            };
 
@@ -202,86 +216,98 @@ namespace Starfruit2
           where TCommandSymbol : class, ISymbol
           => parentSymbol switch
           {
-              INamedTypeSymbol s => GetArgumentDescriptors(parent, s),
-              IMethodSymbol s => GetArgumentDescriptors(parent, s),
+              INamedTypeSymbol s => s.GetMembers()
+                                     .OfType<IPropertySymbol>()
+                                     .Select((Symbol, Position) => (Symbol, Position))
+                                     .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+                                     .Select(p => CreateArgumentDescriptor(parent,
+                                                                           p.Symbol,
+                                                                           MemberSource.Property,
+                                                                           p.Position)),
+              IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
+                                             .Select((Symbol, Position) => (Symbol, Position))
+                                             .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+                                             .Select(p => CreateArgumentDescriptor(parent,
+                                                                                   p.Symbol,
+                                                                                   MemberSource.MethodParameter,
+                                                                                   p.Position)),
               _ => throw new NotImplementedException()
           };
 
-        private IEnumerable<ArgumentDescriptor> GetArgumentDescriptors(ISymbolDescriptor parent,
-                                                                       INamedTypeSymbol parentSymbol) =>
-            // make tuple to capture index
-            parentSymbol.GetMembers()
-                        .Where(x=>x is I)
-                        .Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
-                        .OfType<MemberWrapper<IPropertySymbol>>()
-                        .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
-                        .Select(p => CreateArgumentDescriptor(parent,
-                                                              p.Symbol,
-                                                              MemberSource.Property,
-                                                              p.Position));
+        //private IEnumerable<ArgumentDescriptor> GetArgumentDescriptors(ISymbolDescriptor parent,
+        //                                                               INamedTypeSymbol parentSymbol) =>
+        //    // make tuple to capture index
+        //    parentSymbol.GetMembers()
+        //                .OfType<IPropertySymbol>()
+        //                .Select((Symbol, Position) => (Symbol, Position))
+        //                .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+        //                .Select(p => CreateArgumentDescriptor(parent,
+        //                                                      p.Symbol,
+        //                                                      MemberSource.Property,
+        //                                                      p.Position));
 
-        private IEnumerable<ArgumentDescriptor> GetArgumentDescriptors(ISymbolDescriptor parent,
-                                                                      IMethodSymbol parentSymbol)
-            =>
-          // make tuple to capture index
-          parentSymbol.Parameters.Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
-                                 .OfType<MemberWrapper<IParameterSymbol>>()
-                                 .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
-                                 .Select(p => CreateArgumentDescriptor(parent,
-                                                                       p.Symbol,
-                                                                       MemberSource.MethodParameter,
-                                                                       p.Position));
-
-
-        private IEnumerable<OptionDescriptor> GetOptionDescriptors(ISymbolDescriptor parent,
-                                                                   INamedTypeSymbol parentSymbol) =>
-            // make tuple to capture index
-            parentSymbol.GetMembers()
-                        .Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
-                        .OfType<MemberWrapper<IPropertySymbol>>()
-                        .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
-                        .Select(p => CreateOptionDescriptor(parent,
-                                                            p.Symbol,
-                                                            MemberSource.Property,
-                                                            p.Position));
-
-        private IEnumerable<OptionDescriptor> GetOptionDescriptors(ISymbolDescriptor parent,
-                                                                   IMethodSymbol parentSymbol)
-            =>
-          // make tuple to capture index
-          parentSymbol.Parameters.Select((symbol, pos) => MemberWrapper.Create(symbol, pos))
-                                 .OfType<MemberWrapper<IParameterSymbol>>()
-                                 .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
-                                 .Select(p => CreateOptionDescriptor(parent,
-                                                                       p.Symbol,
-                                                                       MemberSource.MethodParameter,
-                                                                       p.Position));
+        //private IEnumerable<ArgumentDescriptor> GetArgumentDescriptors(ISymbolDescriptor parent,
+        //                                                              IMethodSymbol parentSymbol)
+        //    =>
+        //  // make tuple to capture index
+        //  parentSymbol.Parameters.OfType<IParameterSymbol>()
+        //                         .Select((Symbol, Position) => (Symbol, Position))
+        //                         .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+        //                         .Select(p => CreateArgumentDescriptor(parent,
+        //                                                               p.Symbol,
+        //                                                               MemberSource.MethodParameter,
+        //                                                               p.Position));
 
 
-        private class MemberWrapper
-        {
-            public static MemberWrapper Create(ISymbol symbol, int position)
-            => symbol switch
-            {
-                IPropertySymbol s => new MemberWrapper<IPropertySymbol>(s, position),
-                IParameterSymbol s => new MemberWrapper<IParameterSymbol>(s, position),
-                ISymbol s => new MemberWrapper<ISymbol>(s, position)
-            };
-        }
+        //private IEnumerable<OptionDescriptor> GetOptionDescriptors(ISymbolDescriptor parent,
+        //                                                           INamedTypeSymbol parentSymbol) =>
+        //    // make tuple to capture index
+        //    parentSymbol.GetMembers()
+        //                .OfType<IPropertySymbol>()
+        //                .Select((Symbol, Position) => (Symbol, Position))
+        //                .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+        //                .Select(p => CreateOptionDescriptor(parent,
+        //                                                    p.Symbol,
+        //                                                    MemberSource.Property,
+        //                                                    p.Position));
 
-        private class MemberWrapper<T> : MemberWrapper
-            where T : ISymbol
-        {
-            public MemberWrapper(T? symbol, int position)
-            {
-                Symbol = symbol;
-                Position = position;
-            }
-            public T Symbol;
+        //private IEnumerable<OptionDescriptor> GetOptionDescriptors(ISymbolDescriptor parent,
+        //                                                           IMethodSymbol parentSymbol)
+        //    =>
+        //  // make tuple to capture index
+        //  parentSymbol.Parameters.OfType<IParameterSymbol>()
+        //                         .Select((Symbol, Position) => (Symbol, Position))
+        //                         .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+        //                         .Select(p => CreateOptionDescriptor(parent,
+        //                                                             p.Symbol,
+        //                                                             MemberSource.MethodParameter,
+        //                                                             p.Position));
 
 
-            public int Position;
-        }
+        //private class MemberWrapper
+        //{
+        //    public static MemberWrapper Create(ISymbol symbol, int position)
+        //    => symbol switch
+        //    {
+        //        IPropertySymbol s => new MemberWrapper<IPropertySymbol>(s, position),
+        //        IParameterSymbol s => new MemberWrapper<IParameterSymbol>(s, position),
+        //        ISymbol s => new MemberWrapper<ISymbol>(s, position)
+        //    };
+        //}
+
+        //private class MemberWrapper<T> : MemberWrapper
+        //    where T : ISymbol
+        //{
+        //    public MemberWrapper(T? symbol, int position)
+        //    {
+        //        Symbol = symbol;
+        //        Position = position;
+        //    }
+        //    public T Symbol;
+
+
+        //    public int Position;
+        //}
 
     }
 }

@@ -205,13 +205,13 @@ namespace StarFruit2.Tests
         public void DefaultValue_as_parameter_from_parameter_initialize_on_argument()
         {
             var code = @"
-                       public int MyMethod(int myParamArg=Int32.MinValue)"
+                       public void MyMethod(int myParamArg=Int32.MinValue) {} "
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
-            actual.DefaultValue.CodeRepresentation.Should().Be("Int32.MinValue");
+            actual.DefaultValue.CodeRepresentation.Should().Be("-2147483648");
         }
 
         [Fact]
@@ -253,7 +253,7 @@ namespace StarFruit2.Tests
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.Arguments.First();
+            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
 
             actual.Source.Should().Be(MemberSource.MethodParameter);
         }
@@ -488,7 +488,7 @@ namespace StarFruit2.Tests
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
-            actual.Arguments.First().DefaultValue.CodeRepresentation.Should().Be("Int32.MinValue");
+            actual.Arguments.First().DefaultValue.CodeRepresentation.Should().Be("-2147483648");
         }
 
         [Fact]
@@ -513,7 +513,7 @@ namespace StarFruit2.Tests
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.Options.First();
+            var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Source.Should().Be(MemberSource.MethodParameter);
         }

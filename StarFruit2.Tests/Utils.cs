@@ -135,7 +135,7 @@ namespace StarFruit2.Tests
         internal static string WrapInStandardClass(this string code)
        => code.WrapInClass("MyClass")
               .WrapInNamespace("MyNamespace")
-              .PrefaceWithUsing("StarFruit2");
+              .PrefaceWithUsing("StarFruit2", "System");
 
         internal static string WrapInStandardNamespace(this string code)
         => code.WrapInNamespace("MyNamespace")

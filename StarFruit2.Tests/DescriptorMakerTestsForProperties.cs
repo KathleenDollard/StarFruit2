@@ -5,6 +5,7 @@ using StarFruit.Common;
 using System;
 using System.Linq;
 using Xunit;
+using FluentAssertions.Execution;
 
 namespace StarFruit2.Tests
 {
@@ -259,9 +260,10 @@ namespace StarFruit2.Tests
             var actual2 = actualCli.CommandDescriptor.Options.First();
             var actual3 = actualCli.CommandDescriptor.Options.Skip(1).First();
 
-            actual1.Position.Should().Be(2);
-            actual2.Position.Should().Be(1);
-            actual3.Position.Should().Be(3);
+            using var x = new AssertionScope();
+            actual1.Position.Should().Be(1);
+            actual2.Position.Should().Be(0);
+            actual3.Position.Should().Be(2);
         }
 
         #endregion
