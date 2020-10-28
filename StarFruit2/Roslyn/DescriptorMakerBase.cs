@@ -43,9 +43,9 @@ namespace Starfruit2
 
     // * Test methods/parameters            DONE
 
-    // Add ordering for params              ToDo
-    // Mark async                           ToDo
-    // Member/Command Source (prop/parm)    ToDo
+    // Add ordering for params              DONE
+    // Mark async                           DONE
+    // Code element (prop/parm)             DONE
     // Constructors                         ToDo
 
     // Unique fieldname in descripriptor    Probably to do
