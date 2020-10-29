@@ -25,8 +25,6 @@ namespace StarFruit2
     public class Generate
     {
 
-        // REVERT COMMIT, ADD TO NEW BRANCH
-
         // generate is a c# generate class
 
         // descriptor free, CodeGenerator should rip descirptor apart and pass into
@@ -59,8 +57,6 @@ namespace StarFruit2
             // consider using Utils.cs, but each line as list elem is ok
             List<string> strCollection = new List<string>
             {
-                // better way than casting like this?
-                // solve this w/ extension method on Scope enum, if not introduce method in Generate for VB vs C#
                 $@"{scope.CSharpString()} {strPartial} class {className}", "{"
             };
 
@@ -78,19 +74,19 @@ namespace StarFruit2
             return $"{scope.CSharpString()} {compositeType} {name} {{ get; {setter} }}";
         }
 
-        public List<string> Method(Scope scope, string name, List<string> methodBody, string type, string? genericType, string arguments = "", bool isAsync = false)
+        // generate.MakeParam("BindingContext", "bindingContext")
+        // could do String.join(",",generate.MakeParam(...), generate.MakeParam(...))
+        // TODO: re-eval this interface for prettiness
+        public List<string> Method(Scope scope, string name, List<string> methodBody, string returnType, bool isAsync = false, params string[] arguments)
         {
-            // very mixed feelings about this. It's super easy to check here, but maybe it's just the
-            // compiler's job and I shouldn't worry about it
-            if (isAsync && type != "Task")
+            if (isAsync && !returnType.StartsWith("Task"))
             {
                 throw new InvalidOperationException("async method must return a task in this context");
             }
 
             string asyncStr = isAsync ? "async" : "";
-            string compositeType = genericType is null ? type : $"{type}<{genericType}>";
             List<string> strCollection = new List<string> {
-                $"{scope.CSharpString()} {asyncStr} {compositeType} {name}({arguments})",
+                $"{scope.CSharpString()} {asyncStr} {returnType} {name}({String.Join(", ", arguments)})",
                 "{"
             };
 
@@ -100,8 +96,8 @@ namespace StarFruit2
             return strCollection;
         }
 
-        // TODO: rename me
-        public string InstanceDeclaration => "NewInstance = GetNewInstance(bindingContext);";
+        public string SetNewInstance 
+            => "NewInstance = GetNewInstance(bindingContext);";
 
         public List<string> Constructor(string className, string cliName, IEnumerable<string> constructorBody)
         {
@@ -118,6 +114,28 @@ namespace StarFruit2
             return strCollection;
         }
 
+        public List<string> BuildBlock(string firstLine, List<string> body)
+        {
+            var strCollection = new List<string>
+            {
+                firstLine,
+                "{"
+            };
+
+            strCollection.AddRange(body);
+
+            strCollection.Add("}");
+
+            return strCollection;
+        }
+
+        public string MakeGenericType(string type) => type;
+        public string MakeGenericType(string type, params string[] genericArgs) 
+            => $"{type}<{String.Join(", ", genericArgs)}>";
+
+        public string MakeParam(string paramType, string paramName)
+            => $"{paramType} {paramName}";
+
 
         // string AssignTo(string varName, string assignment) -> varname = assignment;
         // TODO: split left and right parts into assignment (left) and expression (right)
@@ -129,17 +147,78 @@ namespace StarFruit2
         public string ArgDeclarationForCtor(string name, string cliName, string argType)
             => Assign(name, ArgInitExpression(cliName, argType));
 
-
         public string Assign(string leftHand, string rightHand, string op = "=") 
             => $"{leftHand} {op} {rightHand}{(rightHand.EndsWith(";") ? "" : ";")}";
 
-        public static string ArgInitExpression(string cliName, string argType) 
+        // if we keep these 2 init expressions, then this could just be a single
+        // object init method call.
+        public static string ArgInitExpression(string cliName, string argType)
             => $@"new Argument<{argType}>(""{cliName}"");";
 
-        public string OptionInitExpression(string optType, string cliName) => $@"new Option<{optType}>(""{cliName}"");";
+        public string OptionInitExpression(string cliName, string optType)
+            => $@"new Option<{optType}>(""{cliName}"");";
 
 
         public string AddToCommand(string methodName, string argumentName)
             => $"Command.{methodName}({argumentName});";
+
+        internal string GetArg(string? cliName, string argType, string? description) 
+            => $"GetArg<argType>({cliName}, {description})";
+
+        internal string GetOpt(string? cliName, string optType, string? description) 
+            => $"GetOpt<optType>({cliName}, {description})";
+
+        internal string NewCommand(string? cliName) 
+            => $"new Command({cliName})";
+
+        internal string NewCommandHandler(string cmdName) 
+            => $"new CommandSourceHandler({cmdName})";
+
+        public string Return(string returnValue, bool await = false) 
+            => $"return {(await == true ? "await" : "")} {returnValue};";
+
+        public List<string> Return(List<string> returnValue, bool await = false) {
+
+            var strCollection = new List<string> 
+            { 
+                $"return {(await == true ? "await" : "")} {returnValue[0]}" 
+            };
+
+            if (returnValue.Count() == 1)
+            {
+                strCollection[0] += ";";
+                return strCollection;
+            } else if (returnValue.Count() == 0)
+            {
+                return new List<string> { };
+            }
+
+            strCollection.AddRange(returnValue.ToArray()[1..^1]);
+            strCollection.Add($"{returnValue[^1]};");
+
+            return strCollection;
+        }
+
+        internal string GetValueMethod(string valToFetch)
+            => $"GetValue(bindingContext, {valToFetch})";
+
+        // how much should be here vs code generator?
+        // look at this using a public object init method
+        internal List<string> NewCliRoot(List<string> ctorParams, List<string> ctorProperties)
+        {
+            var paramValues = ctorParams.Select(param => GetValueMethod(param));
+            var propDeclarations = ctorProperties.Select(prop => $"{Assign(prop, GetValueMethod(prop))},");
+
+            var strCollection = new List<string> 
+            {
+                $"new CliRoot({String.Join(", ", paramValues)})",
+                "{"
+            };
+
+            strCollection.AddRange(propDeclarations);
+            strCollection.Add("}");
+
+            return strCollection;
+        }
     }
 }

@@ -30,8 +30,8 @@ namespace StarFruit2.Tests
         public void Namespace_ReturnsNamespaceDeclarationAndBody()
         {
             var name = "ThatsASweetNamespace";
-            var classBody = new List<string> { "this is inside the namespace;", "var fizz = 42;" };
-            var expectedData = new List<string> { $"namespace {name}", "{"};
+            var classBody = new List<string> { "// this is inside the namespace", "var fizz = 42;" };
+            var expectedData = new List<string> { $"namespace {name}", "{" };
             expectedData.AddRange(classBody);
             expectedData.Add("}");
 
@@ -47,7 +47,7 @@ namespace StarFruit2.Tests
             var isPartial = true;
             var name = "SweetClassName";
             var classBody = new List<string> { "SomeFunction();", "var fizz = 42;" };
-            var expectedData = new List<string> { $"public partial class {name}", "{"};
+            var expectedData = new List<string> { $"public partial class {name}", "{" };
             expectedData.AddRange(classBody);
             expectedData.Add("}");
 
@@ -130,7 +130,7 @@ namespace StarFruit2.Tests
 
             result.Should().Be(expectedData);
         }
-        
+
         [Fact]
         public void ArgDeclarationForCtor_ReturnsArgDeclaration()
         {
@@ -154,6 +154,233 @@ namespace StarFruit2.Tests
             var result = generate.AddToCommand(methodName, argumentName);
 
             result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void MakeParam_ReturnsStringFormattedParam()
+        {
+            var paramName = "someParam";
+            var paramType = "Object";
+            var expectedData = "Object someParam";
+
+            var result = generate.MakeParam(paramType, paramName);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void MakeGenericType_WithSingleTypeReturnsType()
+        {
+            var type = "string";
+
+            var result = generate.MakeGenericType(type);
+
+            result.Should().Be(type);
+        }
+
+        [Fact]
+        public void MakeGenericType_WithTypeAndSingleGenericArg()
+        {
+            var baseType = "List";
+            var generic = "string";
+            var expectedData = "List<string>";
+
+            var result = generate.MakeGenericType(baseType, generic);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void MakeGenericType_WithTypeAndMultipleGenericArgs()
+        {
+            var baseType = "Dictionary";
+            var firstGeneric = "string";
+            var secondGeneric = "Object";
+            var expectedData = "Dictionary<string, Object>";
+
+            var result = generate.MakeGenericType(baseType, firstGeneric, secondGeneric);
+
+            result.Should().Be(expectedData);
+        }
+
+
+        [Fact]
+        public void Method_ReturnsCorrectMethodWithNoArguments()
+        {
+            var methodBody = new List<string>
+            {
+                "var SomeThing = 42;",
+                "var SomeOtherThing = true;",
+                "return SomeThing;"
+            };
+            var methodName = "SomeMethod";
+            var returnType = "int";
+            var expectedData = new List<string>
+            {
+                $"public {returnType} {methodName}()",
+                "{"
+            };
+            expectedData.AddRange(methodBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Method_ReturnsCorrectAsyncMethodWithNoArguments()
+        {
+            var methodBody = new List<string>
+            {
+                "var SomeThing = 42;",
+                "var SomeOtherThing = true;",
+                "return SomeThing;"
+            };
+            var methodName = "SomeMethod";
+            var returnType = "Task<int>";
+            var expectedData = new List<string>
+            {
+                $"public async {returnType} {methodName}()",
+                "{"
+            };
+            expectedData.AddRange(methodBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType, true));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Method_ReturnsCorrectMethodWithOneArgument()
+        {
+            var methodBody = new List<string>
+            {
+                "var SomeThing = 42;",
+                "var SomeOtherThing = true;",
+                "return SomeThing;"
+            };
+            var methodName = "SomeMethod";
+            var returnType = "Task<int>";
+            var argument = "Object someArgument";
+            var expectedData = new List<string>
+            {
+                $"public {returnType} {methodName}({argument})",
+                "{"
+            };
+            expectedData.AddRange(methodBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType, false, argument));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Method_ReturnsCorrectMethodWithMultipleArguments()
+        {
+            var methodBody = new List<string>
+            {
+                "var SomeThing = 42;",
+                "var SomeOtherThing = true;",
+                "return SomeThing;"
+            };
+            var methodName = "SomeMethod";
+            var returnType = "Task<int>";
+            var argument = "Object someArgument";
+            var otherArgument = "String str";
+            var expectedData = new List<string>
+            {
+                $"public {returnType} {methodName}({argument}, {otherArgument})",
+                "{"
+            };
+            expectedData.AddRange(methodBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType, false, argument, otherArgument));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Assign_WithNoOpGivenReturnsAssignment()
+        {
+            var leftHand = "string fizz";
+            var rightHand = @"""fizz""";
+            var expectedData = $"{leftHand} = {rightHand};";
+
+            var result = generate.Assign(leftHand, rightHand);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void Assign_WithOpGivenReturnsOperation()
+        {
+            var leftHand = "string fizz";
+            var rightHand = @"""fizz""";
+            var op = "+=";
+            var expectedData = $"{leftHand} += {rightHand};";
+
+            var result = generate.Assign(leftHand, rightHand, op);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void Return_WhenGivenSingleStringAndAwaitReturnsCorrectString()
+        {
+            var returnValue = "SomeMethod()";
+            var expectedData = "return await SomeMethod();";
+
+            var result = generate.Return(returnValue, true);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void Return_WhenGivenSingleStringReturnsCorrectString()
+        {
+            var returnValue = "SomeMethod()";
+            var expectedData = "return SomeMethod();";
+
+            var result = Utils.Normalize(generate.Return(returnValue, false));
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void Return_WhenGivenMultipleStringListReturnsCorrectStringList()
+        {
+            var returnValue = new List<string> { "new Object()", "{", "SomeProp = 42", "}" };
+            var expectedData = new List<string> { "return new Object()", "{", "SomeProp = 42", "};" };
+
+            var result = Utils.Normalize(generate.Return(returnValue));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Return_WhenGivenTwoStringListReturnsCorrectStringList()
+        {
+            var returnValue = new List<string> { "SomeMethod(arg1,", "arg2)"};
+            var expectedData = new List<string> { "return SomeMethod(arg1,", "arg2);" };
+
+            var result = Utils.Normalize(generate.Return(returnValue));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Return_WhenGivenSingleStringListReturnsCorrectStringList()
+        {
+            var returnValue = new List<string> { "new Object()" };
+            var expectedData = new List<string> { "return new Object();" };
+
+            var result = Utils.Normalize(generate.Return(returnValue));
+
+            result.Should().BeEquivalentTo(expectedData);
         }
     }
 }

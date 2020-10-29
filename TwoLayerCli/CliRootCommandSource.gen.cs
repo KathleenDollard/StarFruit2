@@ -56,6 +56,7 @@ namespace TwoLayerCli
                 Find_StringOption,
                 Find_BoolOption
             };
+
             FindCommand.Handler = new CommandSourceCommandHandler(InvokeFindAsync);
 
             return FindCommand;
@@ -75,10 +76,11 @@ namespace TwoLayerCli
         {
 
             List_BoolOption = new Option<bool>("bool-option");
-            ListCommand = new Command("list")
-            { 
-                List_BoolOption 
-            };
+            ListCommand = new Command("list");
+            //{ 
+            //    List_BoolOption 
+            //};
+            ListCommand.Add(List_BoolOption);
             ListCommand.Handler = new CommandSourceCommandHandler(InvokeListAsync);
 
             return ListCommand;
@@ -87,10 +89,12 @@ namespace TwoLayerCli
 
         // must be here, since we have to gen 89 and 91
         private CliRoot GetNewInstance(BindingContext bindingContext)
-            => new CliRoot(GetValue(bindingContext, CtorParam))
+        {
+            return new CliRoot(GetValue(bindingContext, CtorParam))
             {
                 StringProperty = GetValue(bindingContext, StringProperty)
             };
+        }
     }
 
 }
