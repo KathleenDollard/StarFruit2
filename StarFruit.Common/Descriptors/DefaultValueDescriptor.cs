@@ -10,7 +10,7 @@ namespace StarFruit2.Common.Descriptors
             DefaultValue = defaultValue;
         }
 
-        public string CodeRepresentation => DefaultValue switch
+        public virtual string CodeRepresentation => DefaultValue switch
         {
             short i => i.ToString(),
             int i => i.ToString(),
@@ -21,5 +21,18 @@ namespace StarFruit2.Common.Descriptors
         };
 
         public object? DefaultValue { get; set; }
+    }
+
+    public class ExplicitDefaultValueDescriptor : DefaultValueDescriptor
+    {
+        private string explicitDefaultValue;
+        public ExplicitDefaultValueDescriptor(string defaultValue)
+            : base(defaultValue)
+        {
+            explicitDefaultValue = defaultValue;
+        }
+
+        public override string CodeRepresentation => explicitDefaultValue;
+
     }
 }

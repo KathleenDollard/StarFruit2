@@ -6,36 +6,49 @@ using System.Collections.Generic;
 using System.Linq;
 using StarFruit2;
 using StarFruit2.Common;
+using System.Diagnostics;
+using StarFruit.Common;
 
 namespace Starfruit2
 {
     // Implementation notes:
     // Arguments:
     // * Name/CliName/OriginalName:    DONE
-    // * Description:                  Needs tests
-    // * IsHidden:                     Will support
+    // * Description:                  DONE
+    // * IsHidden:                     DONE
     // * ArgumentType:                 DONE
     // * Arity:                        Will only support as descriptive scenarios when understood. May need backdoor for cases not generally supported like this.
-    // * AllowedValues:                Will support
-    // * DefaultValue:                 Will support
-    // * Required:                     Will support
+    // * AllowedValues:                DONE
+    // * DefaultValue:                 DONE
+    // * Required:                     DONE
 
     // Options:                      
-    // * Name/CliName/OriginalName:    DONE
-    // * Description:                  Needs tests
-    // * IsHidden:                     Will support
-    // * Aliases:                      Will support
-    // * Prefix:                       Remove and make part of config. Individual choices will be hard (consistency encouraged)
-    // * Required:                     Will support
+    // * Name/CliName/OriginalName:         DONE
+    // * Description:                       DONE
+    // * IsHidden:                          DONE
+    // * Aliases:                           DONE
+    // * ArgumentType:                      DONE
+    // * Arity:                             Will only support as descriptive scenarios when understood. May need backdoor for cases not generally supported like this.
+    // * AllowedValues:                     DONE
+    // * DefaultValue:                      DONE
+    // * Required:                          DONE
 
-    // Comamnds                      
-    // * Name/CliName/OriginalName:    DONE
-    // * Description:                  Needs tests
-    // * IsHidden:                     Will support
-    // * Aliases:                      Will support
-    // * TreatUnmatchedTokensAsErrors  What scenarios need this command specific?
+    // Comamnds                           
+    // * Name/CliName/OriginalName:         DONE
+    // * Description:                       DONE
+    // * IsHidden:                          DONE
+    // * Aliases:                           DONE
+    // * TreatUnmatchedTokensAsErrors       DONE
+    // * SubCommands                        Will do - done and tested for methods, not tested for derived classes, but probably done
 
-    // Explore putting unique name for fields into descripriptor
+    // * Test methods/parameters            DONE
+
+    // Add ordering for params              ToDo
+    // Mark async                           ToDo
+    // Member/Command Source (prop/parm)    ToDo
+    // Constructors                         ToDo
+
+    // Unique fieldname in descripriptor    Probably to do
 
     public class DescriptorMakerBase
     {
@@ -44,30 +57,128 @@ namespace Starfruit2
 
         public DescriptorMakerBase(MakerConfiguration config, SemanticModel semanticModel)
         {
-            this.config = config ?? new MakerConfiguration();
+            this.config = config ?? new MakerConfiguration(new CSharpLanguageHelper());
             this.semanticModel = semanticModel;
         }
     }
 
-    public abstract class DescriptorMakerBase<TCommandSymbol, TMemberSymbol> : DescriptorMakerBase
-        where TCommandSymbol : class, ISymbol
-        where TMemberSymbol : class, ISymbol
+    public abstract class DescriptorMaker : DescriptorMakerBase
+    //where TCommandSymbol : class, ISymbol
+    //where TMemberSymbol : class, ISymbol
     {
-        public DescriptorMakerBase(MakerConfiguration config, SemanticModel semanticModel)
+        public DescriptorMaker(MakerConfiguration config, SemanticModel semanticModel)
            : base(config, semanticModel)
         { }
 
-        protected abstract OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
-                                                                   TMemberSymbol symbol);
-        protected abstract ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
-                                                                       TMemberSymbol symbol);
-        protected abstract IEnumerable<TMemberSymbol> GetMembers(TCommandSymbol parentSymbol);
+        protected virtual IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent,
+                                                                        INamedTypeSymbol parentSymbol)
+        {
+            IEnumerable<ISymbol> members = config.GetSubCommandMembers(parentSymbol);
+            return members.Select(s => s switch
+                {
+                    IMethodSymbol x => CreateCommandDescriptor(parent, x),
+                    INamedTypeSymbol x => CreateCommandDescriptor(parent, x),
+                    _ => throw new NotImplementedException()
+                });
+        }
 
-        protected abstract IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent,
-                                                                         TCommandSymbol parentSymbol);
+        protected virtual CommandDescriptor CreateCommandDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
+                                                                                    TCommandSymbol symbol)
+            where TCommandSymbol : class, ISymbol
+        {
+            Assert.NotNull(symbol);
+            var command = new CommandDescriptor(parent, symbol.Name, symbol)
+            {
+                Name = config.CommandNameToName(symbol.Name),
+                CliName = config.CommandNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                IsHidden = config.GetIsHidden(symbol),
+                TreatUnmatchedTokensAsErrors = config.GetTreatUnmatchedTokensAsErrors(symbol),
+                IsAsync = config.GetAsync(symbol)
+            };
+            command.Aliases.AddRange(config.GetAliases(symbol));
+            command.AddArguments(GetArguments(command, symbol));
+            command.AddOptions(GetOptions(command, symbol));
+            if (symbol is INamedTypeSymbol s)
+            {
+                IEnumerable<CommandDescriptor> subCommands = GetSubCommands(command, s);
+                command.AddCommands(subCommands);
+            }
+            return command;
+        }
 
-        protected internal virtual CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent,
+        protected virtual ArgumentDescriptor CreateArgumentDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
+                                                                                     TMemberSymbol symbol,
+                                                                                     CodeElement memberSource,
+                                                                                     int position)
+        where TMemberSymbol : class, ISymbol
+            // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
+        {
+            var argType = config.GetArgTypeInfo(symbol);
+            Assert.NotNull(argType, "argType");
+            var arg = new ArgumentDescriptor(argType, parent, symbol.Name, symbol)
+            {
+                Name = config.ArgumentNameToName(symbol.Name),
+                CliName = config.ArgumentNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                Required = config.GetIsRequired(symbol),
+                IsHidden = config.GetIsHidden(symbol),
+                DefaultValue = config.GetDefaultValue(symbol),
+                CodeElement = memberSource,
+                Position = position,
+            };
+            arg.AllowedValues.AddRange(config.GetAllowedValues(symbol));
+            return arg;
+        }
+
+
+        protected virtual OptionDescriptor CreateOptionDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
+                                                                                 TMemberSymbol symbol,
+                                                                                 CodeElement memberSource,
+                                                                                 int position)
+        where TMemberSymbol : class, ISymbol
+        {
+            var option = new OptionDescriptor(parent, symbol.Name, symbol)
+            {
+                Name = config.OptionNameToName(symbol.Name),
+                CliName = config.OptionNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                Required = config.GetIsRequired(symbol),
+                IsHidden = config.GetIsHidden(symbol),
+                CodeElement = memberSource,
+                Position = position,
+            };
+
+            option.Aliases.AddRange(config.GetAliases(symbol));
+            option.Arguments.Add(CreateOptionArgumentDescriptor(option, symbol));
+            return option;
+        }
+
+        protected virtual ArgumentDescriptor CreateOptionArgumentDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
+                                                                            TMemberSymbol symbol)
+        where TMemberSymbol : class, ISymbol
+        {
+            var argType = config.GetArgTypeInfo(symbol)
+                            ?? new ArgTypeInfoRoslyn(typeof(bool));
+            var arg = new ArgumentDescriptor(argType,
+                                             parent,
+                                             symbol.Name,
+                                             symbol)
+            {
+                Name = symbol.Name,
+                CliName = config.OptionArgumentNameToCliName(symbol.Name),
+                Description = config.GetDescription(symbol) ?? "",
+                DefaultValue = config.GetDefaultValue(symbol),
+                Required = config.GetIsRequired(symbol),
+                IsHidden = config.GetIsHidden(symbol),
+            };
+            arg.AllowedValues.AddRange(config.GetAllowedValues(symbol));
+            return arg;
+        }
+
+        protected internal virtual CliDescriptor CreateCliDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
                                                                      TCommandSymbol symbol)
+        where TCommandSymbol : class, ISymbol
         {
             var cliDesriptor = new CliDescriptor
             {
@@ -76,30 +187,53 @@ namespace Starfruit2
             };
             return cliDesriptor;
         }
-        protected CommandDescriptor CreateCommandDescriptor(ISymbolDescriptor? parent,
-                                                            TCommandSymbol symbol)
-        {
-            Assert.NotNull(symbol);
-            var command = new CommandDescriptor(parent, symbol.Name, symbol)
-            {
-                Name = config.CommandNameToCliName(symbol.Name),
-            };
-            command.AddArguments(GetArguments(command, symbol));
-            command.AddOptions(GetOptions(command, symbol));
-            command.AddCommands(GetSubCommands(command, symbol));
-            return command;
-        }
 
-        protected IEnumerable<OptionDescriptor> GetOptions(ISymbolDescriptor parent,
+        protected IEnumerable<OptionDescriptor> GetOptions<TCommandSymbol>(ISymbolDescriptor parent,
                                                            TCommandSymbol parentSymbol)
-        => GetMembers(parentSymbol).OfType<TMemberSymbol>()
-                  .Where(p => config.IsOption(p.Name, p.GetAttributes()))
-                  .Select(p => CreateOptionDescriptor(parent, p));
+           where TCommandSymbol : class, ISymbol
+           => parentSymbol switch
+           {
+               INamedTypeSymbol s => s.GetMembers()
+                                      .OfType<IPropertySymbol>()
+                                      .Select((Symbol, Position) => (Symbol, Position))
+                                      .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+                                      .Select(p => CreateOptionDescriptor(parent,
+                                                                          p.Symbol,
+                                                                          CodeElement.Property,
+                                                                          p.Position)),
+               IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
+                                              .Select((Symbol, Position) => (Symbol, Position))
+                                              .Where(p => config.IsOption(p.Symbol.Name, p.Symbol))
+                                              .Select(p => CreateOptionDescriptor(parent,
+                                                                                  p.Symbol,
+                                                                                  CodeElement.MethodParameter,
+                                                                                  p.Position)),
+                                       
+               _ => throw new NotImplementedException()
+           };
 
-        protected IEnumerable<ArgumentDescriptor> GetArguments(ISymbolDescriptor parent,
+        protected IEnumerable<ArgumentDescriptor> GetArguments<TCommandSymbol>(ISymbolDescriptor parent,
                                                                TCommandSymbol parentSymbol)
-         => GetMembers(parentSymbol).OfType<TMemberSymbol>()
-                   .Where(p => config.IsArgument(p.Name, p.GetAttributes()))
-                   .Select(p => CreateArgumentDescriptor(parent, p));
+          where TCommandSymbol : class, ISymbol
+          => parentSymbol switch
+          {
+              INamedTypeSymbol s => s.GetMembers()
+                                     .OfType<IPropertySymbol>()
+                                     .Select((Symbol, Position) => (Symbol, Position))
+                                     .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+                                     .Select(p => CreateArgumentDescriptor(parent,
+                                                                           p.Symbol,
+                                                                           CodeElement.Property,
+                                                                           p.Position)),
+              IMethodSymbol s => s.Parameters.OfType<IParameterSymbol>()
+                                             .Select((Symbol, Position) => (Symbol, Position))
+                                             .Where(p => config.IsArgument(p.Symbol.Name, p.Symbol))
+                                             .Select(p => CreateArgumentDescriptor(parent,
+                                                                                   p.Symbol,
+                                                                                   CodeElement.MethodParameter,
+                                                                                   p.Position)),
+              _ => throw new NotImplementedException()
+          };
+
     }
 }

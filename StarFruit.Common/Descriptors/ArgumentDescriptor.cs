@@ -14,12 +14,12 @@ namespace StarFruit2.Common.Descriptors
         }
 
         public ArityDescriptor? Arity { get; set; }
-        //TODO: AllowedValues aren't yet supported in DescriptorMakerBase or tests
         public List<object> AllowedValues { get; } = new List<object>();
-        // TODO: Consider how ArgumentType works when coming from JSON. If we do Json
         public ArgTypeInfoBase ArgumentType { get; }
         public DefaultValueDescriptor? DefaultValue { get; set; }
         public bool Required { get; set; }
+        public CodeElement CodeElement { get; set; }
+        public int Position { get; set; }
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {

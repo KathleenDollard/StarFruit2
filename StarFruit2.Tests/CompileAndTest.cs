@@ -36,7 +36,7 @@ namespace StarFruit2.Tests
             var generatedSource = testData.GeneratedSource
                                     .WrapInMethod(methodName)
                                     .WrapInClass(className)
-                                    .PrefaceWithUsing();
+                                    .PrefaceWithUsing("System.CommandLine");
 
             using var kernel = new CSharpKernel();
 
@@ -59,7 +59,7 @@ namespace StarFruit2.Tests
             var generatedSource = testData.GeneratedSource
                                     .WrapInMethod(methodName)
                                     .WrapInClass(className)
-                                    .PrefaceWithUsing();
+                                    .PrefaceWithUsing("System.CommandLine");
 
             using var kernel = new CSharpKernel();
 
