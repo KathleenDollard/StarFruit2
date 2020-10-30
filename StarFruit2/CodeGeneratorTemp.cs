@@ -1,5 +1,7 @@
-﻿using StarFruit2.Common;
+﻿using StarFruit.Common;
+using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Generator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +66,9 @@ namespace StarFruit2
 
             // see two layer gen #36-38, unsure best vert whitespace management here
             // fetch all the GetValue calls
-            var cmdValues = string.Join(", ", GetCommandValues(cmd.Name, cmd.Arguments, cmd.Options));
+            var methodArgs = cmd.Arguments.Where(arg => arg.CodeElement == CodeElement.MethodParameter);
+            var methodOptions = cmd.Options.Where(opt => opt.CodeElement == CodeElement.MethodParameter);
+            var cmdValues = string.Join(", ", GetCommandValues(cmd.Name, methodArgs, methodOptions));
 
             // original name may fail on 1 layer
             // push this to generate, since it's C#. generate.Return(body, isAsync)
@@ -75,20 +79,32 @@ namespace StarFruit2
                                    NameForInvokeCommand(cmd.Name),
                                    methodBody,
                                    generate.MakeGenericType("Task", "int"),
-                                   true,
+                                   cmd.IsAsync,
                                    generate.MakeParam("BindingContext", "bindingContext"));
         }
 
-        private List<string> GetCommandValues(string cmdName, List<ArgumentDescriptor> args, List<OptionDescriptor> options)
+        private List<string> GetCommandValues(string cmdName, IEnumerable<ArgumentDescriptor> args, IEnumerable<OptionDescriptor> options)
         {
             List<string> strCollection = new List<string> { };
 
             // unsure on original name vs name here
-            var argValues = args.Select(arg => generate.GetValueMethod(NameForProperty(cmdName, arg.Name)));
-            var optValues = options.Select(opt => generate.GetValueMethod(NameForProperty(cmdName, opt.Name)));
+            //var optsAndArgs = args.OfType<SymbolDescriptor>().Union(options);
+            // grrr, this only works if SymbolDescriptors have code elements, and they shouldn't. Maybe a shared base class for opts and args?
+            // same issue for position
+            //var values = optsAndArgs.Where(elem => elem.CodeElement == CodeElement.MethodParameter).Select(elem => generate.GetValueMethod(NameForProperty(cmdName, elem.Name)));
+            //strCollection.AddRange(values);
 
-            strCollection.AddRange(argValues);
-            strCollection.AddRange(optValues);
+            var combo = args.OfType<SymbolDescriptor>().Union(options).OrderBy(elem => elem.Position).Select(elem => generate.GetValueMethod(NameForProperty(cmdName, elem.Name)));
+            //var foo = args.Select(arg => (name: arg.Name, position: arg.Position));
+            //var bizz = options.Select(opt => (name: opt.Name, position: opt.Position));
+            //var combo = foo.Union(bizz).OrderBy(elem => elem.position).Select(elem => elem.name);
+
+            strCollection.AddRange(combo);
+
+            //var argValues = args.Select(arg => generate.GetValueMethod(NameForProperty(cmdName, arg.Name)));
+            //var optValues = options.Select(opt => generate.GetValueMethod(NameForProperty(cmdName, opt.Name)));
+            //strCollection.AddRange(argValues);
+            //strCollection.AddRange(optValues);
 
             return strCollection;
         }
@@ -114,7 +130,7 @@ namespace StarFruit2
                     (
                         NameForProperty(arg.OriginalName, cmd.Name),
                         generate.GetArg(arg.CliName, arg.ArgumentType.TypeAsString(), arg.Description)
-                    )
+                    ).EndStatement()
                 );
 
             // do samething for option
@@ -149,13 +165,29 @@ namespace StarFruit2
 
         private IEnumerable<string> GetNewInstanceMethod(CommandDescriptor commandDescriptor)
         {
-            // placeholder, must fetch those passed as ctor params
-            var ctorParams = new List<string> { };
-            // placeholder, must fetch those passed as ctor properties
-            var initProperties = new List<string> { };
+            // same problem as invoke: base class doesn't have code element :/
 
+            var ctorParamOpts = commandDescriptor.Options.Where(opt => opt.CodeElement == CodeElement.CtorParameter);
+            var ctorParamArgs = commandDescriptor.Arguments.Where(arg => arg.CodeElement == CodeElement.CtorParameter);
+            // union, then filter, then order, then take name
+            var ctorParamNames = ctorParamArgs.OfType<SymbolDescriptor>().Union(ctorParamOpts).Select(param => param.Name);
+            // placeholder, must fetch those passed as ctor properties
+            var PropertyOpts = commandDescriptor.Options.Where(opt => opt.CodeElement == CodeElement.Property);
+            var PropertyArgs = commandDescriptor.Arguments.Where(arg => arg.CodeElement == CodeElement.Property);
+            var PropertyNames = PropertyOpts.OfType<SymbolDescriptor>().Union(PropertyArgs).Select(prop => prop.Name);
+
+            var ctorParams = ctorParamNames.Select(param => generate.GetValueMethod(param));
+            //var ctorOptsAndArgs = new List<IEnumerable<string>> { ctorParamOpts, ctorParamArgs };
+            //var ctorParams = ctorOptsAndArgs.SelectMany(elem => elem).ToList();
+
+            var initProps = PropertyNames.Select(prop => generate.Assign(prop, generate.GetValueMethod(prop)));
+
+            //var PropertyOptsAndArgs = new List<IEnumerable<string>> { ctorParamOpts, ctorParamArgs };
+            //var initProperties = PropertyOptsAndArgs.SelectMany(elem => elem).ToList();
+
+            var methodBody = generate.Return(generate.ObjectInit("CliRoot", ctorParams, initProps));
             // add a version of return that takes a list and returns a list
-            var methodBody = generate.Return(generate.NewCliRoot(ctorParams, initProperties));
+            //var methodBody = generate.Return(generate.NewCliRoot(ctorParams, initProperties));
 
             return generate.Method(Scope.Private,
                                    "GetNewInstance",
@@ -186,10 +218,10 @@ namespace StarFruit2
             return generate.Constructor(className: className, cliName: commandDescriptor.CliName, constructorBody: strCollection);
 
             string GetCtorOpts(OptionDescriptor opt, ArgumentDescriptor arg)
-                => generate.Assign(opt.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), opt.CliName));
+                => generate.Assign(opt.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), opt.CliName)).EndStatement();
 
             string GetCtorArg(ArgumentDescriptor arg)
-                => generate.Assign(arg.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), arg.CliName));
+                => generate.Assign(arg.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), arg.CliName)).EndStatement();
         }
 
         private List<string> GetProperties(CommandDescriptor commandDescriptor)

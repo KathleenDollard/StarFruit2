@@ -44,6 +44,9 @@ namespace StarFruit2.Common.Descriptors
             SymbolType = symbolType;
         }
 
+        public CodeElement CodeElement { get; set; }
+        public int Position { get; set; }
+
         public abstract string ReportInternal(int tabsCount, VerbosityLevel verbosity);
 
         public virtual string Report(int tabsCount, VerbosityLevel verbosity)

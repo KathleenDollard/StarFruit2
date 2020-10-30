@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using StarFruit2.Generator;
 using System.CommandLine;
 using System.Linq;
 using System.Text;
@@ -79,7 +80,7 @@ namespace StarFruit2
         // TODO: re-eval this interface for prettiness
         public List<string> Method(Scope scope, string name, List<string> methodBody, string returnType, bool isAsync = false, params string[] arguments)
         {
-            if (isAsync && !returnType.StartsWith("Task"))
+            if (isAsync && !returnType.StartsWith("Task<"))
             {
                 throw new InvalidOperationException("async method must return a task in this context");
             }
@@ -96,8 +97,8 @@ namespace StarFruit2
             return strCollection;
         }
 
-        public string SetNewInstance 
-            => "NewInstance = GetNewInstance(bindingContext);";
+        public string SetNewInstance
+            => Assign("NewInstance", "GetNewInstance(bindingContext)");
 
         public List<string> Constructor(string className, string cliName, IEnumerable<string> constructorBody)
         {
@@ -130,7 +131,7 @@ namespace StarFruit2
         }
 
         public string MakeGenericType(string type) => type;
-        public string MakeGenericType(string type, params string[] genericArgs) 
+        public string MakeGenericType(string type, params string[] genericArgs)
             => $"{type}<{String.Join(", ", genericArgs)}>";
 
         public string MakeParam(string paramType, string paramName)
@@ -147,8 +148,8 @@ namespace StarFruit2
         public string ArgDeclarationForCtor(string name, string cliName, string argType)
             => Assign(name, ArgInitExpression(cliName, argType));
 
-        public string Assign(string leftHand, string rightHand, string op = "=") 
-            => $"{leftHand} {op} {rightHand}{(rightHand.EndsWith(";") ? "" : ";")}";
+        public string Assign(string leftHand, string rightHand, string op = "=")
+            => $"{leftHand} {op} {rightHand}";
 
         // if we keep these 2 init expressions, then this could just be a single
         // object init method call.
@@ -162,41 +163,50 @@ namespace StarFruit2
         public string AddToCommand(string methodName, string argumentName)
             => $"Command.{methodName}({argumentName});";
 
-        internal string GetArg(string? cliName, string argType, string? description) 
+        internal string GetArg(string? cliName, string argType, string? description)
             => $"GetArg<argType>({cliName}, {description})";
 
-        internal string GetOpt(string? cliName, string optType, string? description) 
+        internal string GetOpt(string? cliName, string optType, string? description)
             => $"GetOpt<optType>({cliName}, {description})";
 
-        internal string NewCommand(string? cliName) 
+        internal string NewCommand(string? cliName)
             => $"new Command({cliName})";
 
-        internal string NewCommandHandler(string cmdName) 
-            => $"new CommandSourceHandler({cmdName})";
+        internal string NewCommandHandler(string cmdName)
+            => NewObject("CommandSourceHandler", cmdName);
+            //=> $"new CommandSourceHandler({cmdName})";
 
-        public string Return(string returnValue, bool await = false) 
-            => $"return {(await == true ? "await" : "")} {returnValue};";
+        // probably an unneeded layer
+        private string NewObject(string objName, string paramStr)
+            => $"new {objName}({paramStr})";
 
-        public List<string> Return(List<string> returnValue, bool await = false) {
+        public string Return(string returnValue, bool await = false)
+            => $"return{(await == true ? " await " : " ")}{returnValue}".EndStatement();
 
-            var strCollection = new List<string> 
-            { 
-                $"return {(await == true ? "await" : "")} {returnValue[0]}" 
+        public List<string> Return(List<string> returnValue, bool await = false)
+        {
+
+            var strCollection = new List<string>
+            {
+                $"return{(await == true ? " await " : " ")}{returnValue[0]}"
             };
 
             if (returnValue.Count() == 1)
             {
-                strCollection[0] += ";";
-                return strCollection;
-            } else if (returnValue.Count() == 0)
+                return strCollection.EndStatement();
+            }
+            else if (returnValue.Count() == 0)
             {
                 return new List<string> { };
             }
 
             strCollection.AddRange(returnValue.ToArray()[1..^1]);
-            strCollection.Add($"{returnValue[^1]};");
+            strCollection.Add(returnValue[^1]);
 
-            return strCollection;
+            return strCollection.EndStatement();
+            //strCollection.Add($"{EndExpression(returnValue[^1])}");
+
+            //return strCollection;
         }
 
         internal string GetValueMethod(string valToFetch)
@@ -204,21 +214,37 @@ namespace StarFruit2
 
         // how much should be here vs code generator?
         // look at this using a public object init method
-        internal List<string> NewCliRoot(List<string> ctorParams, List<string> ctorProperties)
-        {
-            var paramValues = ctorParams.Select(param => GetValueMethod(param));
-            var propDeclarations = ctorProperties.Select(prop => $"{Assign(prop, GetValueMethod(prop))},");
+        //internal List<string> NewCliRoot(List<string> ctorParams, List<string> ctorProperties)
+        //{
+        //    var paramValues = ctorParams.Select(param => GetValueMethod(param));
+        //    var propDeclarations = ctorProperties.Select(prop => $"{Assign(prop, GetValueMethod(prop))},");
 
-            var strCollection = new List<string> 
+        //    var strCollection = new List<string>
+        //    {
+        //        $"new CliRoot({String.Join(", ", paramValues)})",
+        //        "{"
+        //    };
+
+        //    strCollection.AddRange(propDeclarations);
+        //    strCollection.Add("}");
+
+        //    return ObjectInit("CliRoot", paramValues, propDeclarations);
+
+        //    //return strCollection;
+        //}
+
+        public List<string> ObjectInit(string objName, IEnumerable<string>? ctorParams, IEnumerable<string> props)
+        {
+            var strCollection = new List<string>
             {
-                $"new CliRoot({String.Join(", ", paramValues)})",
+                $"new {objName}({string.Join(", ", ctorParams ?? new List<string>{ })})",
                 "{"
             };
 
-            strCollection.AddRange(propDeclarations);
-            strCollection.Add("}");
+            strCollection.AddRange(props.Select(prop => $"{prop},"));
 
-            return strCollection;
+            strCollection.Add("}");
+            return strCollection.EndStatement();
         }
     }
 }

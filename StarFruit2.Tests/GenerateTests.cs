@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Xunit;
 using FluentAssertions;
 using System.Linq;
@@ -308,7 +306,7 @@ namespace StarFruit2.Tests
         {
             var leftHand = "string fizz";
             var rightHand = @"""fizz""";
-            var expectedData = $"{leftHand} = {rightHand};";
+            var expectedData = $"{leftHand} = {rightHand}";
 
             var result = generate.Assign(leftHand, rightHand);
 
@@ -321,7 +319,7 @@ namespace StarFruit2.Tests
             var leftHand = "string fizz";
             var rightHand = @"""fizz""";
             var op = "+=";
-            var expectedData = $"{leftHand} += {rightHand};";
+            var expectedData = $"{leftHand} += {rightHand}";
 
             var result = generate.Assign(leftHand, rightHand, op);
 
@@ -364,7 +362,7 @@ namespace StarFruit2.Tests
         [Fact]
         public void Return_WhenGivenTwoStringListReturnsCorrectStringList()
         {
-            var returnValue = new List<string> { "SomeMethod(arg1,", "arg2)"};
+            var returnValue = new List<string> { "SomeMethod(arg1,", "arg2)" };
             var expectedData = new List<string> { "return SomeMethod(arg1,", "arg2);" };
 
             var result = Utils.Normalize(generate.Return(returnValue));
@@ -381,6 +379,26 @@ namespace StarFruit2.Tests
             var result = Utils.Normalize(generate.Return(returnValue));
 
             result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void ObjectInit_ReturnsCorrectObjectInitialization()
+        {
+            var objName = "Object";
+            var ctorParams = new List<string> { "42", "\"fizz\"" };
+            var properties = new List<string> { "SomeProp = true", "OtherProp = 42" };
+            var expectedData = new List<string>
+            {
+                $"new {objName}({string.Join(", ", ctorParams)})",
+                "{"
+            };
+            expectedData.AddRange(properties.Select(prop => $"{prop},"));
+            expectedData.Add("};");
+
+            var result = generate.ObjectInit(objName, ctorParams, properties);
+
+            result.Should().BeEquivalentTo(expectedData);
+
         }
     }
 }
