@@ -12,8 +12,6 @@ namespace StarFruit2.Common.Descriptors
             : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Option) { }
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public bool Required { get; set; }
-        public CodeElement CodeElement { get; set; }
-        public int Position { get; set; }
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {

@@ -24,7 +24,6 @@ namespace StarFruit2.Common.Descriptors
         public string OriginalName { get; }
 
         public bool IsHidden { get; set; }
-
         public string Report(int tabsCount, VerbosityLevel verbosity)
             => "Empty SymbolDescriptor - used for testing";
     }
@@ -43,6 +42,9 @@ namespace StarFruit2.Common.Descriptors
             OriginalName = originalName;
             SymbolType = symbolType;
         }
+
+        public CodeElement CodeElement { get; set; }
+        public int Position { get; set; }
 
         public abstract string ReportInternal(int tabsCount, VerbosityLevel verbosity);
 
@@ -131,6 +133,8 @@ namespace StarFruit2.Common.Descriptors
         public string OriginalName { get; }
 
         public bool IsHidden { get; set; }
+
+
     }
 
     public abstract class IdentitySymbolDescriptor : SymbolDescriptor

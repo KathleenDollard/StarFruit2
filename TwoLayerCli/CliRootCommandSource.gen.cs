@@ -66,7 +66,9 @@ namespace TwoLayerCli
         public Option<string> StringOption { get; set; }
         public Option<bool> BoolOption { get; set; }
 
- 
+        public Option<string> StringProperty => parent.StringProperty;
+        public Option<bool> CtorParam => parent.CtorParam;
+
         private Argument<int> GetIntArg()
         {
             return new Argument<int>("int-arg")

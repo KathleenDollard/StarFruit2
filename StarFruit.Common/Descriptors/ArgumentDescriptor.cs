@@ -18,8 +18,6 @@ namespace StarFruit2.Common.Descriptors
         public ArgTypeInfoBase ArgumentType { get; }
         public DefaultValueDescriptor? DefaultValue { get; set; }
         public bool Required { get; set; }
-        public CodeElement CodeElement { get; set; }
-        public int Position { get; set; }
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {
