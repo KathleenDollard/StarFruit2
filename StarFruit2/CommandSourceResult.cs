@@ -6,27 +6,14 @@ using System.Threading.Tasks;
 
 namespace StarFruit2
 {
-    /// <summary>
-    /// </summary>
-    /// <remarks>
-    /// There are two different invocations. A StarFruit2 created method is the handler
-    /// for the System.CommandLine command, in order to retrieve the data the user entered.
-    /// The users method is separately invoked with this data within CommandSourceResult.
-    /// This two stage approach allows authors to validate their data, for example doing
-    /// validations that require two values.
-    /// </remarks>
-    public class CommandSourceResult
+    public abstract class CommandSourceResult
     {
-        protected Func<Task<int>>? RunFunc;
-        private Command command;
+        protected Command command;
+        public bool EarlyReturn { get; }
 
-        public CommandSourceResult(Command command)
-        {
-            this.command = command;
+        public virtual int Run() => 0;
+        public virtual async Task<int> RunAsync() => await Task.FromResult(0);
 
-        }
-
-        public object? NewInstance { get; }
         public ParseResult ParseResult { get; }
         public int ExitCode { get; }
 
@@ -55,6 +42,33 @@ namespace StarFruit2
             Assert.NotNull(RunFunc);
             return RunFunc();
         }
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <remarks>
+    /// There are two different invocations. A StarFruit2 created method is the handler
+    /// for the System.CommandLine command, in order to retrieve the data the user entered.
+    /// The users method is separately invoked with this data within CommandSourceResult.
+    /// This two stage approach allows authors to validate their data, for example doing
+    /// validations that require two values.
+    /// </remarks>
+    public abstract class CommandSourceResult<T> : CommandSourceResult
+    {
+
+        public abstract T MakeNewInstance();
+
+
+
+        //public CommandSourceResult(Command command)
+        //{
+        //    this.command = command;
+
+        //}
+
+        public T? NewInstance { get; }
+
+
 
     }
 }

@@ -10,13 +10,13 @@ namespace TwoLayerCli
             => CommandSource.Run<CliRoot>(args);
     }
 
-    class Program
+    class Program2
     {
         static int Main(string[] args)
-            => CommandSource.Create<CliRoot>().Parse().Run(args);
+            => CommandSource.Create<CliRoot>().Parse(args).Run();
     }
 
-    class Program2
+    class Program3
     {
         static int Main(string[] args)
         {
@@ -28,16 +28,16 @@ namespace TwoLayerCli
                 return commandSourceResult.ExitCode;
             }
             // Property validation and modify if accessible
-            switch (CommandSourceResult.MethodParams)
+            switch (commandSourceResult)
             {
-                case Find_MethodParams:
+                case FindCommandSourceResult:
                 // validation here and values can be changed
-                case List_MethodParams:
+                case ListCommandSourceResult:
                 default:
                     break;
             }
             // if you didn’t early return on help, etc, Execute does nothing
-            var exitCode = CommandSourceResult.Run();
+            var exitCode = commandSourceResult.Run();
             return exitCode;
         }
     }

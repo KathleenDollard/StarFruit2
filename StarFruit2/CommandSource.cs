@@ -2,6 +2,8 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
+using System.CommandLine.Builder;
+using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,35 +78,57 @@ namespace StarFruit2
 
     public abstract class CommandSource
     {
-        protected CommandSource(Command command)
-            => RootCommand = command;
-
-        public static async Task<int> RunAsync<TCli>(string[] args)
-        {
-            return await Create<TCli>().Parse().RunAsync(args);
-        }
-
-        public static int Run<TCli>(string[] args)
-        {
-            return Create<TCli>().Parse().Run(args);
-        }
-
-        public static CommandSource Create<TCli>()
+        public static RootCommandSource Create<TCli>()
         {
             var cliType = typeof(TCli);
             var fullName = $"{cliType.FullName}CommandSource";
             var type = cliType.Assembly.GetType(fullName);
             Assert.NotNull(type);
-            var ret = Activator.CreateInstance(type) as CommandSource;
+            var ret = Activator.CreateInstance(type) as RootCommandSource;
             Assert.NotNull(ret); // throw here if generator is broken
             return ret;
         }
 
-        public Command RootCommand { get; set; }
-
-        public CommandSourceResult Parse()
+        public static async Task<int> RunAsync<TCli>(string[] args)
         {
-            return new CommandSourceResult(RootCommand);
+            return await Create<TCli>().Parse(args).RunAsync();
+        }
+
+        public static int Run<TCli>(string[] args, bool validationReportToUser = true)
+        {
+            return Create<TCli>().Parse(args).Run();
+        }
+
+        protected internal CommandSource? CurrentCommandSource { get; protected set; }
+
+        protected internal virtual CommandSourceResult GetCommandSourceResult(InvocationContext context)
+        {
+            return new NotInvocableCommandSourceResult(context);
+        }
+    }
+
+    public abstract class RootCommandSource : CommandSource
+    {
+        protected RootCommandSource(Command command)
+        => Command = command;
+
+        public CommandSourceResult? Result { get; set; }
+
+        public Command Command { get; set; }
+
+        public CommandSourceResult Parse(string[] args)
+        {
+            // See CommandExtensions.GetInvocationPipeline for breakdown of implementation
+            // This does not call the user's method, but an invoke in the CommandSource that sets the result
+            // This allows the user to validate and manipulate the results prior to running their method
+            // or sidestepping implementation if they just want the data
+            var ret = Command.Invoke(args);
+            if (ret != 0)
+            { 
+                // TODO: should we allow this?
+              }
+
+            return new CommandSourceResult(Command);
         }
 
 
@@ -126,10 +150,10 @@ namespace StarFruit2
 
     }
 
-    public abstract class CommandSource<T> : CommandSource
+    public abstract class RootCommandSource<T> : RootCommandSource
     {
 
-        protected CommandSource(Command command)
+        protected RootCommandSource(Command command)
            : base(command) { }
 
         protected T? NewInstance { get; set; } // exposed through CommandSourceResult

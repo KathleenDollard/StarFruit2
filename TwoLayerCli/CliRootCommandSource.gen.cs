@@ -1,111 +1,231 @@
 ﻿using StarFruit2;
+using StarFruit2.Common;
 using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
+using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 
 namespace TwoLayerCli
 {
-    public partial class CliRootCommandSource : CommandSource<CliRoot>
+
+    public partial class CliRootCommandSource : RootCommandSource<CliRoot>
     {
-        public Argument<int> Find_IntArg { get; private set; }
-        public Option<string> Find_StringOption { get; set; }
-        public Option<bool> Find_BoolOption { get; set; }
-        public Option<bool> List_BoolOption { get; set; }
-        public Option<string> StringProperty { get; set; }
-        public Option<bool> CtorParam { get; set; }
-
-        public Command ListCommand { get; set; }
-        public Command FindCommand { get; set; }
-
         public CliRootCommandSource()
-           : base(new Command("cli-root"))
+             : base(new Command("cli-root"))
         {
             StringProperty = new Option<string>("string-property");
             CtorParam = new Option<bool>("ctor-param");
-            RootCommand.AddOption(CtorParam);
-            RootCommand.AddOption(StringProperty);
-            RootCommand.AddCommand(GetFindCommand());
-            RootCommand.AddCommand(GetListCommand());
-            // no handler because not invokable
+            Command.AddOption(CtorParam);
+            Command.AddOption(StringProperty);
+            Find = new FindCommandSource();
+            List = new ListCommandSource();
+            Command.AddCommand(List.Command);
+            Command.AddCommand(Find.Command);
+
+            Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; } );
         }
 
-        public int InvokeFind(BindingContext bindingContext)
+        public Option<string> StringProperty { get; set; }
+        public Option<bool> CtorParam { get; set; }
+
+        public ListCommandSource List { get; set; }
+        public FindCommandSource Find { get; set; }
+
+    }
+
+    public class FindCommandSource : CliRootCommandSource
+    {
+        internal FindCommandSource()
         {
-            NewInstance = GetNewInstance(bindingContext);
-            var intArg = GetValue(bindingContext, Find_IntArg);
-            var stringOption = GetValue(bindingContext, Find_StringOption);
-            var boolOption = GetValue(bindingContext, Find_BoolOption);
-            RunFunc = () => NewInstance.FindAsync(stringOption, boolOption, intArg);
-            return 0;
+            IntArg = GetIntArg();
+
+            StringOption = GetStringOption();
+
+            BoolOption = GetBoolOption();
+
+            Command = new Command("Find", "Yep, cool");
+            Command.Add(IntArg);
+            Command.Add(StringOption);
+            Command.Add(BoolOption);
+
+            Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
         }
 
-        public int InvokeList(BindingContext bindingContext)
+        protected override CommandSourceResult GetCommandSourceResult( InvocationContext context)
         {
-            NewInstance = GetNewInstance(bindingContext);
-            var boolOption = GetValue(bindingContext, Find_BoolOption);
-            RunFunc = () => NewInstance.ListAsync ( boolOption);
-            return 0;
+            return new FindCommandSourceResult(
+                                           CommandSourceMemberResult.Create<int>(IntArg, context),
+                                           CommandSourceMemberResult.Create<string>(StringOption, context),
+                                           CommandSourceMemberResult.Create<bool>(BoolOption, context),
+                                           CommandSourceMemberResult.Create<string>(StringProperty, context),
+                                           CommandSourceMemberResult.Create<bool>(CtorParam, context));
         }
 
-        private Command GetFindCommand()
+        public Argument<int> IntArg { get; private set; }
+        public Option<string> StringOption { get; set; }
+        public Option<bool> BoolOption { get; set; }
+
+        private Argument<int> GetIntArg()
         {
-            Find_IntArg = new Argument<int>("int-arg")
+            return new Argument<int>("int-arg")
             {
                 Description = "this is cool",
-                Arity = new ArgumentArity(0,1), // this is based on whether it is a collection, required and Arity if the descriptor supports that
+                Arity = new ArgumentArity(0, 1), // this is based on whether it is a collection, required and Arity if the descriptor supports that
                 IsHidden = false,
             };
-            //Find_IntArg.AllowedValues.AddRange("X", "Z");
-            // Find_IntArg.SetDefaultValue... only if we have one
-
-            Find_StringOption = new Option<string>("--string-option")
+            //IntArg.AllowedValues.AddRange("X", "Z");
+            // IntArg.SetDefaultValue... only if we have one
+        }
+        private Option<string> GetStringOption()
+        {
+            var option = new Option<string>("--string-option")
             {
                 Description = "this is cooler",
                 IsRequired = true,
                 IsHidden = false,
             };
             var find_StringOption_arg = new Argument("name"); // most of the stuff from arg above
-            Find_StringOption.Argument = find_StringOption_arg;
-            Find_StringOption.AddAlias("-a");
-
-
-            Find_BoolOption = new Option<bool>("bool-option"); // similar to string option
-
-            FindCommand = new Command("find", "Yep, cool")
-            {
-                Find_BoolOption,
-                Find_StringOption,
-                Find_BoolOption
-            };
-            //FindCommand.IsHidden = false;
-            //Find_StringOption.AddAlias("-a");
-            //Find_StringOption.TreatUnmatchedTokensAsErrors = true;
-
-            FindCommand.Handler = new CommandSourceCommandHandler(InvokeFind);
-
-            return FindCommand;
+            StringOption.Argument = find_StringOption_arg;
+            StringOption.AddAlias("-a");
+            return option;
         }
-
-        private Command GetListCommand()
+        private Option<bool> GetBoolOption()
         {
+            return new Option<bool>("bool-option"); // similar to string option
+        }
+    }
 
-            List_BoolOption = new Option<bool>("bool-option");
-            ListCommand = new Command("find")
-            {
-                List_BoolOption
-            };
-            ListCommand.Handler = new CommandSourceCommandHandler(InvokeList);
+    public class ListCommandSource : CliRootCommandSource
+    {
 
-            return ListCommand;
+        internal ListCommandSource()
+        {
+            VerbosityOption = GetVerbosityOption();
 
+            Command = new Command("list");
+            Command.Add(VerbosityOption);
+
+            Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
         }
 
-        private CliRoot GetNewInstance(BindingContext bindingContext)
-            => new CliRoot(GetValue(bindingContext, CtorParam))
-            {
-                StringProperty = GetValue(bindingContext, StringProperty)
-            };
+        protected override CommandSourceResult GetCommandSourceResult( InvocationContext context)
+        {
+            return new ListCommandSourceResult(
+                                           CommandSourceMemberResult.Create<VerbosityLevel>(VerbosityOption, context),
+                                           CommandSourceMemberResult.Create<string>(StringProperty, context),
+                                           CommandSourceMemberResult.Create<bool>(CtorParam, context));
+        }
+
+        public Option<VerbosityLevel> VerbosityOption { get; set; }
+
+        private Option<VerbosityLevel> GetVerbosityOption()
+        {
+            return new Option<VerbosityLevel>("verbosity-option");
+        }
     }
+
+
+    //public partial class CliRootCommandSourceOld : CommandSource<CliRoot>
+    //{
+    //    public Argument<int> Find_IntArg { get; private set; }
+    //    public Option<string> Find_StringOption { get; set; }
+    //    public Option<bool> Find_BoolOption { get; set; }
+    //    public Option<bool> List_BoolOption { get; set; }
+    //    public Option<string> StringProperty { get; set; }
+    //    public Option<bool> CtorParam { get; set; }
+
+    //    public Command ListCommand { get; set; }
+    //    public Command FindCommand { get; set; }
+
+    //    public CliRootCommandSource()
+    //       : base(new Command("cli-root"))
+    //    {
+    //        StringProperty = new Option<string>("string-property");
+    //        CtorParam = new Option<bool>("ctor-param");
+    //        RootCommand.AddOption(CtorParam);
+    //        RootCommand.AddOption(StringProperty);
+    //        RootCommand.AddCommand(GetFindCommand());
+    //        RootCommand.AddCommand(GetListCommand());
+    //        // no handler because not invokable
+    //    }
+
+    //    public int InvokeFind(BindingContext bindingContext)
+    //    {
+    //        NewInstance = GetNewInstance(bindingContext);
+    //        var intArg = GetValue(bindingContext, Find_IntArg);
+    //        var stringOption = GetValue(bindingContext, Find_StringOption);
+    //        var boolOption = GetValue(bindingContext, Find_BoolOption);
+    //        RunFunc = () => NewInstance.FindAsync(stringOption, boolOption, intArg);
+    //        return 0;
+    //    }
+
+    //    public int InvokeList(BindingContext bindingContext)
+    //    {
+    //        NewInstance = GetNewInstance(bindingContext);
+    //        var boolOption = GetValue(bindingContext, Find_BoolOption);
+    //        RunFunc = () => NewInstance.ListAsync ( boolOption);
+    //        return 0;
+    //    }
+
+    //    private Command GetFindCommand()
+    //    {
+    //        Find_IntArg = new Argument<int>("int-arg")
+    //        {
+    //            Description = "this is cool",
+    //            Arity = new ArgumentArity(0,1), // this is based on whether it is a collection, required and Arity if the descriptor supports that
+    //            IsHidden = false,
+    //        };
+    //        //Find_IntArg.AllowedValues.AddRange("X", "Z");
+    //        // Find_IntArg.SetDefaultValue... only if we have one
+
+    //        Find_StringOption = new Option<string>("--string-option")
+    //        {
+    //            Description = "this is cooler",
+    //            IsRequired = true,
+    //            IsHidden = false,
+    //        };
+    //        var find_StringOption_arg = new Argument("name"); // most of the stuff from arg above
+    //        Find_StringOption.Argument = find_StringOption_arg;
+    //        Find_StringOption.AddAlias("-a");
+
+
+    //        Find_BoolOption = new Option<bool>("bool-option"); // similar to string option
+
+    //        FindCommand = new Command("find", "Yep, cool")
+    //        {
+    //            Find_BoolOption,
+    //            Find_StringOption,
+    //            Find_BoolOption
+    //        };
+    //        //FindCommand.IsHidden = false;
+    //        //Find_StringOption.AddAlias("-a");
+    //        //Find_StringOption.TreatUnmatchedTokensAsErrors = true;
+
+    //        FindCommand.Handler = new CommandSourceCommandHandler(InvokeFind);
+
+    //        return FindCommand;
+    //    }
+
+    //    private Command GetListCommand()
+    //    {
+
+    //        List_BoolOption = new Option<bool>("bool-option");
+    //        ListCommand = new Command("find")
+    //        {
+    //            List_BoolOption
+    //        };
+    //        ListCommand.Handler = new CommandSourceCommandHandler(InvokeList);
+
+    //        return ListCommand;
+
+    //    }
+
+    //    private CliRoot GetNewInstance(BindingContext bindingContext)
+    //        => new CliRoot(GetValue(bindingContext, CtorParam))
+    //        {
+    //            StringProperty = GetValue(bindingContext, StringProperty)
+    //        };
+    //}
 
 }
