@@ -94,16 +94,16 @@ namespace StarFruit2
             return await Create<TCli>().Parse(args).RunAsync();
         }
 
-        public static int Run<TCli>(string[] args, bool validationReportToUser = true)
+        public static int Run<TCli>(string[] args)
         {
             return Create<TCli>().Parse(args).Run();
         }
 
         protected internal CommandSource? CurrentCommandSource { get; protected set; }
 
-        protected internal virtual CommandSourceResult GetCommandSourceResult(InvocationContext context)
+        protected internal virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
         {
-            return new NotInvocableCommandSourceResult(context);
+            return new NotInvocableCommandSourceResult(parseResult);
         }
     }
 
@@ -111,8 +111,6 @@ namespace StarFruit2
     {
         protected RootCommandSource(Command command)
         => Command = command;
-
-        public CommandSourceResult? Result { get; set; }
 
         public Command Command { get; set; }
 
@@ -122,13 +120,16 @@ namespace StarFruit2
             // This does not call the user's method, but an invoke in the CommandSource that sets the result
             // This allows the user to validate and manipulate the results prior to running their method
             // or sidestepping implementation if they just want the data
-            var ret = Command.Invoke(args);
-            if (ret != 0)
+            var parseResult = Command.Parse(args);
+            var exit = parseResult.Invoke();
+            if (exit != 0)
             { 
                 // TODO: should we allow this?
               }
-
-            return new CommandSourceResult(Command);
+            Assert.NotNull(CurrentCommandSource);
+            var result = CurrentCommandSource.GetCommandSourceResult(parseResult);
+            Assert.NotNull(result);
+            return result;
         }
 
 

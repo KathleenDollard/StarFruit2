@@ -4,6 +4,7 @@ using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
 using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 
 namespace TwoLayerCli
@@ -52,14 +53,9 @@ namespace TwoLayerCli
             Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
         }
 
-        protected override CommandSourceResult GetCommandSourceResult( InvocationContext context)
+        protected override CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
         {
-            return new FindCommandSourceResult(
-                                           CommandSourceMemberResult.Create<int>(IntArg, context),
-                                           CommandSourceMemberResult.Create<string>(StringOption, context),
-                                           CommandSourceMemberResult.Create<bool>(BoolOption, context),
-                                           CommandSourceMemberResult.Create<string>(StringProperty, context),
-                                           CommandSourceMemberResult.Create<bool>(CtorParam, context));
+            return new FindCommandSourceResult(parseResult, this);
         }
 
         public Argument<int> IntArg { get; private set; }
@@ -109,12 +105,9 @@ namespace TwoLayerCli
             Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
         }
 
-        protected override CommandSourceResult GetCommandSourceResult( InvocationContext context)
+        protected override CommandSourceResult GetCommandSourceResult( ParseResult parseResult)
         {
-            return new ListCommandSourceResult(
-                                           CommandSourceMemberResult.Create<VerbosityLevel>(VerbosityOption, context),
-                                           CommandSourceMemberResult.Create<string>(StringProperty, context),
-                                           CommandSourceMemberResult.Create<bool>(CtorParam, context));
+            return new ListCommandSourceResult(parseResult, this);
         }
 
         public Option<VerbosityLevel> VerbosityOption { get; set; }

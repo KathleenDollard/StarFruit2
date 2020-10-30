@@ -9,12 +9,12 @@ namespace StarFruit2
 {
     public class CommandSourceMemberResult
     {
-        public static CommandSourceMemberResult<TMember> Create<TMember>(Option option, InvocationContext context)
+        public static CommandSourceMemberResult<T> Create<T>(Option<T> option, ParseResult parseResult)
         {
             throw new NotImplementedException();
         }
 
-        public static CommandSourceMemberResult<TMember> Create<TMember>(Argument argument, InvocationContext context)
+        public static CommandSourceMemberResult<T> Create<T>(Argument<T> argument, ParseResult parseResult)
         {
             throw new NotImplementedException();
         }

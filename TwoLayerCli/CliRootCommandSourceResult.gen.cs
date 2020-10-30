@@ -2,6 +2,7 @@
 using StarFruit2.Common;
 using System;
 using System.Collections.Generic;
+using System.CommandLine.Parsing;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,16 +50,14 @@ namespace TwoLayerCli
 
     public class FindCommandSourceResult : CliRootCommandSourceResult
     {
-        public FindCommandSourceResult(CommandSourceMemberResult<int> intArg_Result,
-                                       CommandSourceMemberResult<string> stringOption_Result,
-                                       CommandSourceMemberResult<bool> boolOption_Result,
-                                       CommandSourceMemberResult<string> stringProperty_Result,
-                                       CommandSourceMemberResult<bool> ctorParam_Result)
-            : base(stringProperty_Result, ctorParam_Result)
+        public FindCommandSourceResult(ParseResult parseResult,
+                                       FindCommandSource findCommandSource)
+            : base(CommandSourceMemberResult.Create(findCommandSource.StringProperty, parseResult),
+                   CommandSourceMemberResult.Create(findCommandSource.CtorParam, parseResult))
         {
-            IntArg_Result = intArg_Result;
-            StringOption_Result = stringOption_Result;
-            BoolOption_Result = boolOption_Result;
+            IntArg_Result = CommandSourceMemberResult.Create(findCommandSource.IntArg, parseResult);
+            StringOption_Result = CommandSourceMemberResult.Create(findCommandSource.StringOption, parseResult);
+            BoolOption_Result = CommandSourceMemberResult.Create(findCommandSource.BoolOption, parseResult);
         }
 
         public CommandSourceMemberResult<int> IntArg_Result { get; set; }
@@ -74,12 +73,12 @@ namespace TwoLayerCli
   
     public class ListCommandSourceResult : CliRootCommandSourceResult
     {
-        public ListCommandSourceResult(CommandSourceMemberResult<VerbosityLevel> verbosityOption_Result,
-                                       CommandSourceMemberResult<string> stringProperty_Result,
-                                       CommandSourceMemberResult<bool> ctorParam_Result)
-             : base(stringProperty_Result, ctorParam_Result)
+        public ListCommandSourceResult(ParseResult parseResult,
+                                       ListCommandSource listCommandSource)
+            : base(CommandSourceMemberResult.Create(listCommandSource.StringProperty, parseResult),
+                   CommandSourceMemberResult.Create(listCommandSource.CtorParam, parseResult))
         {
-            VerbosityOption_Result = verbosityOption_Result;
+             VerbosityOption_Result = CommandSourceMemberResult.Create(listCommandSource.VerbosityOption, parseResult);
         }
 
         public CommandSourceMemberResult<VerbosityLevel> VerbosityOption_Result { get; set; }

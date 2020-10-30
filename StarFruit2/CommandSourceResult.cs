@@ -8,40 +8,18 @@ namespace StarFruit2
 {
     public abstract class CommandSourceResult
     {
-        protected Command command;
+        public CommandSourceResult(ParseResult parseResult)
+        {
+            ParseResult = parseResult;
+        }
+
         public bool EarlyReturn { get; }
+        public ParseResult ParseResult { get; }
+        public int ExitCode { get; }
 
         public virtual int Run() => 0;
         public virtual async Task<int> RunAsync() => await Task.FromResult(0);
 
-        public ParseResult ParseResult { get; }
-        public int ExitCode { get; }
-
-        public async Task<int> RunAsync(string[] args)
-        {
-            Assert.NotNull(Command);
-            var exit = Command.Invoke(args);
-            if (exit != 0)
-            {
-                // TODO: handle failure
-                throw new NotImplementedException();
-            }
-            Assert.NotNull(RunFunc);
-            return await RunFunc();
-        }
-
-        public int Run(string[] args)
-        {
-            Assert.NotNull(Command);
-            var exit = Command.Invoke(args);
-            if (exit != 0)
-            {
-                // TODO: handle failure
-                throw new NotImplementedException();
-            }
-            Assert.NotNull(RunFunc);
-            return RunFunc();
-        }
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 
 namespace StarFruit2
 {
@@ -6,7 +7,7 @@ namespace StarFruit2
     {
         private InvocationContext context;
 
-        public NotInvocableCommandSourceResult(InvocationContext context)
+        public NotInvocableCommandSourceResult(ParseResult parseResult)
         {
             this.context = context;
         }
