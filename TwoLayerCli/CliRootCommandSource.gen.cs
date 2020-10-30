@@ -19,13 +19,14 @@ namespace TwoLayerCli
             CtorParam = new Option<bool>("ctor-param");
             Command.AddOption(CtorParam);
             Command.AddOption(StringProperty);
-            Find = new FindCommandSource();
-            List = new ListCommandSource();
-            Command.AddCommand(List.Command);
+            Find = new FindCommandSource(this);
+            List = new ListCommandSource(this);
             Command.AddCommand(Find.Command);
+            Command.AddCommand(List.Command);
 
-            Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; } );
+            Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
         }
+
 
         public Option<string> StringProperty { get; set; }
         public Option<bool> CtorParam { get; set; }
@@ -35,9 +36,9 @@ namespace TwoLayerCli
 
     }
 
-    public class FindCommandSource : CliRootCommandSource
+    public class FindCommandSource : CommandSource
     {
-        internal FindCommandSource()
+        internal FindCommandSource(CliRootCommandSource root)
         {
             IntArg = GetIntArg();
 
@@ -50,7 +51,7 @@ namespace TwoLayerCli
             Command.Add(StringOption);
             Command.Add(BoolOption);
 
-            Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
+            Command.Handler = CommandHandler.Create(() => { root.CurrentCommandSource = this; return 0; });
         }
 
         protected override CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
@@ -92,20 +93,19 @@ namespace TwoLayerCli
         }
     }
 
-    public class ListCommandSource : CliRootCommandSource
+    public class ListCommandSource : CommandSource
     {
-
-        internal ListCommandSource()
+        internal ListCommandSource(CliRootCommandSource root)
         {
             VerbosityOption = GetVerbosityOption();
 
             Command = new Command("list");
             Command.Add(VerbosityOption);
 
-            Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
+            Command.Handler = CommandHandler.Create(() => { root.CurrentCommandSource = this; return 0; });
         }
 
-        protected override CommandSourceResult GetCommandSourceResult( ParseResult parseResult)
+        protected override CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
         {
             return new ListCommandSourceResult(parseResult, this);
         }

@@ -6,13 +6,13 @@ namespace TwoLayerCli
 {
     class Program
     {
-        static int Main(string[] args)
+        static int Main2(string[] args)
             => CommandSource.Run<CliRoot>(args);
     }
 
     class Program2
     {
-        static int Main(string[] args)
+        static int Main2(string[] args)
             => CommandSource.Create<CliRoot>().Parse(args).Run();
     }
 

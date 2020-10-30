@@ -11,40 +11,27 @@ namespace TwoLayerCli
     // Abstract because there is no invoke
     public abstract class CliRootCommandSourceResult : CommandSourceResult<CliRoot>
     {
-        private CliRoot? instance;
 
-        protected CliRootCommandSourceResult(CommandSourceMemberResult<string> stringProperty_Result,
+        protected CliRootCommandSourceResult(ParseResult parseResult,
+                                             CommandSourceMemberResult<string> stringProperty_Result,
                                              CommandSourceMemberResult<bool> ctorParam_Result)
+            :base( parseResult)
         {
             StringProperty_Result = stringProperty_Result;
             CtorParam_Result = ctorParam_Result;
         }
 
-        // This needs work because you get null unless you've set instance
-        public CliRoot Instance
-        {
-            get
-            {
-                if (instance is null)
-                {
-                    instance = MakeNewInstance();
-                }
-                return instance;
-            }
-            set => instance = value;
-        }
 
         public CommandSourceMemberResult<string> StringProperty_Result { get; set; }
 
         public CommandSourceMemberResult<bool> CtorParam_Result { get; set; }
 
-        public override CliRoot MakeNewInstance()
+        public override CliRoot CreateInstance()
         {
-            Instance = new CliRoot(CtorParam_Result.Value)
+            return new CliRoot(CtorParam_Result.Value)
             {
                 StringProperty = StringProperty_Result.Value,
             };
-            return Instance;
         }
     }
 
@@ -52,7 +39,8 @@ namespace TwoLayerCli
     {
         public FindCommandSourceResult(ParseResult parseResult,
                                        FindCommandSource findCommandSource)
-            : base(CommandSourceMemberResult.Create(findCommandSource.StringProperty, parseResult),
+            : base(parseResult,
+                   CommandSourceMemberResult.Create(findCommandSource.StringProperty, parseResult),
                    CommandSourceMemberResult.Create(findCommandSource.CtorParam, parseResult))
         {
             IntArg_Result = CommandSourceMemberResult.Create(findCommandSource.IntArg, parseResult);
@@ -66,7 +54,7 @@ namespace TwoLayerCli
 
         public async override Task<int> RunAsync()
         {
-            return await Instance.FindAsync(StringOption_Result.Value, BoolOption_Result.Value, IntArg_Result.Value);
+            return await CreateInstance().FindAsync(StringOption_Result.Value, BoolOption_Result.Value, IntArg_Result.Value);
         }
 
     }
@@ -75,7 +63,8 @@ namespace TwoLayerCli
     {
         public ListCommandSourceResult(ParseResult parseResult,
                                        ListCommandSource listCommandSource)
-            : base(CommandSourceMemberResult.Create(listCommandSource.StringProperty, parseResult),
+            : base(parseResult,
+                   CommandSourceMemberResult.Create(listCommandSource.StringProperty, parseResult),
                    CommandSourceMemberResult.Create(listCommandSource.CtorParam, parseResult))
         {
              VerbosityOption_Result = CommandSourceMemberResult.Create(listCommandSource.VerbosityOption, parseResult);
@@ -85,7 +74,7 @@ namespace TwoLayerCli
 
         public async override Task<int> RunAsync()
         {
-            return await Instance.ListAsync(VerbosityOption_Result.Value);
+            return await CreateInstance().ListAsync(VerbosityOption_Result.Value);
         }
     }
 }

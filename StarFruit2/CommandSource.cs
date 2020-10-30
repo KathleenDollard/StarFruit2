@@ -99,7 +99,7 @@ namespace StarFruit2
             return Create<TCli>().Parse(args).Run();
         }
 
-        protected internal CommandSource? CurrentCommandSource { get; protected set; }
+        public Command Command;
 
         protected internal virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
         {
@@ -114,6 +114,8 @@ namespace StarFruit2
 
         public Command Command { get; set; }
 
+        public CommandSource? CurrentCommandSource { get;  set; }
+
         public CommandSourceResult Parse(string[] args)
         {
             // See CommandExtensions.GetInvocationPipeline for breakdown of implementation
@@ -123,9 +125,9 @@ namespace StarFruit2
             var parseResult = Command.Parse(args);
             var exit = parseResult.Invoke();
             if (exit != 0)
-            { 
+            {
                 // TODO: should we allow this?
-              }
+            }
             Assert.NotNull(CurrentCommandSource);
             var result = CurrentCommandSource.GetCommandSourceResult(parseResult);
             Assert.NotNull(result);

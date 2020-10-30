@@ -34,15 +34,12 @@ namespace StarFruit2
     public abstract class CommandSourceResult<T> : CommandSourceResult
     {
 
-        public abstract T MakeNewInstance();
+        protected CommandSourceResult(ParseResult parseResult)
+            : base(parseResult )
+        {   }
 
-
-
-        //public CommandSourceResult(Command command)
-        //{
-        //    this.command = command;
-
-        //}
+   
+        public abstract T CreateInstance();
 
         public T? NewInstance { get; }
 
