@@ -135,7 +135,7 @@ namespace StarFruit2
         }
 
 
-        protected TValue? GetValue<TValue>(BindingContext bindingContext,
+        protected TValue GetValue<TValue>(BindingContext bindingContext,
                  Argument<TValue> argument)
        => bindingContext.ParseResult.CommandResult.Children
             .OfType<ArgumentResult>()
@@ -159,7 +159,7 @@ namespace StarFruit2
         protected RootCommandSource(Command command)
            : base(command) { }
 
-        protected T? NewInstance { get; set; } // exposed through CommandSourceResult
+        protected T NewInstance { get; set; } // exposed through CommandSourceResult
 
     }
 }

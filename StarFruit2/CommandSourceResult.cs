@@ -41,7 +41,7 @@ namespace StarFruit2
    
         public abstract T CreateInstance();
 
-        public T? NewInstance { get; }
+        public T NewInstance { get; }
 
 
 
