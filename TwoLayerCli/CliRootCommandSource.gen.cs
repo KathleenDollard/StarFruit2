@@ -19,8 +19,8 @@ namespace TwoLayerCli
             CtorParam = new Option<bool>("ctor-param");
             Command.AddOption(CtorParam);
             Command.AddOption(StringProperty);
-            Find = new FindCommandSource(this);
-            List = new ListCommandSource(this);
+            Find = new FindCommandSource(this, this);
+            List = new ListCommandSource(this, this);
             Command.AddCommand(Find.Command);
             Command.AddCommand(List.Command);
 
@@ -38,15 +38,18 @@ namespace TwoLayerCli
 
     public class FindCommandSource : CommandSource
     {
-        internal FindCommandSource(CliRootCommandSource root)
+        internal CliRootCommandSource parent;
+
+        internal FindCommandSource(CliRootCommandSource root, CliRootCommandSource parent)
         {
+            this.parent = parent;
             IntArg = GetIntArg();
 
             StringOption = GetStringOption();
 
             BoolOption = GetBoolOption();
 
-            Command = new Command("Find", "Yep, cool");
+            Command = new Command("find", "Yep, cool");
             Command.Add(IntArg);
             Command.Add(StringOption);
             Command.Add(BoolOption);
@@ -63,6 +66,7 @@ namespace TwoLayerCli
         public Option<string> StringOption { get; set; }
         public Option<bool> BoolOption { get; set; }
 
+ 
         private Argument<int> GetIntArg()
         {
             return new Argument<int>("int-arg")
@@ -82,21 +86,25 @@ namespace TwoLayerCli
                 IsRequired = true,
                 IsHidden = false,
             };
-            var find_StringOption_arg = new Argument("name"); // most of the stuff from arg above
-            StringOption.Argument = find_StringOption_arg;
-            StringOption.AddAlias("-a");
+            var find_StringOption_arg = new Argument<string>("name"); // most of the stuff from arg above
+            option.Argument = find_StringOption_arg;
+            option.AddAlias("-a");
             return option;
         }
         private Option<bool> GetBoolOption()
         {
-            return new Option<bool>("bool-option"); // similar to string option
+            var option = new Option<bool>("bool-option"); // similar to string option
+            return option;
         }
     }
 
     public class ListCommandSource : CommandSource
     {
-        internal ListCommandSource(CliRootCommandSource root)
+        internal CliRootCommandSource parent;
+
+        internal ListCommandSource(CliRootCommandSource root, CliRootCommandSource parent)
         {
+            this.parent = parent;
             VerbosityOption = GetVerbosityOption();
 
             Command = new Command("list");
@@ -111,6 +119,10 @@ namespace TwoLayerCli
         }
 
         public Option<VerbosityLevel> VerbosityOption { get; set; }
+
+        public Option<string> StringProperty => parent.StringProperty;
+        public Option<bool> CtorParam => parent.CtorParam;
+
 
         private Option<VerbosityLevel> GetVerbosityOption()
         {
