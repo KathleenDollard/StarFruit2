@@ -1,20 +1,41 @@
-﻿using System.Threading.Tasks;
+﻿using StarFruit2;
+using StarFruit2.Common;
+using System.Threading.Tasks;
 
 namespace TwoLayerCli
 {
-    public class CliRoot
+    /// <summary>
+    /// This is the entry point, the end user types the executable name
+    /// </summary>
+    public partial class CliRoot
     {
-        private bool ctorParam;
-        public CliRoot(bool ctorParam)
-            => this.ctorParam = ctorParam;
+        /// <summary> </summary>
+        /// <param name="ctorParam">This is a constructor parameter</param>
+        public CliRoot(bool ctorParam) { }
 
-        public string StringProperty { get; set; }
+        /// <summary>
+        /// This is a string property
+        /// </summary>
+        [Aliases("s")]
+        [Required]
+        public string StringProperty { get; set; } = "abc";
 
-        public async Task<int> FindAsync(int intArg, string stringOption, bool boolOption)
+        /// <summary>
+        /// Use this to find things
+        /// </summary>
+        /// <param name="stringOption">This is an string argument</param>
+        /// <param name="boolOption">This is an bool argument</param>
+        /// <param name="intArg">This is an integer argument</param>
+        /// <returns></returns>
+        public async Task<int> FindAsync(string stringOption, bool boolOption, int intArg=42)
         { return await Task.FromResult(0); }
 
-        public async Task<int> ListAsync(bool boolOption)
+        /// <summary>
+        /// List the elements you are interested in
+        /// </summary>
+        /// <param name="verbosity">The degree of detail desired</param>
+        /// <returns></returns>
+        public async Task<int> ListAsync(VerbosityLevel verbosity)
         { return await Task.FromResult(0); }
-
     }
 }

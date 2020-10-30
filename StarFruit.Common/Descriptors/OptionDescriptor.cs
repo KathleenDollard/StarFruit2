@@ -10,8 +10,6 @@ namespace StarFruit2.Common.Descriptors
                                 string originalName,
                                 object? raw)
             : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Option) { }
-
-        public OptionOrArgDescriptorSource DescriptorSource { get; set; }
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public bool Required { get; set; }
         public CodeElement CodeElement { get; set; }

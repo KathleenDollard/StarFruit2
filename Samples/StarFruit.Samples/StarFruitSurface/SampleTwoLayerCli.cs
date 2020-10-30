@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StarFruit2.Common;
+using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
@@ -38,15 +39,6 @@ namespace StarFruit2.StarFruitSurface
         LatestMinor, // Uses the highest installed minor, feature band, and patch level that matches the requested major with a minor that is greater or equal than the specified value. If not found, fails.
         LatestMajor, // Uses the highest installed .NET Core SDK with a major that is greater or equal than the specified value. If not found, fail.
         Disable, // Doesn't roll forward. Exact match required.
-    }
-
-    public enum VerbosityLevel
-    {
-        Quiet = 1,
-        Minimal,
-        Normal,
-        Detailed,
-        Diagnostic
     }
 
     public class ManageGlobalJsonImplementation

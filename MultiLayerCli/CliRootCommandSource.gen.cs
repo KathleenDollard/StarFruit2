@@ -14,7 +14,7 @@ namespace MultiLayerCli
            : base(new Command("cliRoot"))
         {
             toolCommandSource = new ToolCommandSource();
-            Command.AddCommand(toolCommandSource.Command);
+            Command.AddCommand(toolCommandSource.RootCommand);
         }
     }
 
@@ -36,10 +36,10 @@ namespace MultiLayerCli
         {
             StringProperty = new Option<string>("string-property");
             CtorParam = new Option<bool>("ctor-param");
-            Command.AddOption(CtorParam);
-            Command.AddOption(StringProperty);
-            Command.AddCommand(GetFindCommand());
-            Command.AddCommand(GetListCommand());
+            RootCommand.AddOption(CtorParam);
+            RootCommand.AddOption(StringProperty);
+            RootCommand.AddCommand(GetFindCommand());
+            RootCommand.AddCommand(GetListCommand());
             // no handler because this is not invokable
         }
 

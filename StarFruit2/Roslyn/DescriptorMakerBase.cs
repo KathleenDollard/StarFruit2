@@ -46,7 +46,9 @@ namespace Starfruit2
     // Add ordering for params              DONE
     // Mark async                           DONE
     // Code element (prop/parm)             DONE
-    // Constructors                         ToDo
+    // Constructors                         ToDo (late stage validation not possible)
+    // Validation                           ToDo
+    // ExtraData/ExtraAttributes            ToDo
 
     // Unique fieldname in descripriptor    Probably to do
 

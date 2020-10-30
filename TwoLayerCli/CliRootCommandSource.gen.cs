@@ -1,11 +1,12 @@
 ﻿using StarFruit2;
+using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
 using System.Threading.Tasks;
 
 namespace TwoLayerCli
 {
-    public partial class CliRootCommandSource
+    public partial class CliRootCommandSource : CommandSource<CliRoot>
     {
         public Argument<int> Find_IntArg { get; private set; }
         public Option<string> Find_StringOption { get; set; }
@@ -22,40 +23,66 @@ namespace TwoLayerCli
         {
             StringProperty = new Option<string>("string-property");
             CtorParam = new Option<bool>("ctor-param");
-            Command.AddOption(CtorParam);
-            Command.AddOption(StringProperty);
-            Command.AddCommand(GetFindCommand());
-            Command.AddCommand(GetListCommand());
+            RootCommand.AddOption(CtorParam);
+            RootCommand.AddOption(StringProperty);
+            RootCommand.AddCommand(GetFindCommand());
+            RootCommand.AddCommand(GetListCommand());
             // no handler because not invokable
         }
 
-        public async Task<int> InvokeFindAsync(BindingContext bindingContext)
+        public int InvokeFind(BindingContext bindingContext)
         {
             NewInstance = GetNewInstance(bindingContext);
-            return await NewInstance.FindAsync(GetValue(bindingContext, Find_IntArg),
-                                               GetValue(bindingContext, Find_StringOption),
-                                               GetValue(bindingContext, Find_BoolOption));
+            var intArg = GetValue(bindingContext, Find_IntArg);
+            var stringOption = GetValue(bindingContext, Find_StringOption);
+            var boolOption = GetValue(bindingContext, Find_BoolOption);
+            RunFunc = () => NewInstance.FindAsync(stringOption, boolOption, intArg);
+            return 0;
         }
 
-        public async Task<int> InvokeListAsync(BindingContext bindingContext)
+        public int InvokeList(BindingContext bindingContext)
         {
             NewInstance = GetNewInstance(bindingContext);
-            return await NewInstance.ListAsync(GetValue(bindingContext, List_BoolOption));
+            var boolOption = GetValue(bindingContext, Find_BoolOption);
+            RunFunc = () => NewInstance.ListAsync ( boolOption);
+            return 0;
         }
 
         private Command GetFindCommand()
         {
-            Find_IntArg = new Argument<int>("int-arg"); // This would actually be a lot more involved.
-            Find_StringOption = new Option<string>("string-option");
-            Find_BoolOption = new Option<bool>("bool-option");
+            Find_IntArg = new Argument<int>("int-arg")
+            {
+                Description = "this is cool",
+                Arity = new ArgumentArity(0,1), // this is based on whether it is a collection, required and Arity if the descriptor supports that
+                IsHidden = false,
+            };
+            //Find_IntArg.AllowedValues.AddRange("X", "Z");
+            // Find_IntArg.SetDefaultValue... only if we have one
 
-            FindCommand = new Command("find")
+            Find_StringOption = new Option<string>("--string-option")
+            {
+                Description = "this is cooler",
+                IsRequired = true,
+                IsHidden = false,
+            };
+            var find_StringOption_arg = new Argument("name"); // most of the stuff from arg above
+            Find_StringOption.Argument = find_StringOption_arg;
+            Find_StringOption.AddAlias("-a");
+
+
+            Find_BoolOption = new Option<bool>("bool-option"); // similar to string option
+
+            FindCommand = new Command("find", "Yep, cool")
             {
                 Find_BoolOption,
                 Find_StringOption,
                 Find_BoolOption
             };
-            FindCommand.Handler = new CommandSourceCommandHandler(InvokeFindAsync);
+            //FindCommand.IsHidden = false;
+            //Find_StringOption.AddAlias("-a");
+            //Find_StringOption.TreatUnmatchedTokensAsErrors = true;
+
+            FindCommand.Handler = new CommandSourceCommandHandler(InvokeFind);
 
             return FindCommand;
         }
@@ -65,10 +92,10 @@ namespace TwoLayerCli
 
             List_BoolOption = new Option<bool>("bool-option");
             ListCommand = new Command("find")
-            { 
-                List_BoolOption 
+            {
+                List_BoolOption
             };
-            ListCommand.Handler = new CommandSourceCommandHandler(InvokeListAsync);
+            ListCommand.Handler = new CommandSourceCommandHandler(InvokeList);
 
             return ListCommand;
 
