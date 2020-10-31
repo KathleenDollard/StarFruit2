@@ -68,12 +68,14 @@ namespace StarFruit2
         }
 
         // string type and string genericType is very place holder, re-eval as needed
-        public string Property(Scope scope, string type, string? genericType, string name, Scope setterScope)
+        public string Property(Scope scope, string type, string name, Scope setterScope)
         {
-            string compositeType = (genericType is null) ? type : $"{type}<{genericType}>";
             string setter = setterScope == Scope.Private ? "private set;" : "set;";
-            return $"{scope.CSharpString()} {compositeType} {name} {{ get; {setter} }}";
+            return $"{scope.CSharpString()} {type} {name} {{ get; {setter} }}";
         }
+
+        public string Field(Scope scope, string type, string name)
+            => $"{scope.CSharpString()} {type} {name}";
 
         // generate.MakeParam("BindingContext", "bindingContext")
         // could do String.join(",",generate.MakeParam(...), generate.MakeParam(...))
@@ -97,15 +99,29 @@ namespace StarFruit2
             return strCollection;
         }
 
+        public string MethodCall(string methodName, List<string>? args) 
+            => $"{methodName}({(args is null ? "" : string.Join(", ", args))})";
+
         public string SetNewInstance
             => Assign("NewInstance", "GetNewInstance(bindingContext)");
 
-        public List<string> Constructor(string className, string cliName, IEnumerable<string> constructorBody)
+        public string ConstructorName(string className, List<string>? ctorArgs, string? baseClassName, List<string>? baseCtorArgs)
+        {
+            if(baseClassName is null)
+            {
+                return MethodCall(className, ctorArgs);
+            } else
+            {
+                return Inheritance(MethodCall(className, ctorArgs),
+                                   MethodCall(baseClassName, baseCtorArgs));
+            }
+        }
+
+        public List<string> Constructor(string ctorName, IEnumerable<string> constructorBody)
         {
             List<string> strCollection = new List<string>
             {
-                $@"{Scope.Public.CSharpString()} {className}",
-                $": base(new Command({cliName}))",
+                $"{Scope.Public.CSharpString()} {ctorName}",
                 "{"
             };
 
@@ -151,6 +167,22 @@ namespace StarFruit2
         public string Assign(string leftHand, string rightHand, string op = "=")
             => $"{leftHand} {op} {rightHand}";
 
+        public string Lambda(IEnumerable<string> args, IEnumerable<string> statements)
+        {
+            string formattedStatements = string.Join(",", statements.Select(s => s.EndStatement()));
+            return $"({string.Join(", ", args)}) => {{ {formattedStatements} }}";
+        }
+
+        public string Inheritance(string inheritingClass, string baseClass)
+        {
+            return $"{inheritingClass} : {baseClass}";
+        }
+
+        // in VB I think this is "MyBase"
+        public string Base = "base";
+        // In VB "Me"
+        private string This = "this";
+
         // if we keep these 2 init expressions, then this could just be a single
         // object init method call.
         public static string ArgInitExpression(string cliName, string argType)
@@ -191,47 +223,22 @@ namespace StarFruit2
                 $"return{(await == true ? " await " : " ")}{returnValue[0]}"
             };
 
-            if (returnValue.Count() == 1)
+            switch (returnValue.Count())
             {
-                return strCollection.EndStatement();
-            }
-            else if (returnValue.Count() == 0)
-            {
-                return new List<string> { };
+                case 0:
+                    return new List<string> { };
+                case 1:
+                    return strCollection.EndStatement();
             }
 
             strCollection.AddRange(returnValue.ToArray()[1..^1]);
             strCollection.Add(returnValue[^1]);
 
             return strCollection.EndStatement();
-            //strCollection.Add($"{EndExpression(returnValue[^1])}");
-
-            //return strCollection;
         }
 
         internal string GetValueMethod(string valToFetch)
             => $"GetValue(bindingContext, {valToFetch})";
-
-        // how much should be here vs code generator?
-        // look at this using a public object init method
-        //internal List<string> NewCliRoot(List<string> ctorParams, List<string> ctorProperties)
-        //{
-        //    var paramValues = ctorParams.Select(param => GetValueMethod(param));
-        //    var propDeclarations = ctorProperties.Select(prop => $"{Assign(prop, GetValueMethod(prop))},");
-
-        //    var strCollection = new List<string>
-        //    {
-        //        $"new CliRoot({String.Join(", ", paramValues)})",
-        //        "{"
-        //    };
-
-        //    strCollection.AddRange(propDeclarations);
-        //    strCollection.Add("}");
-
-        //    return ObjectInit("CliRoot", paramValues, propDeclarations);
-
-        //    //return strCollection;
-        //}
 
         public List<string> ObjectInit(string objName, IEnumerable<string>? ctorParams, IEnumerable<string> props)
         {

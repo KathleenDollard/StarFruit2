@@ -74,13 +74,12 @@ namespace StarFruit2.Tests
         public void Property_ReturnsPropertyDeclarationWithPublicSetter()
         {
             var scope = Scope.Public;
-            var type = "Option";
-            var genericType = "int";
+            var type = "Option<int>";
             var name = "PropName";
             var setterScope = Scope.Public;
             var expectedData = $"public Option<int> {name} {{ get; set; }}";
 
-            var result = generate.Property(scope, type, genericType, name, setterScope);
+            var result = generate.Property(scope, type, name, setterScope);
 
             result.Should().BeEquivalentTo(expectedData);
         }
@@ -89,13 +88,12 @@ namespace StarFruit2.Tests
         public void Property_ReturnsPropertyDeclarationWithPrivateSetter()
         {
             var scope = Scope.Internal;
-            var type = "Argument";
-            var genericType = "string";
+            var type = "Argument<string>";
             var name = "PropName";
             var setterScope = Scope.Private;
             var expectedData = $"internal Argument<string> {name} {{ get; private set; }}";
 
-            var result = generate.Property(scope, type, genericType, name, setterScope);
+            var result = generate.Property(scope, type, name, setterScope);
 
             result.Should().BeEquivalentTo(expectedData);
         }
@@ -104,14 +102,13 @@ namespace StarFruit2.Tests
         [Fact]
         public void Constructor_ReturnsConstructorInheritingFromBase()
         {
-            var name = "SweetClassName";
-            var cliName = "sweet-class-name";
+            var name = "SweetClassName()";
             var ctorBody = new List<string> { "SomeFunction();", "var fizz = 42;" };
-            var expectedData = new List<string> { $"public {name}", $": base(new Command({cliName}))", "{" };
+            var expectedData = new List<string> { $"public {name}", "{" };
             expectedData.AddRange(ctorBody);
             expectedData.Add("}");
 
-            var result = Utils.Normalize(generate.Constructor(name, cliName, ctorBody));
+            var result = Utils.Normalize(generate.Constructor(name, ctorBody));
 
             result.Should().BeEquivalentTo(expectedData);
         }
