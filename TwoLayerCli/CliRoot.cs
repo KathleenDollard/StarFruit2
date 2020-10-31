@@ -1,5 +1,6 @@
 ﻿using StarFruit2;
 using StarFruit2.Common;
+using System;
 using System.Threading.Tasks;
 
 namespace TwoLayerCli
@@ -27,8 +28,12 @@ namespace TwoLayerCli
         /// <param name="boolOption">This is an bool argument</param>
         /// <param name="intArg">This is an integer argument</param>
         /// <returns></returns>
-        public async Task<int> FindAsync(string stringOption, bool boolOption, int intArg=42)
-        { return await Task.FromResult(0); }
+        public async Task<int> FindAsync(string stringOption, bool boolOption, int intArg = 42)
+        {
+            Console.WriteLine($"StringProperty: {StringProperty}   stringOption: {stringOption}   boolOption: {boolOption}    intArg: {intArg}");
+            return await Task.FromResult(0);
+
+        }
 
         /// <summary>
         /// List the elements you are interested in

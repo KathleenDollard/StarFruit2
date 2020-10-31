@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-
-namespace Starfruit2_B
+﻿namespace Starfruit2_B
 {
 
     //public abstract class RoslynDescriptorMaker<TCommandSource, TOptionArgSource> : DescriptorMakerBase<TCommandSource, TOptionArgSource>

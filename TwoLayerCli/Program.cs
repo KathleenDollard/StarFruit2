@@ -18,7 +18,7 @@ namespace TwoLayerCli
 
     class Program3
     {
-        static int Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
             var commandSource = CommandSource.Create<CliRoot>() as CliRootCommandSource;
             // modify System.CommandLine elements here
@@ -37,8 +37,9 @@ namespace TwoLayerCli
                     break;
             }
             // if you didn’t early return on help, etc, Execute does nothing
-            var exitCode = commandSourceResult.Run();
+            var exitCode = await commandSourceResult.RunAsync();
             return exitCode;
         }
+
     }
 }

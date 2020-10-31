@@ -16,7 +16,7 @@ namespace TwoLayerCli
         public CliRootCommandSource()
             : base(new Command("cli-root"))
         {
-            StringProperty = new Option<string>("string-property");
+            StringProperty = GetStringProperty();
             CtorParam = new Option<bool>("ctor-param");
             Command.AddOption(CtorParam);
             Command.AddOption(StringProperty);
@@ -35,6 +35,21 @@ namespace TwoLayerCli
         public ListCommandSource List { get; set; }
         public FindCommandSource Find { get; set; }
 
+        private Option<string> GetStringProperty()
+        {
+            var option = new Option<string>("--string-property")
+            {
+                Description = "this is cooler",
+                IsRequired = true,
+                IsHidden = false,
+            };
+            var optionArg = new Argument<string>("name");
+            // only if DefaultValue is not null
+            optionArg.SetDefaultValue("abc");
+            option.Argument = optionArg;
+            option.AddAlias("-a");
+            return option;
+        }
     }
 
     public class FindCommandSource
@@ -73,15 +88,17 @@ namespace TwoLayerCli
 
         private Argument<int> GetIntArg()
         {
-            return new Argument<int>("int-arg")
+            var argument = new Argument<int>("int-arg")
             {
                 Description = "this is cool",
                 Arity = new ArgumentArity(0, 1), // this is based on whether it is a collection, required and Arity if the descriptor supports that
                 IsHidden = false,
             };
-            //IntArg.AllowedValues.AddRange("X", "Z");
-            // IntArg.SetDefaultValue... only if we have one
+            // only if DefaultValue is not null
+            argument.SetDefaultValue(42);
+            return argument;
         }
+
         private Option<string> GetStringOption()
         {
             var option = new Option<string>("--string-option")

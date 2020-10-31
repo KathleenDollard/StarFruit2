@@ -1,9 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-using StarFruit2.Common.Descriptors;
+﻿using StarFruit2.Common.Descriptors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace StarFruit2.Generator
 {
