@@ -354,7 +354,7 @@ namespace StarFruit2.Tests
             expectedData.AddRange(methodBody);
             expectedData.Add("}");
 
-            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType, false, argument));
+            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType, false, false, argument));
 
             result.Should().BeEquivalentTo(expectedData);
         }
@@ -380,7 +380,7 @@ namespace StarFruit2.Tests
             expectedData.AddRange(methodBody);
             expectedData.Add("}");
 
-            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType, false, argument, otherArgument));
+            var result = Utils.Normalize(generate.Method(Scope.Public, methodName, methodBody, returnType, false, false, argument, otherArgument));
 
             result.Should().BeEquivalentTo(expectedData);
         }

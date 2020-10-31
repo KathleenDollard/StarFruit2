@@ -11,7 +11,8 @@ namespace StarFruit2
     {
         Public,
         Private,
-        Internal
+        Internal,
+        Protected
     }
 
     static class ScopeExtensions
@@ -51,7 +52,8 @@ namespace StarFruit2
 
 
         public string AddToCommand(string methodName, string argumentName)
-            => MethodCall($"Command.{methodName}", new List<string> { argumentName });
+            => MethodCall($"Command.{methodName}",
+                          new List<string> { argumentName }).EndStatement();
 
 
 
@@ -70,11 +72,11 @@ namespace StarFruit2
         internal string NewCommand(string cliName, string? desc = null)
         {
             var args = new List<string> { cliName, desc };
-            return NewObject($"Command", string.Join(", ", args));
+            return NewObject($"Command", args);
         }
 
         internal string NewCommandHandler(string cmdName)
-            => NewObject("CommandSourceHandler", cmdName);
+            => NewObject("CommandSourceHandler", new List<String> { cmdName });
 
 
         internal string GetValueMethod(string valToFetch)
@@ -134,7 +136,7 @@ namespace StarFruit2
         // generate.MakeParam("BindingContext", "bindingContext")
         // could do String.join(",",generate.MakeParam(...), generate.MakeParam(...))
         // TODO: re-eval this interface for prettiness
-        public List<string> Method(Scope scope, string name, List<string> methodBody, string returnType, bool isAsync = false, params string[] arguments)
+        public List<string> Method(Scope scope, string name, List<string> methodBody, string returnType, bool isAsync = false, bool isOverriden = false, params string[] arguments)
         {
             if (isAsync && !returnType.StartsWith("Task<"))
             {
@@ -142,8 +144,9 @@ namespace StarFruit2
             }
 
             string asyncStr = isAsync ? "async" : "";
+            string overrideStr = isOverriden ? "override" : "";
             List<string> strCollection = new List<string> {
-                $"{scope.CSharpString()} {asyncStr} {returnType} {name}({String.Join(", ", arguments)})",
+                $"{scope.CSharpString()} {overrideStr} {asyncStr} {returnType} {name}({String.Join(", ", arguments)})",
                 "{"
             };
 
@@ -153,8 +156,10 @@ namespace StarFruit2
             return strCollection;
         }
 
-        public string MethodCall(string methodName, List<string>? args)
-            => $"{methodName}({(args is null ? "" : string.Join(", ", args))})";
+        public string MethodCall(string methodName, List<string>? args = null)
+            => $"{methodName}({FormattedArgs(args)})";
+        public string MethodCall(string methodName, params string[] args)
+            => MethodCall(methodName, args.ToList());
 
         public List<string> Constructor(string className, IEnumerable<string>? ctorArgs, IEnumerable<string>? baseArgs, IEnumerable<string> ctorBody, Scope scope = Scope.Public)
         {
@@ -198,6 +203,25 @@ namespace StarFruit2
         public string Assign(string leftHand, string rightHand, string op = "=")
             => $"{leftHand} {op} {rightHand}";
 
+        public List<string> Assign(string leftHand, List<string> rightHand, string op = "=")
+        {
+            var strCollection = new List<string>
+            {
+                Assign(leftHand, rightHand[0], op)
+                //$"return{(await == true ? " await " : " ")}{returnValue[0]}"
+            };
+
+            switch (rightHand.Count())
+            {
+                case 1:
+                    return strCollection;
+            }
+
+            strCollection.AddRange(rightHand.ToArray()[1..^1]);
+            strCollection.Add(rightHand[^1]);
+
+            return strCollection;
+        }
         // FIXME: consider how we handle expression vs statements
         //        COVER ME WITH TESTS
         public string Lambda(IEnumerable<string>? args, IEnumerable<string> statements)
@@ -231,6 +255,8 @@ namespace StarFruit2
         public readonly string Base = "base";
         // In VB "Me"
         public readonly string This = "this";
+        // In VB "Dim"
+        public readonly string Var = "var";
 
         public string Return(string returnValue, bool await = false)
             => $"return{(await == true ? " await " : " ")}{returnValue}".EndStatement();
@@ -257,14 +283,16 @@ namespace StarFruit2
             return strCollection.EndStatement();
         }
 
-        private string NewObject(string objName, string paramStr)
-            => $"new {objName}({paramStr})";
+        public string NewObject(string objName, params string[] paramStrs)
+            => NewObject(objName, paramStrs.ToList());
+        public string NewObject(string objName, IEnumerable<string>? paramStr = null)
+            => $"new {objName}({FormattedArgs(paramStr)})";
 
         public List<string> NewObjectWithInit(string objName, IEnumerable<string>? ctorArgs, IEnumerable<string>? assignments)
         {
             var strCollection = new List<string>
             {
-                NewObject(objName, FormattedArgs(ctorArgs)),
+                NewObject(objName, ctorArgs),
                 "{"
             };
 

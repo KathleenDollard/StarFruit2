@@ -72,205 +72,68 @@ namespace StarFruit2
         {
             var isRoot2 = commandDescriptor.IsRoot;
             List<string> strCollection = new List<string>();
-            // TODO: implement GetFields
-            strCollection.AddRange(GetFields());
-            strCollection.AddRange(GetProperties(commandDescriptor));
+
             strCollection.AddRange(GetConstructor(commandDescriptor, className));
 
+            // TOOD: this isn't quite right, as 1 layer needs this on root, multilayer need this on childred
+            strCollection.AddRange(GetCommandSourceResultMethod(commandDescriptor));
 
-            // consider if these can leverage same underlying Generate method, be mindful of rabbit hole, generated methods can have > 1 param
-            strCollection.AddRange(GetInvokeMethods(commandDescriptor)); // <--- gotta get all of them
-            strCollection.AddRange(GetCommandMethods(commandDescriptor));
-
-
-            strCollection.AddRange(GetNewInstanceMethod(commandDescriptor));
-
-            return strCollection;
-        }
-
-        private IEnumerable<string> GetFields()
-        {
-            throw new NotImplementedException();
-        }
-
-
-        // TODO: this works for 2 layer, does this break for 1 or multi layer?
-        private IEnumerable<string> GetInvokeMethods(CommandDescriptor commandDescriptor)
-            => commandDescriptor.SubCommands.SelectMany(cmd => GetInvokeMethod(cmd));
-
-        private List<string> GetInvokeMethod(CommandDescriptor cmd)
-        {
-            // "NewInstance = GetNewInstance(bindingContext)";
-            var methodBody = new List<string>
+            if (!commandDescriptor.IsRoot)
             {
-                generate.SetNewInstance,
-            };
+                strCollection.AddRange(GetFields(commandDescriptor));
+            }
 
-            // see two layer gen #36-38, unsure best vert whitespace management here
-            // fetch all the GetValue calls
-            var methodArgs = cmd.Arguments.Where(arg => arg.CodeElement == CodeElement.MethodParameter);
-            var methodOptions = cmd.Options.Where(opt => opt.CodeElement == CodeElement.MethodParameter);
-            var cmdValues = string.Join(", ", GetCommandValues(cmd.Name, methodArgs, methodOptions));
+            strCollection.AddRange(GetProperties(commandDescriptor));
 
-            // original name may fail on 1 layer
-            // push this to generate, since it's C#. generate.Return(body, isAsync)
-            methodBody.Add(generate.Return($"NewInstance.{cmd.OriginalName}({cmdValues})", true));
+            strCollection.AddRange(GetOptAndArgMethods(commandDescriptor));
 
-            // this will fall over with compound generic types, deal with that if encountered
-            return generate.Method(Scope.Public,
-                                   NameForInvokeCommand(cmd.Name),
-                                   methodBody,
-                                   generate.GenericType("Task", "int"),
-                                   cmd.IsAsync,
-                                   generate.Parameter("BindingContext", "bindingContext"));
-        }
 
-        private List<string> GetCommandValues(string cmdName, IEnumerable<ArgumentDescriptor> args, IEnumerable<OptionDescriptor> options)
-        {
-            List<string> strCollection = new List<string> { };
+            //// consider if these can leverage same underlying Generate method, be mindful of rabbit hole, generated methods can have > 1 param
+            //strCollection.AddRange(GetInvokeMethods(commandDescriptor)); // <--- gotta get all of them
+            //strCollection.AddRange(GetCommandMethods(commandDescriptor));
 
-            // unsure on original name vs name here
-            //var optsAndArgs = args.OfType<SymbolDescriptor>().Union(options);
-            // grrr, this only works if SymbolDescriptors have code elements, and they shouldn't. Maybe a shared base class for opts and args?
-            // same issue for position
-            //var values = optsAndArgs.Where(elem => elem.CodeElement == CodeElement.MethodParameter).Select(elem => generate.GetValueMethod(NameForProperty(cmdName, elem.Name)));
-            //strCollection.AddRange(values);
 
-            var combo = args.OfType<SymbolDescriptor>().Union(options).OrderBy(elem => elem.Position).Select(elem => generate.GetValueMethod(NameForProperty(cmdName, elem.Name)));
-            //var foo = args.Select(arg => (name: arg.Name, position: arg.Position));
-            //var bizz = options.Select(opt => (name: opt.Name, position: opt.Position));
-            //var combo = foo.Union(bizz).OrderBy(elem => elem.position).Select(elem => elem.name);
-
-            strCollection.AddRange(combo);
-
-            //var argValues = args.Select(arg => generate.GetValueMethod(NameForProperty(cmdName, arg.Name)));
-            //var optValues = options.Select(opt => generate.GetValueMethod(NameForProperty(cmdName, opt.Name)));
-            //strCollection.AddRange(argValues);
-            //strCollection.AddRange(optValues);
+            //strCollection.AddRange(GetNewInstanceMethod(commandDescriptor));
 
             return strCollection;
-        }
-
-        private IEnumerable<string> GetCommandMethods(CommandDescriptor commandDescriptor)
-        {
-            var strCollection = GetCommandMethod(commandDescriptor);
-            strCollection.AddRange(commandDescriptor.SubCommands.SelectMany(cmd => GetCommandMethod(cmd)));
-
-            return strCollection;
-        }
-
-        private List<string> GetCommandMethod(CommandDescriptor cmd)
-        {
-            List<string> methodBody = new List<string> { };
-
-            // if this is VB unfriendly, push down to generate, might also push the get arg def down there as well
-            // TODO: finalize how to handle arg declaration
-            var argDeclarations =
-                cmd.Arguments.Select
-                (
-                    arg => generate.Assign
-                    (
-                        NameForProperty(arg.OriginalName, cmd.Name),
-                        generate.GetArg(arg.CliName, arg.ArgumentType.TypeAsString(), arg.Description)
-                    ).EndStatement()
-                );
-
-            // do samething for option
-
-            methodBody.AddRange(argDeclarations);
-
-            // throw all the args and opts into the new command (line 53-58), subcommands would come here as well
-
-            methodBody.AddRange(NewCommand(cmd));
-
-            methodBody.Add(generate.Assign($"{NameForCommand(cmd.Name)}.Handler", generate.NewCommandHandler(cmd.Name)));
-
-
-            methodBody.Add(generate.Return(NameForCommand(cmd.Name)));
-
-            return generate.Method(Scope.Private,
-                                   NameForGetCommand(cmd.Name),
-                                   methodBody,
-                                   "Command");
-        }
-
-        private List<string> NewCommand(CommandDescriptor cmd)
-        {
-            var strCollection = new List<string> { };
-
-            strCollection.AddRange(cmd.Arguments.Select(arg => $"{NameForProperty(cmd.Name, arg.OriginalName)},"));
-            strCollection.AddRange(cmd.Arguments.Select(opt => $"{NameForProperty(cmd.Name, opt.OriginalName)},"));
-
-            // scrap BuildBlock for now, instead build like 2 layer gen line 83
-            return generate.BuildBlock(generate.Assign(NameForCommand(cmd.Name), generate.NewCommand(cmd.CliName)), strCollection);
-        }
-
-        private IEnumerable<string> GetNewInstanceMethod(CommandDescriptor commandDescriptor)
-        {
-            // same problem as invoke: base class doesn't have code element :/
-
-            var ctorParamOpts = commandDescriptor.Options.Where(opt => opt.CodeElement == CodeElement.CtorParameter);
-            var ctorParamArgs = commandDescriptor.Arguments.Where(arg => arg.CodeElement == CodeElement.CtorParameter);
-            // union, then filter, then order, then take name
-            var ctorParamNames = ctorParamArgs.OfType<SymbolDescriptor>().Union(ctorParamOpts).Select(param => param.Name);
-            // placeholder, must fetch those passed as ctor properties
-            var PropertyOpts = commandDescriptor.Options.Where(opt => opt.CodeElement == CodeElement.Property);
-            var PropertyArgs = commandDescriptor.Arguments.Where(arg => arg.CodeElement == CodeElement.Property);
-            var PropertyNames = PropertyOpts.OfType<SymbolDescriptor>().Union(PropertyArgs).Select(prop => prop.Name);
-
-            var ctorParams = ctorParamNames.Select(param => generate.GetValueMethod(param));
-            //var ctorOptsAndArgs = new List<IEnumerable<string>> { ctorParamOpts, ctorParamArgs };
-            //var ctorParams = ctorOptsAndArgs.SelectMany(elem => elem).ToList();
-
-            var initProps = PropertyNames.Select(prop => generate.Assign(prop, generate.GetValueMethod(prop)));
-
-            //var PropertyOptsAndArgs = new List<IEnumerable<string>> { ctorParamOpts, ctorParamArgs };
-            //var initProperties = PropertyOptsAndArgs.SelectMany(elem => elem).ToList();
-
-            var methodBody = generate.Return(generate.NewObjectWithInit("CliRoot", ctorParams, initProps));
-            // add a version of return that takes a list and returns a list
-            //var methodBody = generate.Return(generate.NewCliRoot(ctorParams, initProperties));
-
-            return generate.Method(Scope.Private,
-                                   "GetNewInstance",
-                                   methodBody,
-                                   "CliRoot",
-                                   arguments: generate.Parameter("BindingContext", "bindingContext"));
         }
 
         private IEnumerable<string> GetConstructor(CommandDescriptor commandDescriptor, string className)
         {
             var strCollection = new List<string> { };
             List<string>? ctorArgs = null;
+            string rootStr;
+            string? parentStr;
 
-            if (!commandDescriptor.IsRoot)
+            if (commandDescriptor.IsRoot)
             {
-                strCollection.Add(generate.Assign($"{generate.This}.parent", "parent"));
+                rootStr = generate.This;
+                parentStr = generate.This;
             }
             else
             {
+                rootStr = $"{generate.This}.root";
+                parentStr = $"{generate.This}.parent";
                 ctorArgs = new List<string>
                 {
                     // not 100% sure if that will resolve to CliRootCommandSource as desired
                     generate.Parameter(commandDescriptor.Root.Name, "root"),
                     generate.Parameter(commandDescriptor.Parent.Name, "parent")
                 };
+
+                strCollection.Add(generate.Assign($"{generate.This}.parent", "parent"));
             }
 
-            //strCollection.AddRange(commandDescriptor.Options
-            //            .SelectMany(opt => opt.Arguments.Select(arg => GetCtorOpts(opt, arg))));
+            // add options and args
+            var optsAndArgs = commandDescriptor.Arguments.OfType<SymbolDescriptor>().Union(commandDescriptor.Options);
+            strCollection.AddRange(optsAndArgs.SelectMany(elem => AssignAndAdd(elem)));
 
-            //strCollection.AddRange(commandDescriptor.Arguments.Select(arg => GetCtorArg(arg)));
+            // add commands
+            strCollection.AddRange(commandDescriptor.SubCommands.SelectMany(subCmd => AddCommand(subCmd)));
 
-            //// go add new arg declarations
-            //strCollection.AddRange(commandDescriptor.Options.Select(opt => generate.AddToCommand("AddOption", opt.Name)));
-            //// go add arguments to command
-            //strCollection.AddRange(commandDescriptor.Arguments.Select(arg => generate.AddToCommand("AddArgument", arg.Name)));
-            //// go add subcommands to command
-            //strCollection.AddRange(commandDescriptor.SubCommands.Select(cmd => generate.AddToCommand("AddCommand", $"{NameForGetCommand(cmd.Name)}()")));
+            // add command handler
+            strCollection.Add(GetCommandHandler(commandDescriptor.IsRoot));
 
-
-            // assume all subcommands are methods. This is bad assumption, they can be classes or methods, but sidestep for now, see multi-layer model
             var baseArgs = new List<string> {
                 generate.NewCommand(commandDescriptor.CliName, commandDescriptor.Description)
             };
@@ -280,40 +143,105 @@ namespace StarFruit2
                                         baseArgs: baseArgs,
                                         ctorBody: strCollection);
 
-            string GetCtorOpts(OptionDescriptor opt, ArgumentDescriptor arg)
-                => generate.Assign(opt.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), opt.CliName)).EndStatement();
+            List<string> AssignAndAdd(SymbolDescriptor symbol)
+            {
+                var name = symbol.OriginalName;
+                return new List<string> {
+                    // StringProperty = GetStringProperty();
+                    generate.Assign(name, generate.MethodCall($"Get{name}")),
+                    // Command.Add(StringProperty);
+                    generate.AddToCommand("Add", name)
+                };
+            }
 
-            string GetCtorArg(ArgumentDescriptor arg)
-                => generate.Assign(arg.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), arg.CliName)).EndStatement();
+            List<string> AddCommand(CommandDescriptor subCmd)
+            {
+                var bizz = new List<string> { rootStr, parentStr };
+                var newObject = generate.NewObject($"{subCmd.Name}CommandSource", bizz);
+                var foo = generate.Assign(subCmd.Name, newObject);
+
+                return new List<string>
+                {
+                    foo,
+                    generate.AddToCommand("AddCommand", $"{subCmd.Name}.Command")
+                };
+            }
+
+            string GetCommandHandler(bool isRoot)
+            {
+                var commandSource = isRoot ? "CurrentCommandSource" : "root.CurrentCommandSource";
+                var handlerLambdaArgs = new List<string>
+                {
+                    generate.Assign(commandSource, generate.This),
+                     generate.Return(generate.This)
+                };
+                var handlerLambda = new List<string> { generate.Lambda(null, handlerLambdaArgs) };
+                var createdCommandHandler = generate.MethodCall("CommandHandler.Create", handlerLambda);
+                return generate.Assign($"Command.Handler", createdCommandHandler);
+            }
         }
+
+        private IEnumerable<string> GetCommandSourceResultMethod(CommandDescriptor commandDescriptor)
+        {
+            // not sure if that is the right name here, want just Find
+            var cmdSourceObj = generate.NewObject($"{commandDescriptor.Name}CommandSourceResult", "parseResult", generate.This);
+            var methodBody = new List<string>
+            {
+                generate.Return(cmdSourceObj)
+            };
+
+            return generate.Method(scope: Scope.Protected,
+                                   name: $"GetCommandSourceResult",
+                                   methodBody: methodBody,
+                                   returnType: "CommandSourceResult",
+                                   isAsync: false,
+                                   isOverriden: true,
+                                   arguments: generate.Parameter("ParseResult", "parseResult"));
+        }
+
+        private IEnumerable<string> GetFields(CommandDescriptor commandDescriptor)
+            => new List<string>
+            {
+                generate.Field(Scope.Internal, commandDescriptor.Parent.Name, "parent")
+            };
 
         private List<string> GetProperties(CommandDescriptor commandDescriptor)
         {
-            List<string> fieldStrings = new List<string>();
+            List<string> strCollection = new List<string>();
             // add top level args/opts
-            fieldStrings.AddRange(commandDescriptor.Arguments
+
+            strCollection.AddRange(commandDescriptor.Arguments
                                                    .Where(arg => !arg.IsHidden)
                                                    .Select(arg => GetArgument(arg, commandDescriptor))
                                                    .ToList());
 
-            fieldStrings.AddRange(commandDescriptor.Options
+            strCollection.AddRange(commandDescriptor.Options
                                                    .Where(opt => !opt.IsHidden)
                                                    .Select(opt => GetOption(opt, commandDescriptor))
                                                    .ToList());
-            // add subcommands
-            fieldStrings.AddRange(commandDescriptor.SubCommands.SelectMany(cmd => GetProperties(cmd)));
 
-            return fieldStrings;
+            // TODO: not done, haven't handled adding parent props, see 86-87 in .gen
+
+            return strCollection;
         }
+
+        private IEnumerable<string> GetOptAndArgMethods(CommandDescriptor cmd)
+        {
+            var optionMethods = cmd.Options.SelectMany(opt => GetOptionMethod(cmd, opt));
+            var argumentMethods = cmd.Arguments.SelectMany(arg => GetArgMethod(cmd, arg));
+
+            return optionMethods.Union(argumentMethods);
+        }
+
 
         private string GetArgument(ArgumentDescriptor arg, CommandDescriptor commandDescriptor)
         {
-            var scope = Scope.Public;
+            Scope scope = Scope.Public;
             return generate.Property(
                 scope: scope,
                 type: generate.GenericType("Argument", arg.ArgumentType.TypeAsString()),
                 // need to properly handle top level prop names (i.e. no command prefix)
-                name: NameForProperty(arg.Name, commandDescriptor.Name ?? ""),
+                name: arg.Name,
                 setterScope: scope
             );
         }
@@ -323,22 +251,229 @@ namespace StarFruit2
             Scope scope = Scope.Public;
             return generate.Property(
                 scope: scope,
+                // this still feels not quite right w/ the .First
                 type: generate.GenericType("Option", opt.Arguments.First().ArgumentType.TypeAsString()),
-                name: NameForProperty(opt.Name, commandDescriptor.Name ?? ""),
+                name: opt.Name,
                 setterScope: scope
             );
         }
 
-        private string NameForGetCommand(string cmdName)
-            => $"Get{cmdName}Command";
+        private IEnumerable<string> GetOptionMethod(CommandDescriptor cmd, OptionDescriptor opt)
+        {
+            var methodBody = new List<string> { };
+            var type = opt.Arguments.First().ArgumentType.TypeAsString();
+            var optType = generate.GenericType("Option", type);
+            var args = new List<string> { opt.CliName };
+            var assignments = new List<string> { 
+                generate.Assign("Description", opt.Description),
+                // this might be a problem, as IDK if this breaks string rep of bool in VB
+                generate.Assign("IsRequired", opt.Required.ToString()),
+                generate.Assign("IsHidden", opt.IsHidden.ToString())
+            };
+            var optObject = generate.NewObjectWithInit(optType, args, assignments);
 
-        private string NameForInvokeCommand(string cmdName)
-            => $"Invoke{cmdName}Async";
+            methodBody.AddRange(generate.Assign($"{generate.Var} option", optObject));
 
-        private string NameForCommand(string cmdName)
-            => $"{cmdName}Command";
+            // this is a terrible variable name
+            var optArgName = $"{cmd.Name}_{opt.OriginalName}_arg";
+            var optArgObj = generate.NewObject(generate.GenericType("Argument", type), "name");
+            // var find_StringOption_arg = new Argument<string>("name");
+            methodBody.Add(generate.Assign(optArgName, optArgObj));
+            // TODO: must add default value logic
 
-        private string NameForProperty(string cmdName, string name)
-            => cmdName == "" ? name : $"{cmdName}_{name}";
+            methodBody.Add(generate.Assign("option.Argument", optArgName));
+            methodBody.AddRange(opt.Aliases.Select(alias => generate.MethodCall("option.AddAlias", alias)));
+
+            methodBody.Add(generate.Return("option"));
+
+            return generate.Method(scope: Scope.Private,
+                                   name: $"Get{opt.OriginalName}",
+                                   methodBody: methodBody,
+                                   returnType: optType);
+        }
+
+        private IEnumerable<string> GetArgMethod(CommandDescriptor cmd, ArgumentDescriptor arg)
+        {
+            var methodBody = new List<string> { };
+            var argType = generate.GenericType("Argument", arg.ArgumentType.TypeAsString());
+            var args = new List<string> { arg.CliName };
+            var assignments = new List<string> {
+                generate.Assign("Description", arg.Description),
+                // this might be a problem, as IDK if this breaks string rep of bool in VB
+                generate.Assign("IsRequired", arg.Required.ToString()),
+                generate.Assign("IsHidden", arg.IsHidden.ToString())
+            };
+            var optObject = generate.NewObjectWithInit(argType, args, assignments);
+
+            methodBody.AddRange(generate.Assign($"{generate.Var} argument", optObject));
+
+            // TODO: must add default value logic
+
+            methodBody.Add(generate.Return("argument"));
+
+            return generate.Method(scope: Scope.Private,
+                                   name: $"Get{arg.OriginalName}",
+                                   methodBody: methodBody,
+                                   returnType: argType);
+        }
+
+
+        //// TODO: this works for 2 layer, does this break for 1 or multi layer?
+        //private IEnumerable<string> GetInvokeMethods(CommandDescriptor commandDescriptor)
+        //    => commandDescriptor.SubCommands.SelectMany(cmd => GetInvokeMethod(cmd));
+
+        //private List<string> GetInvokeMethod(CommandDescriptor cmd)
+        //{
+        //    // "NewInstance = GetNewInstance(bindingContext)";
+        //    var methodBody = new List<string>
+        //    {
+        //        generate.SetNewInstance,
+        //    };
+
+        //    // see two layer gen #36-38, unsure best vert whitespace management here
+        //    // fetch all the GetValue calls
+        //    var methodArgs = cmd.Arguments.Where(arg => arg.CodeElement == CodeElement.MethodParameter);
+        //    var methodOptions = cmd.Options.Where(opt => opt.CodeElement == CodeElement.MethodParameter);
+        //    var cmdValues = string.Join(", ", GetCommandValues(cmd.Name, methodArgs, methodOptions));
+
+        //    // original name may fail on 1 layer
+        //    // push this to generate, since it's C#. generate.Return(body, isAsync)
+        //    methodBody.Add(generate.Return($"NewInstance.{cmd.OriginalName}({cmdValues})", true));
+
+        //    // this will fall over with compound generic types, deal with that if encountered
+        //    return generate.Method(scope: Scope.Public,
+        //                           name: NameForInvokeCommand(cmd.Name),
+        //                           methodBody: methodBody,
+        //                           returnType: generate.GenericType("Task", "int"),
+        //                           isAsync: cmd.IsAsync,
+        //                           isOverriden: false,
+        //                           arguments: generate.Parameter("BindingContext", "bindingContext"));
+        //}
+        //
+        //private List<string> GetCommandValues(string cmdName, IEnumerable<ArgumentDescriptor> args, IEnumerable<OptionDescriptor> options)
+        //{
+        //    List<string> strCollection = new List<string> { };
+
+        //    // unsure on original name vs name here
+        //    //var optsAndArgs = args.OfType<SymbolDescriptor>().Union(options);
+        //    // grrr, this only works if SymbolDescriptors have code elements, and they shouldn't. Maybe a shared base class for opts and args?
+        //    // same issue for position
+        //    //var values = optsAndArgs.Where(elem => elem.CodeElement == CodeElement.MethodParameter).Select(elem => generate.GetValueMethod(NameForProperty(cmdName, elem.Name)));
+        //    //strCollection.AddRange(values);
+
+        //    var combo = args.OfType<SymbolDescriptor>().Union(options).OrderBy(elem => elem.Position).Select(elem => generate.GetValueMethod(NameForProperty(cmdName, elem.Name)));
+        //    //var foo = args.Select(arg => (name: arg.Name, position: arg.Position));
+        //    //var bizz = options.Select(opt => (name: opt.Name, position: opt.Position));
+        //    //var combo = foo.Union(bizz).OrderBy(elem => elem.position).Select(elem => elem.name);
+
+        //    strCollection.AddRange(combo);
+
+        //    //var argValues = args.Select(arg => generate.GetValueMethod(NameForProperty(cmdName, arg.Name)));
+        //    //var optValues = options.Select(opt => generate.GetValueMethod(NameForProperty(cmdName, opt.Name)));
+        //    //strCollection.AddRange(argValues);
+        //    //strCollection.AddRange(optValues);
+
+        //    return strCollection;
+        //}
+
+        //private IEnumerable<string> GetCommandMethods(CommandDescriptor commandDescriptor)
+        //{
+        //    var strCollection = GetCommandMethod(commandDescriptor);
+        //    strCollection.AddRange(commandDescriptor.SubCommands.SelectMany(cmd => GetCommandMethod(cmd)));
+
+        //    return strCollection;
+        //}
+
+        //private List<string> GetCommandMethod(CommandDescriptor cmd)
+        //{
+        //    List<string> methodBody = new List<string> { };
+
+        //    // if this is VB unfriendly, push down to generate, might also push the get arg def down there as well
+        //    // TODO: finalize how to handle arg declaration
+        //    var argDeclarations =
+        //        cmd.Arguments.Select
+        //        (
+        //            arg => generate.Assign
+        //            (
+        //                NameForProperty(arg.OriginalName, cmd.Name),
+        //                generate.GetArg(arg.CliName, arg.ArgumentType.TypeAsString(), arg.Description)
+        //            ).EndStatement()
+        //        );
+
+        //    // do samething for option
+
+        //    methodBody.AddRange(argDeclarations);
+
+        //    // throw all the args and opts into the new command (line 53-58), subcommands would come here as well
+
+        //    methodBody.AddRange(NewCommand(cmd));
+
+        //    methodBody.Add(generate.Assign($"{NameForCommand(cmd.Name)}.Handler", generate.NewCommandHandler(cmd.Name)));
+
+
+        //    methodBody.Add(generate.Return(NameForCommand(cmd.Name)));
+
+        //    return generate.Method(Scope.Private,
+        //                           NameForGetCommand(cmd.Name),
+        //                           methodBody,
+        //                           "Command");
+        //}
+
+        //private List<string> NewCommand(CommandDescriptor cmd)
+        //{
+        //    var strCollection = new List<string> { };
+
+        //    strCollection.AddRange(cmd.Arguments.Select(arg => $"{NameForProperty(cmd.Name, arg.OriginalName)},"));
+        //    strCollection.AddRange(cmd.Arguments.Select(opt => $"{NameForProperty(cmd.Name, opt.OriginalName)},"));
+
+        //    // scrap BuildBlock for now, instead build like 2 layer gen line 83
+        //    return generate.BuildBlock(generate.Assign(NameForCommand(cmd.Name), generate.NewCommand(cmd.CliName)), strCollection);
+        //}
+
+        //private IEnumerable<string> GetNewInstanceMethod(CommandDescriptor commandDescriptor)
+        //{
+        //    // same problem as invoke: base class doesn't have code element :/
+
+        //    var ctorParamOpts = commandDescriptor.Options.Where(opt => opt.CodeElement == CodeElement.CtorParameter);
+        //    var ctorParamArgs = commandDescriptor.Arguments.Where(arg => arg.CodeElement == CodeElement.CtorParameter);
+        //    // union, then filter, then order, then take name
+        //    var ctorParamNames = ctorParamArgs.OfType<SymbolDescriptor>().Union(ctorParamOpts).Select(param => param.Name);
+        //    // placeholder, must fetch those passed as ctor properties
+        //    var PropertyOpts = commandDescriptor.Options.Where(opt => opt.CodeElement == CodeElement.Property);
+        //    var PropertyArgs = commandDescriptor.Arguments.Where(arg => arg.CodeElement == CodeElement.Property);
+        //    var PropertyNames = PropertyOpts.OfType<SymbolDescriptor>().Union(PropertyArgs).Select(prop => prop.Name);
+
+        //    var ctorParams = ctorParamNames.Select(param => generate.GetValueMethod(param));
+        //    //var ctorOptsAndArgs = new List<IEnumerable<string>> { ctorParamOpts, ctorParamArgs };
+        //    //var ctorParams = ctorOptsAndArgs.SelectMany(elem => elem).ToList();
+
+        //    var initProps = PropertyNames.Select(prop => generate.Assign(prop, generate.GetValueMethod(prop)));
+
+        //    //var PropertyOptsAndArgs = new List<IEnumerable<string>> { ctorParamOpts, ctorParamArgs };
+        //    //var initProperties = PropertyOptsAndArgs.SelectMany(elem => elem).ToList();
+
+        //    var methodBody = generate.Return(generate.NewObjectWithInit("CliRoot", ctorParams, initProps));
+        //    // add a version of return that takes a list and returns a list
+        //    //var methodBody = generate.Return(generate.NewCliRoot(ctorParams, initProperties));
+
+        //    return generate.Method(Scope.Private,
+        //                           "GetNewInstance",
+        //                           methodBody,
+        //                           "CliRoot",
+        //                           arguments: generate.Parameter("BindingContext", "bindingContext"));
+        ////}
+
+        
+        //private string NameForGetCommand(string cmdName)
+        //    => $"Get{cmdName}Command";
+
+        //private string NameForInvokeCommand(string cmdName)
+        //    => $"Invoke{cmdName}Async";
+
+        //private string NameForCommand(string cmdName)
+        //    => $"{cmdName}Command";
+
+        //private string NameForProperty(string cmdName, string name)
+        //    => cmdName == "" ? name : $"{cmdName}_{name}";
     }
 }
