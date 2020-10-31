@@ -10,6 +10,14 @@ namespace StarFruit2
 {
     public class CodeGeneratorTemp
     {
+        // HEY KATHLEEN!
+        // If you're taking a look, I'm part way through teasing apart the differences between ctors
+        // depending on whether it is the root one or not. Relevant methods
+        // - GetClassBody
+        // - GetConstructor
+        // - RootCtorName
+        // - NonRootCtorName
+
         private string[] Libraries = new string[]
         {
             "StarFruit2",
