@@ -37,6 +37,54 @@ namespace StarFruit2
         // 1b. create variation of gen class that compiles, copy field from the gen and compare to it
         // 2. dotnet interactive and just compile it, could potentially ask roslyn instead
         // CompileAndTest file
+
+        // FIXME: the init expression is now opt/arg method call
+        public string OptionDeclarationForCtor(string name, string cliName, string optType)
+           => Assign(name, OptionInitExpression(cliName, optType));
+
+        public string ArgDeclarationForCtor(string name, string cliName, string argType)
+            => Assign(name, ArgInitExpression(cliName, argType));
+
+        // FIXME: look at naming
+        public string SetNewInstance
+            => Assign("NewInstance", "GetNewInstance(bindingContext)");
+
+
+        public string AddToCommand(string methodName, string argumentName)
+            => MethodCall($"Command.{methodName}", new List<string> { argumentName });
+
+
+
+        // FIXME: these might stick around as the GetArg/Option method call builders
+        public static string ArgInitExpression(string cliName, string argType)
+            => $@"new Argument<{argType}>(""{cliName}"");";
+
+        public string OptionInitExpression(string cliName, string optType)
+            => $@"new Option<{optType}>(""{cliName}"");";
+        internal string GetArg(string? cliName, string argType, string? description)
+            => $"GetArg<argType>({cliName}, {description})";
+
+        internal string GetOpt(string? cliName, string optType, string? description)
+            => $"GetOpt<optType>({cliName}, {description})";
+
+        internal string NewCommand(string cliName, string? desc = null)
+        {
+            var args = new List<string> { cliName, desc };
+            return NewObject($"Command", string.Join(", ", args));
+        }
+
+        internal string NewCommandHandler(string cmdName)
+            => NewObject("CommandSourceHandler", cmdName);
+
+
+        internal string GetValueMethod(string valToFetch)
+            => $"GetValue(bindingContext, {valToFetch})";
+
+
+        // above is non-general, below is general
+
+
+
         public IEnumerable<string> Usings(params string[] nspaces)
             => nspaces.Select(nspace => $"using {nspace};");
 
@@ -51,16 +99,22 @@ namespace StarFruit2
             return nspace;
         }
 
-        public List<string> Class(Scope scope, bool isPartial, string className, List<string> classBody)
+        public List<string> Class(Scope scope, bool isPartial, string className, string? baseClassName, List<string> classBody)
         {
             var strPartial = isPartial ? "partial" : "";
             // TODO: this somewhat screws indenting whitespace but is much simpler to test!
             // consider using Utils.cs, but each line as list elem is ok
             List<string> strCollection = new List<string>
             {
-                $@"{scope.CSharpString()} {strPartial} class {className}", "{"
+                $@"{scope.CSharpString()} {strPartial} class {className}"
             };
 
+            if (!(baseClassName is null))
+            {
+                strCollection.Add($": {baseClassName}");
+            }
+
+            strCollection.Add("{");
             strCollection.AddRange(classBody);
             strCollection.Add("}");
 
@@ -99,38 +153,25 @@ namespace StarFruit2
             return strCollection;
         }
 
-        public string MethodCall(string methodName, List<string>? args) 
+        public string MethodCall(string methodName, List<string>? args)
             => $"{methodName}({(args is null ? "" : string.Join(", ", args))})";
 
-        public string SetNewInstance
-            => Assign("NewInstance", "GetNewInstance(bindingContext)");
-
-        public string ConstructorName(string className, List<string>? ctorArgs, string? baseClassName, List<string>? baseCtorArgs)
-        {
-            if(baseClassName is null)
-            {
-                return MethodCall(className, ctorArgs);
-            } else
-            {
-                return Inheritance(MethodCall(className, ctorArgs),
-                                   MethodCall(baseClassName, baseCtorArgs));
-            }
-        }
-
-        public List<string> Constructor(string ctorName, IEnumerable<string> constructorBody)
+        public List<string> Constructor(string className, IEnumerable<string>? ctorArgs, IEnumerable<string>? baseArgs, IEnumerable<string> ctorBody, Scope scope = Scope.Public)
         {
             List<string> strCollection = new List<string>
             {
-                $"{Scope.Public.CSharpString()} {ctorName}",
-                "{"
+                $"{scope.CSharpString()} {className}({FormattedArgs(ctorArgs)})",
+                $": base({FormattedArgs(baseArgs)})"
             };
 
-            strCollection.AddRange(constructorBody);
+            strCollection.Add("{");
+            strCollection.AddRange(ctorBody);
             strCollection.Add("}");
 
             return strCollection;
         }
 
+        // FIXME: delete me
         public List<string> BuildBlock(string firstLine, List<string> body)
         {
             var strCollection = new List<string>
@@ -146,71 +187,50 @@ namespace StarFruit2
             return strCollection;
         }
 
-        public string MakeGenericType(string type) => type;
-        public string MakeGenericType(string type, params string[] genericArgs)
+        public string GenericType(string type) => type;
+        public string GenericType(string type, params string[] genericArgs)
             => $"{type}<{String.Join(", ", genericArgs)}>";
 
-        public string MakeParam(string paramType, string paramName)
+        public string Parameter(string paramType, string paramName)
             => $"{paramType} {paramName}";
 
-
-        // string AssignTo(string varName, string assignment) -> varname = assignment;
-        // TODO: split left and right parts into assignment (left) and expression (right)
-        //public string OptionDeclarationForCtor(string name, string cliName, string optType)
-        //    => $@"{name} = new Option<{optType}>(""{cliName}"");";
-        public string OptionDeclarationForCtor(string name, string cliName, string optType)
-           => Assign(name, OptionInitExpression(cliName, optType));
-
-        public string ArgDeclarationForCtor(string name, string cliName, string argType)
-            => Assign(name, ArgInitExpression(cliName, argType));
 
         public string Assign(string leftHand, string rightHand, string op = "=")
             => $"{leftHand} {op} {rightHand}";
 
-        public string Lambda(IEnumerable<string> args, IEnumerable<string> statements)
+        // FIXME: consider how we handle expression vs statements
+        //        COVER ME WITH TESTS
+        public string Lambda(IEnumerable<string>? args, IEnumerable<string> statements)
         {
-            string formattedStatements = string.Join(",", statements.Select(s => s.EndStatement()));
-            return $"({string.Join(", ", args)}) => {{ {formattedStatements} }}";
+            // we can only handle bizz right now
+            //Func<bool> foo = () => true;
+            //Func<bool> bizz = () => { return true; };
+            string formattedStatements;
+            switch (statements.Count())
+            {
+                case 0:
+                    formattedStatements = "{ }";
+                    break;
+                case 1:
+                    formattedStatements = statements.First().EndStatement();
+                    break;
+                default:
+                    {
+                        formattedStatements = $"{{ {string.Join(" ", statements.Select(s => s.EndStatement()))} }}";
+                        break;
+                    }
+            }
+
+            return $"({FormattedArgs(args)}) => {formattedStatements}";
         }
 
-        public string Inheritance(string inheritingClass, string baseClass)
-        {
-            return $"{inheritingClass} : {baseClass}";
-        }
+        public string FormattedArgs(IEnumerable<string>? args)
+            => args is null ? "" : string.Join(", ", args);
 
         // in VB I think this is "MyBase"
-        public string Base = "base";
+        public readonly string Base = "base";
         // In VB "Me"
-        private string This = "this";
-
-        // if we keep these 2 init expressions, then this could just be a single
-        // object init method call.
-        public static string ArgInitExpression(string cliName, string argType)
-            => $@"new Argument<{argType}>(""{cliName}"");";
-
-        public string OptionInitExpression(string cliName, string optType)
-            => $@"new Option<{optType}>(""{cliName}"");";
-
-
-        public string AddToCommand(string methodName, string argumentName)
-            => $"Command.{methodName}({argumentName});";
-
-        internal string GetArg(string? cliName, string argType, string? description)
-            => $"GetArg<argType>({cliName}, {description})";
-
-        internal string GetOpt(string? cliName, string optType, string? description)
-            => $"GetOpt<optType>({cliName}, {description})";
-
-        internal string NewCommand(string? cliName)
-            => $"new Command({cliName})";
-
-        internal string NewCommandHandler(string cmdName)
-            => NewObject("CommandSourceHandler", cmdName);
-            //=> $"new CommandSourceHandler({cmdName})";
-
-        // probably an unneeded layer
-        private string NewObject(string objName, string paramStr)
-            => $"new {objName}({paramStr})";
+        public readonly string This = "this";
 
         public string Return(string returnValue, bool await = false)
             => $"return{(await == true ? " await " : " ")}{returnValue}".EndStatement();
@@ -237,18 +257,18 @@ namespace StarFruit2
             return strCollection.EndStatement();
         }
 
-        internal string GetValueMethod(string valToFetch)
-            => $"GetValue(bindingContext, {valToFetch})";
+        private string NewObject(string objName, string paramStr)
+            => $"new {objName}({paramStr})";
 
-        public List<string> ObjectInit(string objName, IEnumerable<string>? ctorParams, IEnumerable<string> props)
+        public List<string> NewObjectWithInit(string objName, IEnumerable<string>? ctorArgs, IEnumerable<string>? assignments)
         {
             var strCollection = new List<string>
             {
-                $"new {objName}({string.Join(", ", ctorParams ?? new List<string>{ })})",
+                NewObject(objName, FormattedArgs(ctorArgs)),
                 "{"
             };
 
-            strCollection.AddRange(props.Select(prop => $"{prop},"));
+            strCollection.AddRange(assignments.Select(a => $"{a},"));
 
             strCollection.Add("}");
             return strCollection.EndStatement();

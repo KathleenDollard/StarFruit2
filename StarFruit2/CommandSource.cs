@@ -99,7 +99,12 @@ namespace StarFruit2
             return Create<TCli>().Parse(args).Run();
         }
 
-        public Command Command;
+        public Command Command { get; }
+
+        protected CommandSource(Command command)
+        {
+            Command = command;
+        }
 
         protected internal virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
         {
@@ -109,10 +114,7 @@ namespace StarFruit2
 
     public abstract class RootCommandSource : CommandSource
     {
-        protected RootCommandSource(Command command)
-        => Command = command;
-
-        public Command Command { get; set; }
+        protected RootCommandSource(Command command) : base(command) { }
 
         public CommandSource? CurrentCommandSource { get;  set; }
 

@@ -19,6 +19,9 @@ namespace StarFruit2.Common.Descriptors
         public InvokeMethodInfo? InvokeMethod { get; set; } // in Reflection models, this is a MethodInfo, in Roslyn it will be something else
         public List<CommandDescriptor> SubCommands { get; } = new List<CommandDescriptor>();
         public bool IsAsync { get; set; }
+        public CommandDescriptor? Parent { get; }
+        public CommandDescriptor Root { get; }
+        public bool IsRoot => Root == this;
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {

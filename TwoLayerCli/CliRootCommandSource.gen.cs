@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 namespace TwoLayerCli
 {
 
-    public partial class CliRootCommandSource : RootCommandSource<CliRoot>
+    public partial class CliRootCommandSource
+        : RootCommandSource<CliRoot>
     {
-        public CliRootCommandSource() : base(new Command("cli-root"))
+        public CliRootCommandSource()
+            : base(new Command("cli-root"))
         {
             StringProperty = new Option<string>("string-property");
             CtorParam = new Option<bool>("ctor-param");
@@ -35,11 +37,13 @@ namespace TwoLayerCli
 
     }
 
-    public class FindCommandSource : CommandSource
+    public class FindCommandSource
+        : CommandSource
     {
         internal CliRootCommandSource parent;
 
         internal FindCommandSource(CliRootCommandSource root, CliRootCommandSource parent)
+            : base(new Command("find", "Yep, cool"))
         {
             this.parent = parent;
             IntArg = GetIntArg();
@@ -48,7 +52,6 @@ namespace TwoLayerCli
 
             BoolOption = GetBoolOption();
 
-            Command = new Command("find", "Yep, cool");
             Command.Add(IntArg);
             Command.Add(StringOption);
             Command.Add(BoolOption);
@@ -104,11 +107,11 @@ namespace TwoLayerCli
         internal CliRootCommandSource parent;
 
         internal ListCommandSource(CliRootCommandSource root, CliRootCommandSource parent)
+            : base(new Command("list"))
         {
             this.parent = parent;
             VerbosityOption = GetVerbosityOption();
 
-            Command = new Command("list");
             Command.Add(VerbosityOption);
 
             Command.Handler = CommandHandler.Create(() => { root.CurrentCommandSource = this; return 0; });

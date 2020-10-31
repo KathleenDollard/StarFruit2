@@ -28,7 +28,7 @@ namespace StarFruit2
         };
 
         private Generate generate;
-        
+
 
         public CodeGeneratorTemp(Generate generate)
         {
@@ -45,37 +45,37 @@ namespace StarFruit2
             return strCollection;
         }
 
-        private List<string> GetNamespaceBody(CliDescriptor cliDescriptor) 
+        private List<string> GetNamespaceBody(CliDescriptor cliDescriptor)
             => GetClasses(cliDescriptor.CommandDescriptor);
 
         private List<string> GetClasses(CommandDescriptor commandDescriptor)
         {
-            var rootCommandClass = GetRootClass(commandDescriptor);
+            var rootCommandClass = GetClass(commandDescriptor);
             var subCommandClasses = commandDescriptor.SubCommands.SelectMany(subCmd => GetClass(subCmd));
 
             return rootCommandClass.Union(subCommandClasses).ToList();
         }
 
-        // This isn't quite enough, since the ctor for the root and non-root are different
-        private List<string> GetRootClass(CommandDescriptor cmd) 
-            => generate.Class(Scope.Public,
-                              true,
-                              generate.Inheritance($"{cmd.OriginalName}CommandSource", $"RootCommandSource<{cmd.OriginalName}>"),
-                              GetClassBody(cmd, $"{cmd.OriginalName}CommandSource", true));
-
-        private List<string> GetClass(CommandDescriptor cmd) 
-            => generate.Class(Scope.Public,
-                              true,
-                              generate.Inheritance($"{cmd.OriginalName}CommandSource", "CommandSource"),
-                              GetClassBody(cmd, $"{cmd.OriginalName}CommandSource", false));
-
-        private List<string> GetClassBody(CommandDescriptor commandDescriptor, string className, bool isRoot)
+        private List<string> GetClass(CommandDescriptor cmd)
         {
+            var className = $"{cmd.OriginalName}CommandSource";
+            var baseClassName = cmd.IsRoot ? generate.GenericType("RootCommandSource", cmd.OriginalName) : "CommandSource";
+
+            return generate.Class(scope: Scope.Public,
+                                  isPartial: true,
+                                  className: className,
+                                  baseClassName: baseClassName,
+                                  classBody: GetClassBody(cmd, className));
+        }
+
+        private List<string> GetClassBody(CommandDescriptor commandDescriptor, string className)
+        {
+            var isRoot2 = commandDescriptor.IsRoot;
             List<string> strCollection = new List<string>();
             // TODO: implement GetFields
             strCollection.AddRange(GetFields());
             strCollection.AddRange(GetProperties(commandDescriptor));
-            strCollection.AddRange(GetConstructor(commandDescriptor, className, isRoot));
+            strCollection.AddRange(GetConstructor(commandDescriptor, className));
 
 
             // consider if these can leverage same underlying Generate method, be mindful of rabbit hole, generated methods can have > 1 param
@@ -120,9 +120,9 @@ namespace StarFruit2
             return generate.Method(Scope.Public,
                                    NameForInvokeCommand(cmd.Name),
                                    methodBody,
-                                   generate.MakeGenericType("Task", "int"),
+                                   generate.GenericType("Task", "int"),
                                    cmd.IsAsync,
-                                   generate.MakeParam("BindingContext", "bindingContext"));
+                                   generate.Parameter("BindingContext", "bindingContext"));
         }
 
         private List<string> GetCommandValues(string cmdName, IEnumerable<ArgumentDescriptor> args, IEnumerable<OptionDescriptor> options)
@@ -227,7 +227,7 @@ namespace StarFruit2
             //var PropertyOptsAndArgs = new List<IEnumerable<string>> { ctorParamOpts, ctorParamArgs };
             //var initProperties = PropertyOptsAndArgs.SelectMany(elem => elem).ToList();
 
-            var methodBody = generate.Return(generate.ObjectInit("CliRoot", ctorParams, initProps));
+            var methodBody = generate.Return(generate.NewObjectWithInit("CliRoot", ctorParams, initProps));
             // add a version of return that takes a list and returns a list
             //var methodBody = generate.Return(generate.NewCliRoot(ctorParams, initProperties));
 
@@ -235,66 +235,56 @@ namespace StarFruit2
                                    "GetNewInstance",
                                    methodBody,
                                    "CliRoot",
-                                   arguments: generate.MakeParam("BindingContext", "bindingContext"));
+                                   arguments: generate.Parameter("BindingContext", "bindingContext"));
         }
 
-        private IEnumerable<string> GetConstructor(CommandDescriptor commandDescriptor, string className, bool isRoot)
+        private IEnumerable<string> GetConstructor(CommandDescriptor commandDescriptor, string className)
         {
             var strCollection = new List<string> { };
+            List<string>? ctorArgs = null;
 
-            strCollection.AddRange(commandDescriptor.Options
-                        .SelectMany(opt => opt.Arguments.Select(arg => GetCtorOpts(opt, arg))));
+            if (!commandDescriptor.IsRoot)
+            {
+                strCollection.Add(generate.Assign($"{generate.This}.parent", "parent"));
+            }
+            else
+            {
+                ctorArgs = new List<string>
+                {
+                    // not 100% sure if that will resolve to CliRootCommandSource as desired
+                    generate.Parameter(commandDescriptor.Root.Name, "root"),
+                    generate.Parameter(commandDescriptor.Parent.Name, "parent")
+                };
+            }
 
-            strCollection.AddRange(commandDescriptor.Arguments.Select(arg => GetCtorArg(arg)));
+            //strCollection.AddRange(commandDescriptor.Options
+            //            .SelectMany(opt => opt.Arguments.Select(arg => GetCtorOpts(opt, arg))));
 
-            // go add new arg declarations
-            strCollection.AddRange(commandDescriptor.Options.Select(opt => generate.AddToCommand("AddOption", opt.Name)));
-            // go add arguments to command
-            strCollection.AddRange(commandDescriptor.Arguments.Select(arg => generate.AddToCommand("AddArgument", arg.Name)));
-            // go add subcommands to command
-            strCollection.AddRange(commandDescriptor.SubCommands.Select(cmd => generate.AddToCommand("AddCommand", $"{NameForGetCommand(cmd.Name)}()")));
+            //strCollection.AddRange(commandDescriptor.Arguments.Select(arg => GetCtorArg(arg)));
+
+            //// go add new arg declarations
+            //strCollection.AddRange(commandDescriptor.Options.Select(opt => generate.AddToCommand("AddOption", opt.Name)));
+            //// go add arguments to command
+            //strCollection.AddRange(commandDescriptor.Arguments.Select(arg => generate.AddToCommand("AddArgument", arg.Name)));
+            //// go add subcommands to command
+            //strCollection.AddRange(commandDescriptor.SubCommands.Select(cmd => generate.AddToCommand("AddCommand", $"{NameForGetCommand(cmd.Name)}()")));
 
 
             // assume all subcommands are methods. This is bad assumption, they can be classes or methods, but sidestep for now, see multi-layer model
+            var baseArgs = new List<string> {
+                generate.NewCommand(commandDescriptor.CliName, commandDescriptor.Description)
+            };
 
-            if (isRoot)
-            {
-                var ctorName = RootCtorName(className, commandDescriptor.CliName);
-                return generate.Constructor(ctorName: ctorName, constructorBody: strCollection);
-            } else
-            {
-                // must fetch this, seems like we have to either pass root along or traverse up parents to root
-                var rootClassName = "";
-                // must fetch this, seems like we need some sort of .Parent on commandDescriptior
-                var parentClassName = "";
-
-                var ctorName = NonRootCtorName(className, rootClassName, parentClassName); ;
-                return generate.Constructor(ctorName: ctorName, constructorBody: strCollection);
-            }
+            return generate.Constructor(className: className,
+                                        ctorArgs: ctorArgs,
+                                        baseArgs: baseArgs,
+                                        ctorBody: strCollection);
 
             string GetCtorOpts(OptionDescriptor opt, ArgumentDescriptor arg)
                 => generate.Assign(opt.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), opt.CliName)).EndStatement();
 
             string GetCtorArg(ArgumentDescriptor arg)
                 => generate.Assign(arg.Name, generate.OptionInitExpression(arg.ArgumentType.TypeAsString(), arg.CliName)).EndStatement();
-        }
-
-        private string RootCtorName(string className, string cliName)
-        {
-            return generate.ConstructorName(className: className,
-                                            ctorArgs: null,
-                                            baseClassName: generate.Base,
-                                            baseCtorArgs: new List<string> { generate.NewCommand(cliName) });
-        }
-
-        private string NonRootCtorName(string className, string rootClassName, string parentClassName)
-        {
-            var rootParam = generate.MakeParam(rootClassName, "root");
-            var parentParam = generate.MakeParam(parentClassName, "parent");
-            return generate.ConstructorName(className: className,
-                                            ctorArgs: new List<string> { rootParam, parentParam },
-                                            baseClassName: null,
-                                            baseCtorArgs: null);
         }
 
         private List<string> GetProperties(CommandDescriptor commandDescriptor)
@@ -321,7 +311,7 @@ namespace StarFruit2
             var scope = Scope.Public;
             return generate.Property(
                 scope: scope,
-                type: generate.MakeGenericType("Argument", arg.ArgumentType.TypeAsString()),
+                type: generate.GenericType("Argument", arg.ArgumentType.TypeAsString()),
                 // need to properly handle top level prop names (i.e. no command prefix)
                 name: NameForProperty(arg.Name, commandDescriptor.Name ?? ""),
                 setterScope: scope
@@ -333,7 +323,7 @@ namespace StarFruit2
             Scope scope = Scope.Public;
             return generate.Property(
                 scope: scope,
-                type: generate.MakeGenericType("Option", opt.Arguments.First().ArgumentType.TypeAsString()),
+                type: generate.GenericType("Option", opt.Arguments.First().ArgumentType.TypeAsString()),
                 name: NameForProperty(opt.Name, commandDescriptor.Name ?? ""),
                 setterScope: scope
             );

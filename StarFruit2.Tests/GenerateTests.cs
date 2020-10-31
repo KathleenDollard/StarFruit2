@@ -49,11 +49,12 @@ namespace StarFruit2.Tests
             expectedData.AddRange(classBody);
             expectedData.Add("}");
 
-            var result = generate.Class(scope, isPartial, name, classBody);
+            var result = generate.Class(scope, isPartial, name, null, classBody);
 
             result.Should().BeEquivalentTo(expectedData);
         }
-        // look at just testing first line/single line where useful
+
+        // ADD COVERAGE FOR INHERITANCE
         [Fact]
         public void Class_ReturnsClassDeclarationAndBody()
         {
@@ -65,7 +66,7 @@ namespace StarFruit2.Tests
             expectedData.AddRange(classBody);
             expectedData.Add("}");
 
-            var result = Utils.Normalize(generate.Class(scope, isPartial, name, classBody));
+            var result = Utils.Normalize(generate.Class(scope, isPartial, name, null, classBody));
 
             result.Should().BeEquivalentTo(expectedData);
         }
@@ -98,17 +99,103 @@ namespace StarFruit2.Tests
             result.Should().BeEquivalentTo(expectedData);
         }
 
-        // TODO: could be whitespace concerns with indentation of : base for inheritance
         [Fact]
-        public void Constructor_ReturnsConstructorInheritingFromBase()
+        public void Constructor_ReturnsCtorWithNoArgsAndNoBaseArgs()
         {
-            var name = "SweetClassName()";
-            var ctorBody = new List<string> { "SomeFunction();", "var fizz = 42;" };
-            var expectedData = new List<string> { $"public {name}", "{" };
+            var className = "ClassName";
+            var ctorBody = new List<string> { "Something = true;" };
+            var expectedData = new List<string>
+            {
+                $"public {className}()",
+                ": base()",
+                "{"
+            };
             expectedData.AddRange(ctorBody);
             expectedData.Add("}");
 
-            var result = Utils.Normalize(generate.Constructor(name, ctorBody));
+            var result = Utils.Normalize(generate.Constructor(className, null, null, ctorBody));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Constructor_ReturnsCtorWithArgsAndNoBaseArgs()
+        {
+            var className = "ClassName";
+            var ctorBody = new List<string> { "Something = true;" };
+            var ctorArgs = new List<string> { "42", "true" };
+            var expectedData = new List<string>
+            {
+                $"public {className}(42, true)",
+                ": base()",
+                "{"
+            };
+            expectedData.AddRange(ctorBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Constructor(className, ctorArgs, null, ctorBody));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+
+        [Fact]
+        public void Constructor_ReturnsCtorWithNoArgsAndBaseArgs()
+        {
+            var className = "ClassName";
+            var ctorBody = new List<string> { "Something = true;" };
+            var baseArgs = new List<string> { "42", "true" };
+            var expectedData = new List<string>
+            {
+                $"public {className}()",
+                ": base(42, true)",
+                "{"
+            };
+            expectedData.AddRange(ctorBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Constructor(className, null, baseArgs, ctorBody));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Constructor_ReturnsCtorWithArgsAndBaseArgs()
+        {
+            var className = "ClassName";
+            var ctorBody = new List<string> { "Something = true;" };
+            var ctorArgs = new List<string> { "42", "true" };
+            var baseArgs = new List<string> { "\"fizz\"", "false" };
+            var expectedData = new List<string>
+            {
+                $"public {className}(42, true)",
+                ": base(\"fizz\", false)",
+                "{"
+            };
+            expectedData.AddRange(ctorBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Constructor(className, ctorArgs, baseArgs, ctorBody));
+
+            result.Should().BeEquivalentTo(expectedData);
+        }
+
+        [Fact]
+        public void Constructor_ReturnsCtorWithNonDefaultScope()
+        {
+            var className = "ClassName";
+            var scope = Scope.Private;
+            var ctorBody = new List<string> { "Something = true;" };
+            var expectedData = new List<string>
+            {
+                $"private {className}()",
+                ": base()",
+                "{"
+            };
+            expectedData.AddRange(ctorBody);
+            expectedData.Add("}");
+
+            var result = Utils.Normalize(generate.Constructor(className, null, null, ctorBody, scope));
 
             result.Should().BeEquivalentTo(expectedData);
         }
@@ -158,7 +245,7 @@ namespace StarFruit2.Tests
             var paramType = "Object";
             var expectedData = "Object someParam";
 
-            var result = generate.MakeParam(paramType, paramName);
+            var result = generate.Parameter(paramType, paramName);
 
             result.Should().Be(expectedData);
         }
@@ -168,7 +255,7 @@ namespace StarFruit2.Tests
         {
             var type = "string";
 
-            var result = generate.MakeGenericType(type);
+            var result = generate.GenericType(type);
 
             result.Should().Be(type);
         }
@@ -180,7 +267,7 @@ namespace StarFruit2.Tests
             var generic = "string";
             var expectedData = "List<string>";
 
-            var result = generate.MakeGenericType(baseType, generic);
+            var result = generate.GenericType(baseType, generic);
 
             result.Should().Be(expectedData);
         }
@@ -193,7 +280,7 @@ namespace StarFruit2.Tests
             var secondGeneric = "Object";
             var expectedData = "Dictionary<string, Object>";
 
-            var result = generate.MakeGenericType(baseType, firstGeneric, secondGeneric);
+            var result = generate.GenericType(baseType, firstGeneric, secondGeneric);
 
             result.Should().Be(expectedData);
         }
@@ -392,10 +479,76 @@ namespace StarFruit2.Tests
             expectedData.AddRange(properties.Select(prop => $"{prop},"));
             expectedData.Add("};");
 
-            var result = generate.ObjectInit(objName, ctorParams, properties);
+            var result = generate.NewObjectWithInit(objName, ctorParams, properties);
 
             result.Should().BeEquivalentTo(expectedData);
 
+        }
+
+        [Fact]
+        public void Lambda_ReturnsLambdaWithZeroArgsAndOneStatement()
+        {
+            var statement = new List<string> { "true" };
+            var expectedData = "() => true;";
+
+            var result = generate.Lambda(null, statement);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void Lambda_ReturnsLambdaWithOneArgAndOneStatement()
+        {
+            var args = new List<string> { "opt" };
+            var statement = new List<string> { "true" };
+            var expectedData = "(opt) => true;";
+
+            var result = generate.Lambda(args, statement);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void Lambda_ReturnsLambdaWithOneArgAndMultipleStatements()
+        {
+            var args = new List<string> { "opt" };
+            var statement = new List<string> { "true", "return 1" };
+            var expectedData = "(opt) => { true; return 1; }";
+
+            var result = generate.Lambda(args, statement);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void Lambda_ReturnsLambdaWithMultipleArgsAndMultipleStatements()
+        {
+            var args = new List<string> { "opt", "arg" };
+            var statement = new List<string> { "true", "return 1" };
+            var expectedData = "(opt, arg) => { true; return 1; }";
+
+            var result = generate.Lambda(args, statement);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void FormattedArgs_ReturnsEmptyStringWhenArgsAreNull()
+        {
+            var expectedData = "";
+            var result = generate.FormattedArgs(null);
+
+            result.Should().Be(expectedData);
+        }
+
+        [Fact]
+        public void FormattedArgs_ReturnsCommaDelimitedArgsWhenArgsArePresent()
+        {
+            var args = new List<string> { "42", "true" };
+            var expectedData = "42, true";
+            var result = generate.FormattedArgs(args);
+
+            result.Should().Be(expectedData);
         }
     }
 }
