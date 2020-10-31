@@ -1,7 +1,4 @@
-﻿using StarFruit2.Common;
-using System;
-using System.CommandLine;
-using System.CommandLine.Parsing;
+﻿using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 
 namespace StarFruit2
@@ -41,7 +38,7 @@ namespace StarFruit2
    
         public abstract T CreateInstance();
 
-        public T? NewInstance { get; }
+        public T NewInstance { get; }
 
 
 

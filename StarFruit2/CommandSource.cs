@@ -2,8 +2,6 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
-using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -159,7 +157,7 @@ namespace StarFruit2
         protected RootCommandSource(Command command)
            : base(command) { }
 
-        protected T? NewInstance { get; set; } // exposed through CommandSourceResult
+        protected T NewInstance { get; set; } // exposed through CommandSourceResult
 
     }
 }

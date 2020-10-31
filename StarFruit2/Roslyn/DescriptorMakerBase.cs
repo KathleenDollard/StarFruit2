@@ -1,12 +1,10 @@
-﻿using System.CommandLine.Parsing;
-using StarFruit2.Common.Descriptors;
+﻿using StarFruit2.Common.Descriptors;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using StarFruit2;
 using StarFruit2.Common;
-using System.Diagnostics;
 using StarFruit.Common;
 
 namespace Starfruit2

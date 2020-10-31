@@ -1,8 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using StarFruit2;
-using StarFruit2.Common;
-using StarFruit2.Common.Descriptors;
-using System.Collections.Generic;
 
 namespace Starfruit2
 {
