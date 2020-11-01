@@ -1,5 +1,6 @@
-﻿using System;
-using System.Net.Mime;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 
 namespace StarFruit2.Common
 {
@@ -12,19 +13,19 @@ namespace StarFruit2.Common
     /// For exmple: In Reflection, this provides a Type object. In Roslyn it provides
     /// a syntax node that represents the type.
     /// </summary>
-    public class ArgTypeInfo
+    public class ArgTypeInfoRoslyn : ArgTypeInfoBase
     {
-        public ArgTypeInfo(object? typeRepresentation)
-        {
-            TypeRepresentation = typeRepresentation;
-        }
+        public ArgTypeInfoRoslyn(object? typeRepresentation)
+            : base(typeRepresentation)
+        { }
 
-        public object? TypeRepresentation { get; }
-
-        public virtual string TypeAsString()
+        public override string TypeAsString()
         => TypeRepresentation switch
         {
             Type t => t.Name,
+            INamedTypeSymbol t => t.Name,
+            PredefinedTypeSyntax p => p.ToString(),
+            IdentifierNameSyntax i => i.Identifier.ToString(),
             _ => TypeRepresentation?.ToString() ?? ""
         };
     }

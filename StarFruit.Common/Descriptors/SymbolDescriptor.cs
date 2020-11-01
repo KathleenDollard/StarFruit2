@@ -14,17 +14,16 @@ namespace StarFruit2.Common.Descriptors
         }
         public SymbolType SymbolType { get; }
         public object? Raw { get; }
-        public IEnumerable<string>? Aliases { get; }
+        public List<string> Aliases { get; } = new List<string>();
         public string? Description { get; }
 
         public string Name { get; }
 
-        public string? CommandLineName { get; }
+        public string? CliName { get; }
 
         public string OriginalName { get; }
 
         public bool IsHidden { get; set; }
-
         public string Report(int tabsCount, VerbosityLevel verbosity)
             => "Empty SymbolDescriptor - used for testing";
     }
@@ -44,6 +43,9 @@ namespace StarFruit2.Common.Descriptors
             SymbolType = symbolType;
         }
 
+        public CodeElement CodeElement { get; set; }
+        public int Position { get; set; }
+
         public abstract string ReportInternal(int tabsCount, VerbosityLevel verbosity);
 
         public virtual string Report(int tabsCount, VerbosityLevel verbosity)
@@ -53,7 +55,6 @@ namespace StarFruit2.Common.Descriptors
             return $"{whitespace}{Name}" +
                    $"{whitespace2}Kind:{SymbolType }" +
                    $"{whitespace2}Description:{Description }" +
-                   $"{whitespace2}Aliases:{Aliases }" +
                    $"{whitespace2}IsHidden:{IsHidden  }" +
                    ReportInternal(tabsCount + 1, verbosity) +
                    $"{whitespace2}Raw:{ReportRaw(Raw)}";
@@ -101,8 +102,6 @@ namespace StarFruit2.Common.Descriptors
         /// </summary>
         public object? Raw { get; }
         public SymbolType SymbolType { get; }
-        public IEnumerable<string>? Aliases { get; set; }
-        // TODO: Understand raw aliases: public IReadOnlyList<string> RawAliases { get; }
         public string? Description { get; set; }
 
         /// <summary>
@@ -110,7 +109,7 @@ namespace StarFruit2.Common.Descriptors
         /// but the option prefix is not included.
         /// </summary>
         /// <remarks>
-        /// The Name should not be ambiguous with an OriginalName and vice versa. For example, if you are 
+        /// The Name should not be ambiguous with a different OriginalName and vice versa. For example, if you are 
         /// removing Arg suffixes via rules (a standard scenario), then having an BlahArg and a BlahArgArg 
         /// argument woudl not be legal. 
         /// </remarks>
@@ -120,7 +119,7 @@ namespace StarFruit2.Common.Descriptors
         /// The name as used when System.CommandLine objects are created. This name includes option prefixes
         /// and is the name as it should appear in automated help. 
         /// </summary>
-        public string? CommandLineName { get; set; }
+        public string? CliName { get; set; }
 
         /// <summary>
         /// The original name in the model. This is used for DescriptionSource (which recognizes either Name or 
@@ -134,5 +133,27 @@ namespace StarFruit2.Common.Descriptors
         public string OriginalName { get; }
 
         public bool IsHidden { get; set; }
+
+
+    }
+
+    public abstract class IdentitySymbolDescriptor : SymbolDescriptor
+    {
+        public IdentitySymbolDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
+                                     string originalName,
+                                     object? raw,
+                                     SymbolType symbolType)
+            : base(parentSymbolDescriptorBase, originalName, raw, symbolType)
+        { }
+        public List<string> Aliases { get; } = new List<string>();
+
+        public override string Report(int tabsCount, VerbosityLevel verbosity)
+        {
+            string whitespace2 = CommonExtensions.NewLineWithTabs(tabsCount + 1);
+            return $"{base.Report(tabsCount + 1, verbosity)}" +
+                   $"{whitespace2}Aliases:{Aliases }";
+        }
+
+
     }
 }

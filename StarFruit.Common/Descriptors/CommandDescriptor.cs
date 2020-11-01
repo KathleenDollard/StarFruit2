@@ -1,21 +1,28 @@
 ﻿using StarFruit.Common;
+using StarFruit.Common.Descriptors;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace StarFruit2.Common.Descriptors
 {
-    public class CommandDescriptor : SymbolDescriptor
+    public class CommandDescriptor : IdentitySymbolDescriptor
     {
-        public CommandDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
+
+        //TODO: Add CommandDescriptor?.Parent and CommandDescriptior.Root to constructor
+        public CommandDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                  string originalName,
                                  object? raw)
             : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Command) { }
 
+        public CommandDescriptorSource DescriptorSource { get; set; }
         public bool TreatUnmatchedTokensAsErrors { get; set; } = true;
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public List<OptionDescriptor> Options { get; } = new List<OptionDescriptor>();
         public InvokeMethodInfo? InvokeMethod { get; set; } // in Reflection models, this is a MethodInfo, in Roslyn it will be something else
         public List<CommandDescriptor> SubCommands { get; } = new List<CommandDescriptor>();
+        public bool IsAsync { get; set; }
+        public CommandDescriptor? Parent { get; }
+        public CommandDescriptor Root { get; }
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {

@@ -2,9 +2,8 @@
 
   <PropertyGroup>
 	  <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <LangVersion>9.0</LangVersion>
-
-	  <IsPackable>false</IsPackable>
+    <LangVersion>Latest</LangVersion>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,16 +30,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="TestData\Empty.Code.cs">
+    <Compile Update="TestData\EmptyTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestData\SeveralOptionsAndArgumentsSampleData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="TestData\SingleArgumentSampleData.cs">
+    <Compile Update="TestData\SingleArgStringTestModel.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="TestData\SingleArgIntTestModel.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="TestData\SingleArgBoolTestModel.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="TestData\SingleOptionWithArgumentSampleData.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="XmlCommentTestCode.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>

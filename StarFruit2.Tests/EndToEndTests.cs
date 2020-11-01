@@ -7,9 +7,9 @@ using StarFruit2.Common.Descriptors;
 using TestData;
 using System;
 using FluentAssertions;
-using Starfruit2_B;
 using Microsoft.CodeAnalysis;
 using StarFruit2.Generator;
+using Starfruit2;
 
 namespace StarFruit2.Tests
 {
@@ -17,11 +17,14 @@ namespace StarFruit2.Tests
     {
         [Theory]
         [InlineData(typeof(EmptyTestData))]
+        [InlineData(typeof(SingleArgStringTestData))]
+        [InlineData(typeof(SingleIntArgTestData))]
+        [InlineData(typeof(SingleBoolArgTestData))]
         public void Model_to_descriptor(Type type)
         {
             var testData = Activator.CreateInstance(type) as BaseTestData;
 
-            CliDescriptor actual = GetCli(testData.ModelCodeFileName );
+            CliDescriptor actual = Utils.GetCliFromFile(testData.ModelCodeFileName);
 
             actual.Should().Match(testData.CliDescriptor);
         }
@@ -32,7 +35,7 @@ namespace StarFruit2.Tests
         {
             var testData = Activator.CreateInstance(type) as BaseTestData;
 
-            var actual = CodeGenerator.GetSourceCode(testData.CliDescriptor, CodeGenerator.Include.CommandCode );
+            var actual = CodeGenerator.GetSourceCode(testData.CliDescriptor, CodeGenerator.Include.CommandCode);
 
             actual.Should().NotBeNullOrEmpty();
             var normActual = Utils.Normalize(actual);
@@ -40,32 +43,6 @@ namespace StarFruit2.Tests
             normActual.Should().Be(normExpected);
         }
 
-        private static CliDescriptor GetCli(string fileName)
-        {
-            var code = File.ReadAllText($"TestData/{fileName}");
-            var tree = CSharpSyntaxTree.ParseText(code);
-            var compilation = GetCompilation(tree);
-            var rootCommand = tree.GetRoot().DescendantNodes()
-                               .OfType<ClassDeclarationSyntax>()
-                               .Single();
-
-            var cli = RoslyDescriptorMakerFactory.CreateCliDescriptor(rootCommand, compilation);
-            return cli;
-        }
-
-        private static CSharpCompilation GetCompilation(SyntaxTree tree)
-        {
-            MetadataReference mscorlib =
-                       MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-
-            MetadataReference[] references = { mscorlib };
-
-            return CSharpCompilation.Create("TransformationCS",
-                                            new SyntaxTree[] { tree },
-                                            references,
-                                            new CSharpCompilationOptions(
-                                                    OutputKind.ConsoleApplication));
-        }
 
     }
 }

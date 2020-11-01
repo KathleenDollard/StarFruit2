@@ -1,57 +1,60 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using StarFruit2;
+using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
 using System;
 
-namespace Starfruit2_B
+namespace Starfruit2
 {
     public static class RoslyDescriptorMakerFactory
     {
-        public static CliDescriptor CreateCliDescriptor<T>(T source, CSharpCompilation?compilation )
+        public static CliDescriptor CreateCliDescriptor<T>(T source, CSharpCompilation? compilation)
             where T : Microsoft.CodeAnalysis.SyntaxNode
-        => source switch
         {
-            ClassDeclarationSyntax classDeclaration => new CommandMakerClassSyntax().CreateCliDescriptor(null, classDeclaration, compilation),
-            MethodDeclarationSyntax methodDeclaration => new CommandMakerMethodSyntax().CreateCliDescriptor(null, methodDeclaration, compilation),
-            _ => throw new InvalidOperationException("Unexpected syntax type")
-        };
-
-        public static CommandDescriptor CreateCommandDescriptor(SyntaxNode source, Compilation compilation)
-        {
-            return compilation switch
-            {
-                CSharpCompilation c => CreateCommandDescriptor(source, c),
-                _ => throw new NotImplementedException()
-            };
-        }
-
-        private static CommandDescriptor CreateCommandDescriptor(SyntaxNode source, CSharpCompilation compilation)
-        {
+            var semanticModel = GetSemanticModel(source, compilation);
+            var config = new MakerConfiguration(new CSharpLanguageHelper());
             return source switch
             {
-                ClassDeclarationSyntax classDeclaration => CreateCommandDescriptor(null, classDeclaration, compilation),
-                MethodDeclarationSyntax methodDeclaration => CreateCommandDescriptor(null, methodDeclaration, compilation),
-                CompilationUnitSyntax compUnitSyntax => CreateCommandDescriptor(null, compUnitSyntax, compilation),
+                // The common case is a class declaration. If a method declaration is used, any properties in the contained class are ignored. 
+                // Is this so confusing we should we even expose the method approach - or is it important for static methods? 
+                ClassDeclarationSyntax classDeclaration => CliDescriptorFromClassDeclaration(config, semanticModel, classDeclaration  ),
+                MethodDeclarationSyntax methodDeclaration => CliDescriptorFromMethodDeclaration(config, semanticModel, methodDeclaration),
                 _ => throw new InvalidOperationException("Unexpected syntax type")
             };
         }
 
-        private static CommandDescriptor CreateCommandDescriptor(object p, CompilationUnitSyntax source, CSharpCompilation compilation)
+        private static CliDescriptor CliDescriptorFromClassDeclaration(MakerConfiguration config,
+                                                                       SemanticModel semanticModel,
+                                                                       ClassDeclarationSyntax source)
         {
-            SemanticModel symbol = compilation.GetSemanticModel(source.SyntaxTree);
-            throw new NotImplementedException();
+            var maker = new ClassSyntaxCommandMaker(config, semanticModel);
+            var typeSymbol = semanticModel.GetDeclaredSymbol(source) as INamedTypeSymbol ;
+            Assert.NotNull(typeSymbol);
+            return maker.CreateCliDescriptor(null, typeSymbol);
         }
 
-        private static CommandDescriptor CreateCommandDescriptor(object p, MethodDeclarationSyntax source, CSharpCompilation compilation)
+        private static CliDescriptor CliDescriptorFromMethodDeclaration(MakerConfiguration config,
+                                                                        SemanticModel semanticModel,
+                                                                        MethodDeclarationSyntax source)
         {
-            SemanticModel symbol = compilation.GetSemanticModel(source.SyntaxTree);
-            throw new NotImplementedException();
+            var maker = new MethodSyntaxCommandMaker(config, semanticModel);
+            var typeSymbol = semanticModel.GetDeclaredSymbol(source);
+            Assert.NotNull(typeSymbol);
+            return maker.CreateCliDescriptor(null, typeSymbol);
         }
 
-        private static CommandDescriptor CreateCommandDescriptor(object p, ClassDeclarationSyntax source, CSharpCompilation compilation)
+        private static SemanticModel GetSemanticModel(SyntaxNode syntax,
+                                                      Compilation? compilation)
         {
-            throw new NotImplementedException();
+            if (compilation == null)
+            {
+                throw new NotImplementedException();
+            }
+            SemanticModel semanticModel = compilation.GetSemanticModel(syntax.SyntaxTree);
+
+            return semanticModel;
         }
     }
 }

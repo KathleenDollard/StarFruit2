@@ -1,83 +1,56 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using StarFruit.Common;
 using StarFruit2;
-using StarFruit2.Common;
-using StarFruit2.Common.Descriptors;
-using System;
-using System.Linq;
 
-namespace Starfruit2_B
+namespace Starfruit2
 {
-    public class CommandMakerMethodSyntax : DescriptorMakerBase<MethodDeclarationSyntax, ParameterSyntax, CSharpCompilation>
+
+    public class MethodSyntaxCommandMaker : DescriptorMaker
     {
-        protected internal override CliDescriptor CreateCliDescriptor(ISymbolDescriptor? parent,
-                                                                      MethodDeclarationSyntax source,
-                                                                      CSharpCompilation? compilation = null)
-        {
-            var semanticModel = GetSemanticModel(source, compilation);
-            var methodSymbol = semanticModel.GetDeclaredSymbol(source);
-            if (methodSymbol is null)
-            {
-                throw new InvalidOperationException("Symbol not found");
-            }
-            var cliDesriptor = new CliDescriptor
-            {
-                GeneratedComandSourceNamespace = methodSymbol.ContainingNamespace.ToString() ?? "",
-                CommandDescriptor = CreateCommandDescriptor(parent, source, semanticModel)
-            };
-            return cliDesriptor;
+        public MethodSyntaxCommandMaker(MakerConfiguration config, SemanticModel semanticModel)
+          : base(config, semanticModel)
+        { }
 
-        }
+        ////protected override ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor parent,
+        ////                                                               IParameterSymbol parameterSymbol)
+        ////=> new ArgumentDescriptor(new ArgTypeInfoRoslyn(parameterSymbol.Type), parent, parameterSymbol.Name, parameterSymbol)
+        ////{
+        ////    Name = parameterSymbol.Name,
+        ////    CliName = config.ArgumentNameToCliName(parameterSymbol.Name),
+        ////    Description = config.GetDescription(parameterSymbol) ?? ""
+        ////};
 
-        protected CommandDescriptor CreateCommandDescriptor(ISymbolDescriptor? parent,
-                                                           MethodDeclarationSyntax methodDeclaration,
-                                                           SemanticModel semanticModel)
-        {
-            var command = new CommandDescriptor(parent, methodDeclaration.Identifier.ToString(), methodDeclaration)
-            {
-                Name = SourceToCommandName(methodDeclaration.Identifier.ToString()),
-            };
-            command.AddArguments(methodDeclaration.ParameterList.Parameters
-                                    .Where(p => IsArgument(p))
-                                    .Select(p => CreateArgumentDescriptor(parent, p, semanticModel)));
-            command.AddOptions(methodDeclaration.ParameterList.Parameters
-                                    .Where(p => IsOption(p))
-                                    .Select(p => CreateOptionDescriptor(parent, p, semanticModel)));
-            return command;
-        }
+        //protected override OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor parent,
+        //                                                           IParameterSymbol parameterSymbol)
+        //{
+        //    var option = new OptionDescriptor(parent, parameterSymbol.Name, parameterSymbol)
+        //    {
+        //        Name = parameterSymbol.Name,
+        //        CliName = config.OptionNameToCliName(parameterSymbol.Name),
+        //        Description = config.GetDescription(parameterSymbol) ?? "",
+        //        Required = config.GetIsRequired(parameterSymbol),
+        //        IsHidden = config.GetIsHidden(parameterSymbol),
+        //    };
+        //    option.Aliases.AddRange(config.GetAliases(parameterSymbol));
+        //    option.Arguments.Add(CreateOptionArgumentDescriptor(parent, parameterSymbol));
+        //    return option;
+        //}
 
-        protected OptionDescriptor CreateOptionDescriptor(ISymbolDescriptor? parent,
-                                                          ParameterSyntax parameterDeclaration,
-                                                          SemanticModel semanticModel)
-        {
-            var option = new OptionDescriptor(parent, parameterDeclaration.Identifier.ToString(), parameterDeclaration)
-            {
-                Name = SourceToOptionName(parameterDeclaration.Identifier.ToString())
-            };
-            option.Arguments.Add(CreateOptionArgumentDescriptor(parent, parameterDeclaration, semanticModel));
-            return option;
-        }
+        //private ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor parent,
+        //                                                          IParameterSymbol parameterSymbol)
+        //=> new ArgumentDescriptor(new ArgTypeInfoRoslyn(parameterSymbol.Type),
+        //                          parent,
+        //                          parameterSymbol.Name,
+        //                          parameterSymbol.Name)
+        //{
+        //    Name = parameterSymbol.Name,
+        //    CliName = config.OptionArgumentNameToCliName(parameterSymbol.Name),
+        //    Description = config.GetDescription(parameterSymbol) ?? ""
+        //};
 
-        private ArgumentDescriptor CreateArgumentDescriptor(ISymbolDescriptor? parent,
-                                                            ParameterSyntax parameterDeclaration,
-                                                            SemanticModel semanticModel)
-        => new ArgumentDescriptor(new ArgTypeInfo(parameterDeclaration.Type), parent, parameterDeclaration.Identifier.ToString(), parameterDeclaration)
-        {
-            Name = SourceToArgumentName(parameterDeclaration.Identifier.ToString())
-        };
+        //protected override IEnumerable<IParameterSymbol> GetMembers(IMethodSymbol parentSymbol)
+        //=> parentSymbol.Parameters;
 
-        private ArgumentDescriptor CreateOptionArgumentDescriptor(ISymbolDescriptor? parent,
-                                                                  ParameterSyntax parameterDeclaration,
-                                                                  SemanticModel semanticModel)
-        => new ArgumentDescriptor(new ArgTypeInfo(parameterDeclaration.Type), parent, parameterDeclaration.Identifier.ToString(), parameterDeclaration)
-        {
-            Name = SourceToArgumentName(parameterDeclaration.Identifier.ToString())
-        };
-
-        protected internal override bool IsArgument(ParameterSyntax parameter)
-        => parameter.Identifier.ToString().EndsWith("Arg")
-            || parameter.HasAttribute(typeof(ArgumentAttribute));
+        //protected override IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent, IMethodSymbol parentSymbol)
+        //=> new List<CommandDescriptor> { };
     }
 }

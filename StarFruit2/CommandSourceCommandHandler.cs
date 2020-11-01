@@ -10,15 +10,17 @@ namespace StarFruit2
 {
     public class CommandSourceCommandHandler : ICommandHandler
     {
-        private readonly Func<BindingContext, Task<int>> _action;
+        private readonly Func<BindingContext, int> _action;
 
         public CommandSourceCommandHandler(
-            Func<BindingContext, Task<int>> action)
+            Func<BindingContext, int> action)
         {
             _action = action ?? throw new ArgumentNullException(nameof(action)); ;
         }
 
-        public async Task<int> InvokeAsync(InvocationContext context)
-            => await _action(context.BindingContext);
+        public Task<int> InvokeAsync(InvocationContext context)
+        {
+            return Task.FromResult(_action(context.BindingContext));
+        }
     }
 }
