@@ -27,7 +27,7 @@ namespace TestData
             GeneratedSourceClassName = testName + "CommandSource";
 
             var commandDescriptor = CommandDescriptor;
-//<<<<<<< HEAD
+
             var option = new OptionDescriptor(commandDescriptor, originalName, null)
             {
                 Name = originalName,
@@ -41,47 +41,14 @@ namespace TestData
                 Description = description,
                 DefaultValue = defaultValue,
             });
-//=======
-//            var foo = new ArgumentDescriptor(new ArgTypeInfo(typeof(T)), null, originalName, null)
-//            {
-//                Name = originalName,
-//                CommandLineName = commandLineName,
-//                Description = description,
-//                DefaultValue = defaultValue,
-//            };
-//>>>>>>> args-and-opts-source-gen
 
             commandDescriptor.AddOptions(options:
                 new List<OptionDescriptor>()
                 {
-//<<<<<<< HEAD
                      option
                 }
             );
 
-//=======
-//                        new OptionDescriptor(foo, originalName, null)
-//                        {
-//                            Name = originalName,
-//                            CommandLineName = commandLineName,
-//                            Description = description,
-//                            Arguments = new List<ArgumentDescriptor>() { foo }
-//                        }
-//                }
-//            );
-
-//            //commandDescriptor.AddArguments(arguments: new List<ArgumentDescriptor>()
-//            //{
-//            //    new ArgumentDescriptor(new ArgTypeInfo(argType), null, originalName, null)
-//            //    {
-//            //        Name = originalName,
-//            //        CommandLineName = commandLineName,
-//            //        Description = description,
-//            //        DefaultValue = new DefaultValueDescriptor(defaultValue),
-//            //    }
-//            //});
-
-//>>>>>>> args-and-opts-source-gen
             CliDescriptor = new CliDescriptor
             {
                 GeneratedComandSourceNamespace = GeneratedNamespace,

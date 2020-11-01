@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 namespace TwoLayerCli
 {
 
-    public partial class CliRootCommandSource
-        : RootCommandSource<CliRoot>
+    public partial class CliRootCommandSource : RootCommandSource<CliRoot>
     {
         public CliRootCommandSource()
-            : base(new Command("cli-root"))
+             : base(new Command("cli-root"))
         {
             StringProperty = GetStringProperty();
             CtorParam = new Option<bool>("ctor-param");
@@ -52,8 +51,7 @@ namespace TwoLayerCli
         }
     }
 
-    public class FindCommandSource
-        : CommandSource
+    public class FindCommandSource : CommandSource
     {
         internal CliRootCommandSource parent;
 
