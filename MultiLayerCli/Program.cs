@@ -1,14 +1,24 @@
-﻿using StarFruit2;
-using System.Threading.Tasks;
+﻿// COMMENTING OUT FOR BUILDING
+
+//using StarFruit2;
+//using System.Threading.Tasks;
 
 namespace MultiLayerCli
 {
     class Program
     {
-        static async Task<int> Main(string[] args)
-             => await new CliRootCommandSource().RunAndExitAsync(args);
-    }
+        static void Main(string[] args)
+        {
 
-    public partial class CliRootCommandSource : RootCommandSource<CliRoot>
-    { }
+        }
+    }
+    //{
+    //    class Program
+    //    {
+    //        static async Task<int> Main(string[] args)
+    //             => await new CliRootCommandSource().RunAndExitAsync(args);
+    //    }
+
+    //    public partial class CliRootCommandSource : RootCommandSource<CliRoot>
+    //    { }
 }

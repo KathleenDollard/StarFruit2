@@ -7,6 +7,8 @@ namespace StarFruit2.Common.Descriptors
         private string? generatedCommandSourceClassName;
 
         public string? GeneratedComandSourceNamespace { get; set; }
+
+        // don't need this any more
         public string? GeneratedCommandSourceClassName
         {
             get

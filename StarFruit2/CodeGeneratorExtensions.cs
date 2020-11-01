@@ -79,23 +79,35 @@ namespace StarFruit2.Generator
             var ret = new List<string>();
             foreach (var argument in commandDescriptor.Arguments)
             {
-                ret.Add($@"Command.Arguments.Add(new Argument({argument.Name})
-                                {{ArgumentType = typeof({argument.ArgumentType.TypeAsString()}}});");
+                var arg = GetArgument(argument);
+                //ret.Add($@"Command.Arguments.Add(new Argument({argument.Description})
+                //                {{ArgumentType = typeof({argument.ArgumentType.TypeAsString()}}});");
+                ret.Add($@"command.Arguments.Add({arg});");
             }
             return string.Join("\n", ret);
         }
+
+        // this is very c#, lang dependent should be in Generate
+        // may not be needed, same with GetOption<>, GetOptions
+        private static string GetArgument(ArgumentDescriptor argument) 
+            => $@"GetArg<{argument.ArgumentType.TypeAsString()}>(""{argument.CliName}"", ""{argument.Description}"", {argument.DefaultValue.CodeRepresentation})";
 
         private static string AddOptions(CommandDescriptor commandDescriptor)
         {
             var ret = new List<string>();
             foreach (var option in commandDescriptor.Options)
             {
-
-                ret.Add($@"Command.Options.Add(new Option({option.Name}, {option.Description})
-                              Argument = new Argument({option.Name})
-                                 {{ArgumentType = typeof({option.Arguments.First().ArgumentType.TypeAsString()}}});");
+                // TODO: cleanup after refactor of CodeGenerator/Generate is complete
+                // This is VERY placehold code, just trying to get it under passing test coverage
+                ret.Add(GetOption(option));
+                //ret.Add($@"Command.Options.Add(new Option({option.Name}, {option.Description})
+                //              Argument = new Argument({option.Name})
+                //                 {{ArgumentType = typeof({option.Arguments.First().ArgumentType.TypeAsString()}}});");
             }
             return string.Join("\n", ret);
         }
+
+        private static string GetOption(OptionDescriptor option) 
+            => $@"command.Options.Add(GetOption<{option.Arguments.First().ArgumentType.TypeAsString()}>(""{option.CliName}"", ""{option.Description}"", {option.Arguments.First().DefaultValue.CodeRepresentation}));";
     }
 }

@@ -7,8 +7,6 @@ namespace StarFruit2.Common.Descriptors
 {
     public class CommandDescriptor : IdentitySymbolDescriptor
     {
-
-        //TODO: Add CommandDescriptor?.Parent and CommandDescriptior.Root to constructor
         public CommandDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                  string originalName,
                                  object? raw)
@@ -23,6 +21,7 @@ namespace StarFruit2.Common.Descriptors
         public bool IsAsync { get; set; }
         public CommandDescriptor? Parent { get; }
         public CommandDescriptor Root { get; }
+        public bool IsRoot => Root == this;
 
         public override string ReportInternal(int tabsCount, VerbosityLevel verbosity)
         {

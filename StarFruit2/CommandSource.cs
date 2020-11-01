@@ -97,7 +97,12 @@ namespace StarFruit2
             return Create<TCli>().Parse(args).Run();
         }
 
-        public Command Command;
+        public Command Command { get; }
+
+        protected CommandSource(Command command)
+        {
+            Command = command;
+        }
 
         protected internal virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
         {
@@ -107,10 +112,7 @@ namespace StarFruit2
 
     public abstract class RootCommandSource : CommandSource
     {
-        protected RootCommandSource(Command command)
-        => Command = command;
-
-        public Command Command { get; set; }
+        protected RootCommandSource(Command command) : base(command) { }
 
         public CommandSource? CurrentCommandSource { get;  set; }
 
@@ -133,7 +135,7 @@ namespace StarFruit2
         }
 
 
-        protected TValue? GetValue<TValue>(BindingContext bindingContext,
+        protected TValue GetValue<TValue>(BindingContext bindingContext,
                  Argument<TValue> argument)
        => bindingContext.ParseResult.CommandResult.Children
             .OfType<ArgumentResult>()
@@ -141,7 +143,7 @@ namespace StarFruit2
             .Select(a => a.GetValueOrDefault<TValue>())
             .FirstOrDefault();
 
-        protected TValue? GetValue<TValue>(BindingContext bindingContext,
+        protected TValue GetValue<TValue>(BindingContext bindingContext,
                              Option<TValue> option)
             => bindingContext.ParseResult.CommandResult.Children
                         .OfType<OptionResult>()

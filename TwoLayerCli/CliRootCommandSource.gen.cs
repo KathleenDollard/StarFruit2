@@ -56,6 +56,7 @@ namespace TwoLayerCli
         internal CliRootCommandSource parent;
 
         internal FindCommandSource(CliRootCommandSource root, CliRootCommandSource parent)
+            : base(new Command("find", "Yep, cool"))
         {
             this.parent = parent;
             IntArg = GetIntArg();
@@ -64,7 +65,6 @@ namespace TwoLayerCli
 
             BoolOption = GetBoolOption();
 
-            Command = new Command("find", "Yep, cool");
             Command.Add(IntArg);
             Command.Add(StringOption);
             Command.Add(BoolOption);
@@ -122,11 +122,11 @@ namespace TwoLayerCli
         internal CliRootCommandSource parent;
 
         internal ListCommandSource(CliRootCommandSource root, CliRootCommandSource parent)
+            : base(new Command("list"))
         {
             this.parent = parent;
             VerbosityOption = GetVerbosityOption();
 
-            Command = new Command("list");
             Command.Add(VerbosityOption);
 
             Command.Handler = CommandHandler.Create(() => { root.CurrentCommandSource = this; return 0; });

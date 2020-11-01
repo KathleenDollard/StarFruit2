@@ -27,6 +27,7 @@ namespace TestData
             GeneratedSourceClassName = testName + "CommandSource";
 
             var commandDescriptor = CommandDescriptor;
+
             var option = new OptionDescriptor(commandDescriptor, originalName, null)
             {
                 Name = originalName,
@@ -96,5 +97,4 @@ namespace TestData
                    defaultValue: new DefaultValueDescriptor(true))
         { }
     }
-
 }

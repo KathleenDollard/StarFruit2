@@ -39,6 +39,9 @@ namespace StarFruit2.Tests
             return value.Trim();
         }
 
+        internal static IEnumerable<string> Normalize(IEnumerable<string> values) 
+            => values.Select(v => Normalize(v));
+
         private static string ReplaceWithRepeating(string value, string oldValue, string newValue)
         {
             var len = value.Length + 1; // plus one forces this to run at least once
