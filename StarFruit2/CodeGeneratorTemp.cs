@@ -10,14 +10,6 @@ namespace StarFruit2
 {
     public class CodeGeneratorTemp
     {
-        // HEY KATHLEEN!
-        // If you're taking a look, I'm part way through teasing apart the differences between ctors
-        // depending on whether it is the root one or not. Relevant methods
-        // - GetClassBody
-        // - GetConstructor
-        // - RootCtorName
-        // - NonRootCtorName
-
         private string[] Libraries = new string[]
         {
             "StarFruit2",
@@ -70,30 +62,19 @@ namespace StarFruit2
 
         private List<string> GetClassBody(CommandDescriptor commandDescriptor, string className)
         {
-            var isRoot2 = commandDescriptor.IsRoot;
             List<string> strCollection = new List<string>();
-
-            strCollection.AddRange(GetConstructor(commandDescriptor, className));
-
-            // TOOD: this isn't quite right, as 1 layer needs this on root, multilayer need this on childred
-            strCollection.AddRange(GetCommandSourceResultMethod(commandDescriptor));
 
             if (!commandDescriptor.IsRoot)
             {
                 strCollection.AddRange(GetFields(commandDescriptor));
             }
 
+            strCollection.AddRange(GetConstructor(commandDescriptor, className));
+
+            // WE WANT THEM ON ALL FOR NOW, CommandSourceResult will deal with it potentially being a trivial call
+            strCollection.AddRange(GetCommandSourceResultMethod(commandDescriptor));
             strCollection.AddRange(GetProperties(commandDescriptor));
-
             strCollection.AddRange(GetOptAndArgMethods(commandDescriptor));
-
-
-            //// consider if these can leverage same underlying Generate method, be mindful of rabbit hole, generated methods can have > 1 param
-            //strCollection.AddRange(GetInvokeMethods(commandDescriptor)); // <--- gotta get all of them
-            //strCollection.AddRange(GetCommandMethods(commandDescriptor));
-
-
-            //strCollection.AddRange(GetNewInstanceMethod(commandDescriptor));
 
             return strCollection;
         }
@@ -116,9 +97,8 @@ namespace StarFruit2
                 parentStr = $"{generate.This}.parent";
                 ctorArgs = new List<string>
                 {
-                    // not 100% sure if that will resolve to CliRootCommandSource as desired
-                    generate.Parameter(commandDescriptor.Root.Name, "root"),
-                    generate.Parameter(commandDescriptor.Parent.Name, "parent")
+                    generate.Parameter($"{commandDescriptor.Root.Name}CommandSource", "root"),
+                    generate.Parameter($"{commandDescriptor.Parent.Name}CommandSource", "parent")
                 };
 
                 strCollection.Add(generate.Assign($"{generate.This}.parent", "parent"));
@@ -126,10 +106,10 @@ namespace StarFruit2
 
             // add options and args
             var optsAndArgs = commandDescriptor.Arguments.OfType<SymbolDescriptor>().Union(commandDescriptor.Options);
-            strCollection.AddRange(optsAndArgs.SelectMany(elem => AssignAndAdd(elem)));
+            strCollection.AddRange(optsAndArgs.SelectMany(elem => AssignAndAdd(elem, generate)));
 
             // add commands
-            strCollection.AddRange(commandDescriptor.SubCommands.SelectMany(subCmd => AddCommand(subCmd)));
+            strCollection.AddRange(commandDescriptor.SubCommands.SelectMany(subCmd => AddSubCommand(subCmd, generate)));
 
             // add command handler
             strCollection.Add(GetCommandHandler(commandDescriptor.IsRoot));
@@ -143,7 +123,7 @@ namespace StarFruit2
                                         baseArgs: baseArgs,
                                         ctorBody: strCollection);
 
-            List<string> AssignAndAdd(SymbolDescriptor symbol)
+            static List<string> AssignAndAdd(SymbolDescriptor symbol, Generate generate)
             {
                 var name = symbol.OriginalName;
                 return new List<string> {
@@ -154,15 +134,15 @@ namespace StarFruit2
                 };
             }
 
-            List<string> AddCommand(CommandDescriptor subCmd)
+            List<string> AddSubCommand(CommandDescriptor subCmd, Generate generate)
             {
-                var bizz = new List<string> { rootStr, parentStr };
-                var newObject = generate.NewObject($"{subCmd.Name}CommandSource", bizz);
-                var foo = generate.Assign(subCmd.Name, newObject);
+                var commandArgs = new List<string> { rootStr, parentStr };
+                var newObject = generate.NewObject($"{subCmd.Name}CommandSource", commandArgs);
+                var commandAssignment = generate.Assign(subCmd.Name, newObject);
 
                 return new List<string>
                 {
-                    foo,
+                    commandAssignment,
                     generate.AddToCommand("AddCommand", $"{subCmd.Name}.Command")
                 };
             }
@@ -170,14 +150,14 @@ namespace StarFruit2
             string GetCommandHandler(bool isRoot)
             {
                 var commandSource = isRoot ? "CurrentCommandSource" : "root.CurrentCommandSource";
-                var handlerLambdaArgs = new List<string>
+                var handlerLambdaStatements = new List<string>
                 {
                     generate.Assign(commandSource, generate.This),
                      generate.Return(generate.This)
                 };
-                var handlerLambda = new List<string> { generate.Lambda(null, handlerLambdaArgs) };
-                var createdCommandHandler = generate.MethodCall("CommandHandler.Create", handlerLambda);
-                return generate.Assign($"Command.Handler", createdCommandHandler);
+                var handlerLambda = generate.Lambda(null, handlerLambdaStatements);
+                var commandHandler = generate.MethodCall("CommandHandler.Create", handlerLambda);
+                return generate.Assign($"Command.Handler", commandHandler);
             }
         }
 
@@ -261,28 +241,35 @@ namespace StarFruit2
         private IEnumerable<string> GetOptionMethod(CommandDescriptor cmd, OptionDescriptor opt)
         {
             var methodBody = new List<string> { };
-            var type = opt.Arguments.First().ArgumentType.TypeAsString();
+            var optionArg = opt.Arguments.First();
+
+            // var option = ...
+            var type = optionArg.ArgumentType.TypeAsString();
             var optType = generate.GenericType("Option", type);
             var args = new List<string> { opt.CliName };
-            var assignments = new List<string> { 
+            var assignments = new List<string> {
                 generate.Assign("Description", opt.Description),
-                // this might be a problem, as IDK if this breaks string rep of bool in VB
+                // TODO: we have no faith in passing the bool this way, come back and check
                 generate.Assign("IsRequired", opt.Required.ToString()),
                 generate.Assign("IsHidden", opt.IsHidden.ToString())
             };
             var optObject = generate.NewObjectWithInit(optType, args, assignments);
-
             methodBody.AddRange(generate.Assign($"{generate.Var} option", optObject));
 
-            // this is a terrible variable name
-            var optArgName = $"{cmd.Name}_{opt.OriginalName}_arg";
-            var optArgObj = generate.NewObject(generate.GenericType("Argument", type), "name");
-            // var find_StringOption_arg = new Argument<string>("name");
+            var optArgName = $"{generate.Var} {cmd.Name}_{opt.OriginalName}_arg";
+            var optArgObj = generate.NewObject(generate.GenericType("Argument", type), optionArg.CliName);
             methodBody.Add(generate.Assign(optArgName, optArgObj));
             // TODO: must add default value logic
 
             methodBody.Add(generate.Assign("option.Argument", optArgName));
+
+            // TODO: might blow up if aliases aren't there
             methodBody.AddRange(opt.Aliases.Select(alias => generate.MethodCall("option.AddAlias", alias)));
+
+            if (!(optionArg.DefaultValue is null))
+            {
+                methodBody.Add(GetArgumentDefaultValue(optionArg));
+            }
 
             methodBody.Add(generate.Return("option"));
 
@@ -299,15 +286,27 @@ namespace StarFruit2
             var args = new List<string> { arg.CliName };
             var assignments = new List<string> {
                 generate.Assign("Description", arg.Description),
-                // this might be a problem, as IDK if this breaks string rep of bool in VB
-                generate.Assign("IsRequired", arg.Required.ToString()),
                 generate.Assign("IsHidden", arg.IsHidden.ToString())
             };
+
+            if (!(arg.Arity is null))
+            {
+                var arityObject = generate.NewObject("ArgumentArity",
+                                                     arg.Arity.MinimumCount.ToString(),
+                                                     arg.Arity.MaximumCount.ToString());
+                var arityAssignment = generate.Assign("Arity", arityObject);
+
+                assignments.Add(arityAssignment);
+            }
+
             var optObject = generate.NewObjectWithInit(argType, args, assignments);
 
             methodBody.AddRange(generate.Assign($"{generate.Var} argument", optObject));
 
-            // TODO: must add default value logic
+            if (!(arg.DefaultValue is null))
+            {
+                methodBody.Add(GetArgumentDefaultValue(arg));
+            }
 
             methodBody.Add(generate.Return("argument"));
 
@@ -315,6 +314,12 @@ namespace StarFruit2
                                    name: $"Get{arg.OriginalName}",
                                    methodBody: methodBody,
                                    returnType: argType);
+        }
+
+        private string GetArgumentDefaultValue(ArgumentDescriptor arg)
+        {
+
+            return generate.MethodCall("argument.SetDefaultValue", arg.DefaultValue.CodeRepresentation);
         }
 
 
@@ -463,7 +468,7 @@ namespace StarFruit2
         //                           arguments: generate.Parameter("BindingContext", "bindingContext"));
         ////}
 
-        
+
         //private string NameForGetCommand(string cmdName)
         //    => $"Get{cmdName}Command";
 
