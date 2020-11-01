@@ -20,13 +20,12 @@ namespace TwoLayerCli
             Command.AddOption(CtorParam);
             Command.AddOption(StringProperty);
             Find = new FindCommandSource(this, this);
-            List = new ListCommandSource(this, this);
             Command.AddCommand(Find.Command);
+            List = new ListCommandSource(this, this);
             Command.AddCommand(List.Command);
 
             Command.Handler = CommandHandler.Create(() => { CurrentCommandSource = this; return 0; });
         }
-
 
         public Option<string> StringProperty { get; set; }
         public Option<bool> CtorParam { get; set; }
@@ -60,14 +59,12 @@ namespace TwoLayerCli
         {
             this.parent = parent;
             IntArg = GetIntArg();
-
-            StringOption = GetStringOption();
-
-            BoolOption = GetBoolOption();
-
             Command.Add(IntArg);
+            StringOption = GetStringOption();
             Command.Add(StringOption);
+            BoolOption = GetBoolOption();
             Command.Add(BoolOption);
+
 
             Command.Handler = CommandHandler.Create(() => { root.CurrentCommandSource = this; return 0; });
         }
@@ -81,6 +78,7 @@ namespace TwoLayerCli
         public Option<string> StringOption { get; set; }
         public Option<bool> BoolOption { get; set; }
 
+        // may no longer need 85 or 86 
         public Option<string> StringProperty => parent.StringProperty;
         public Option<bool> CtorParam => parent.CtorParam;
 
