@@ -32,10 +32,10 @@ namespace StarFruit2.Common.Descriptors
     {
         public static ISymbolDescriptor Empty = new EmptySymbolDescriptor();
 
-        public SymbolDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
-                                    string originalName,
-                                    object? raw,
-                                    SymbolType symbolType)
+        public SymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
+                                string originalName,
+                                object? raw,
+                                SymbolType symbolType)
         {
             ParentSymbolDescriptorBase = parentSymbolDescriptorBase;
             Raw = raw;
@@ -93,7 +93,7 @@ namespace StarFruit2.Common.Descriptors
         /// The setting of this value makes depth first much easier, so that is the only option.
         /// If sibling evaluation is needed, plan a post processing step.
         /// </summary>
-        public ISymbolDescriptor ParentSymbolDescriptorBase { get; }
+        public ISymbolDescriptor? ParentSymbolDescriptorBase { get; }
 
         /// <summary>
         /// This is the underlying thing rules were evaluated against. For
@@ -139,10 +139,10 @@ namespace StarFruit2.Common.Descriptors
 
     public abstract class IdentitySymbolDescriptor : SymbolDescriptor
     {
-        public IdentitySymbolDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
-                                     string originalName,
-                                     object? raw,
-                                     SymbolType symbolType)
+        public IdentitySymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
+                                        string originalName,
+                                        object? raw,
+                                        SymbolType symbolType)
             : base(parentSymbolDescriptorBase, originalName, raw, symbolType)
         { }
         public List<string> Aliases { get; } = new List<string>();

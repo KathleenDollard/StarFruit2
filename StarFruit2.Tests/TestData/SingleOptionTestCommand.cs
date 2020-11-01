@@ -8,7 +8,7 @@ namespace TestData
 {
     public class SingleOptionTestCommand<T> : BaseTestData
     {
-        public CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
+        public CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null,null) { Name = "my-class" };
 
         public SingleOptionTestCommand(string testName,
                                        string originalName,

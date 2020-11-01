@@ -65,12 +65,12 @@ namespace StarFruit2
                                                         ctorArgs,
                                                         baseArgs,
                                                         commandDescriptor.GetOptionsAndArgs()
-                                                                         .Select(PropertyAssignment(generate)));
+                                                                         .Select(PropertyAssignment(generate))));
             strCollection.AddRange(Properties(commandDescriptor));
             strCollection.AddRange(CreateInstanceMethod(commandDescriptor));
             return strCollection;
 
-            static List<string> GetCtorArgs(string commandSourceName)
+            static List<string> GetCtorArgs(string commandSourceName, Generate generate)
             {
                 return new List<string>
                 {
