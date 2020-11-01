@@ -90,7 +90,7 @@ namespace StarFruit2
         public IEnumerable<string> Usings(params string[] nspaces)
             => nspaces.Select(nspace => $"using {nspace};");
 
-        public List<string> Namespace(string name, List<string> classBody)
+        public List<string> Namespace(string name, IEnumerable<string> classBody)
         {
             List<string> nspace = new List<string>();
             nspace.Add($"namespace {name}");
