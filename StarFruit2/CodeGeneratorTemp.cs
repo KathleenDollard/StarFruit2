@@ -13,8 +13,9 @@ namespace StarFruit2
         private string[] Libraries = new string[]
         {
             "StarFruit2",
-            "System.CommandLine",
             "StarFruit2.Common",
+            "System",
+            "System.CommandLine",
             "System.CommandLine.Invocation",
             "System.CommandLine.Parsing"
         };
@@ -42,10 +43,21 @@ namespace StarFruit2
 
         private List<string> GetClasses(CommandDescriptor commandDescriptor)
         {
-            var rootCommandClass = GetClass(commandDescriptor);
-            var subCommandClasses = commandDescriptor.SubCommands.SelectMany(subCmd => GetClass(subCmd));
+            var strCollection = new List<string> { };
 
-            return rootCommandClass.Union(subCommandClasses).ToList();
+            //// HERE THAR BE DRAGONS: IF YOU UNCOMMENT THIS, YOU CAN SEE THE OPENING CURLIES WITHIN THE CLASS GET EATEN
+            ////      NOTE: the presence or absence of .ToList() on rootCommandClass and subCommandClasses makes no difference
+            ////      If Union is switched for Concat, dupes aren't removed so things are groovy
+            //var rootCommandClass = GetClass(commandDescriptor).ToList();
+            //var subCommandClasses = commandDescriptor.SubCommands.SelectMany(subCmd => GetClass(subCmd)).ToList();
+
+            //return rootCommandClass.Union(subCommandClasses).ToList();
+
+            strCollection.AddRange(GetClass(commandDescriptor));
+            strCollection.AddRange(commandDescriptor.SubCommands.SelectMany(subCmd => GetClass(subCmd)));
+            
+
+            return strCollection;
         }
 
         private List<string> GetClass(CommandDescriptor cmd)
@@ -128,7 +140,7 @@ namespace StarFruit2
                 var name = symbol.OriginalName;
                 return new List<string> {
                     // StringProperty = GetStringProperty();
-                    generate.Assign(name, generate.MethodCall($"Get{name}")),
+                    generate.Assign(name, generate.MethodCall($"Get{name}")).EndStatement(),
                     // Command.Add(StringProperty);
                     generate.AddToCommand("Add", name)
                 };
@@ -153,18 +165,18 @@ namespace StarFruit2
                 var handlerLambdaStatements = new List<string>
                 {
                     generate.Assign(commandSource, generate.This),
-                     generate.Return(generate.This)
+                     generate.Return(generate.StringRepresentation(0))
                 };
                 var handlerLambda = generate.Lambda(null, handlerLambdaStatements);
                 var commandHandler = generate.MethodCall("CommandHandler.Create", handlerLambda);
-                return generate.Assign($"Command.Handler", commandHandler);
+                return generate.Assign($"Command.Handler", commandHandler).EndStatement();
             }
         }
 
         private IEnumerable<string> GetCommandSourceResultMethod(CommandDescriptor commandDescriptor)
         {
             // not sure if that is the right name here, want just Find
-            var cmdSourceObj = generate.NewObject($"{commandDescriptor.Name}CommandSourceResult", "parseResult", generate.This);
+            var cmdSourceObj = generate.NewObject($"{commandDescriptor.OriginalName}CommandSourceResult", "parseResult", generate.This);
             var methodBody = new List<string>
             {
                 generate.Return(cmdSourceObj)
@@ -207,10 +219,23 @@ namespace StarFruit2
 
         private IEnumerable<string> GetOptAndArgMethods(CommandDescriptor cmd)
         {
+            var strCollection = new List<string> { };
             var optionMethods = cmd.Options.SelectMany(opt => GetOptionMethod(cmd, opt));
             var argumentMethods = cmd.Arguments.SelectMany(arg => GetArgMethod(cmd, arg));
 
-            return optionMethods.Union(argumentMethods);
+            // replace these conditionals with a union of optionMethods and argumentMethods to see magic disappering curlies
+
+            if (!(optionMethods is null))
+            {
+                strCollection.AddRange(optionMethods);
+            }
+
+            if (!(argumentMethods is null))
+            {
+                strCollection.AddRange(argumentMethods);
+            }
+
+            return strCollection;
         }
 
 
@@ -246,30 +271,31 @@ namespace StarFruit2
             // var option = ...
             var type = optionArg.ArgumentType.TypeAsString();
             var optType = generate.GenericType("Option", type);
-            var args = new List<string> { opt.CliName };
+            var args = new List<string> { $@"""{optionArg.CliName}""" };
             var assignments = new List<string> {
-                generate.Assign("Description", opt.Description),
+                generate.Assign("Description", generate.StringRepresentation(opt.Description)),
                 // TODO: we have no faith in passing the bool this way, come back and check
-                generate.Assign("IsRequired", opt.Required.ToString()),
-                generate.Assign("IsHidden", opt.IsHidden.ToString())
+                generate.Assign("IsRequired", generate.StringRepresentation(opt.Required)),
+                generate.Assign("IsHidden", generate.StringRepresentation(opt.IsHidden))
             };
             var optObject = generate.NewObjectWithInit(optType, args, assignments);
-            methodBody.AddRange(generate.Assign($"{generate.Var} option", optObject));
+            methodBody.AddRange(generate.Assign($"{generate.Var} option", optObject).EndStatement());
 
-            var optArgName = $"{generate.Var} {cmd.Name}_{opt.OriginalName}_arg";
-            var optArgObj = generate.NewObject(generate.GenericType("Argument", type), optionArg.CliName);
-            methodBody.Add(generate.Assign(optArgName, optArgObj));
+            var optArgName = $"{cmd.OriginalName}_{opt.OriginalName}_arg";
+            var optArgObj = generate.NewObject(generate.GenericType("Argument", type), $@"""{optionArg.CliName}""");
+            methodBody.Add(generate.Assign($"{generate.Var} {optArgName}", optArgObj).EndStatement());
             // TODO: must add default value logic
 
-            methodBody.Add(generate.Assign("option.Argument", optArgName));
 
             // TODO: might blow up if aliases aren't there
             methodBody.AddRange(opt.Aliases.Select(alias => generate.MethodCall("option.AddAlias", alias)));
 
             if (!(optionArg.DefaultValue is null))
             {
-                methodBody.Add(GetArgumentDefaultValue(optionArg));
+                methodBody.Add(GetArgumentDefaultValue(optionArg, optArgName));
             }
+
+            methodBody.Add(generate.Assign("option.Argument", optArgName).EndStatement());
 
             methodBody.Add(generate.Return("option"));
 
@@ -285,8 +311,8 @@ namespace StarFruit2
             var argType = generate.GenericType("Argument", arg.ArgumentType.TypeAsString());
             var args = new List<string> { arg.CliName };
             var assignments = new List<string> {
-                generate.Assign("Description", arg.Description),
-                generate.Assign("IsHidden", arg.IsHidden.ToString())
+                generate.Assign("Description", generate.StringRepresentation(arg.Description)),
+                generate.Assign("IsHidden", generate.StringRepresentation(arg.IsHidden))
             };
 
             if (!(arg.Arity is null))
@@ -301,7 +327,7 @@ namespace StarFruit2
 
             var optObject = generate.NewObjectWithInit(argType, args, assignments);
 
-            methodBody.AddRange(generate.Assign($"{generate.Var} argument", optObject));
+            methodBody.AddRange(generate.Assign($"{generate.Var} argument", optObject).EndStatement());
 
             if (!(arg.DefaultValue is null))
             {
@@ -316,10 +342,10 @@ namespace StarFruit2
                                    returnType: argType);
         }
 
-        private string GetArgumentDefaultValue(ArgumentDescriptor arg)
+        private string GetArgumentDefaultValue(ArgumentDescriptor arg, string argName = "argument")
         {
 
-            return generate.MethodCall("argument.SetDefaultValue", arg.DefaultValue.CodeRepresentation);
+            return generate.MethodCall($"{argName}.SetDefaultValue", arg.DefaultValue.CodeRepresentation).EndStatement();
         }
 
 

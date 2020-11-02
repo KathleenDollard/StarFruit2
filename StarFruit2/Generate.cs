@@ -26,7 +26,6 @@ namespace StarFruit2
 
     public class Generate
     {
-
         // generate is a c# generate class
 
         // descriptor free, CodeGenerator should rip descirptor apart and pass into
@@ -71,7 +70,7 @@ namespace StarFruit2
 
         internal string NewCommand(string cliName, string? desc = null)
         {
-            var args = new List<string> { cliName, desc };
+            var args = new List<string> { StringRepresentation(cliName), StringRepresentation(desc) };
             return NewObject($"Command", args);
         }
 
@@ -85,7 +84,22 @@ namespace StarFruit2
 
         // above is non-general, below is general
 
-
+        public string StringRepresentation(Object? obj)
+        {
+            if(obj is null)
+            {
+                return @"""""";
+            } else if(obj.GetType() == typeof(bool))
+            {
+                return (bool)obj ? "true" : "false";
+            } else if(obj.GetType() == typeof(string)) 
+            {
+                return $@"""{obj}""";
+            } else
+            {
+                return obj.ToString();
+            }
+        }
 
         public IEnumerable<string> Usings(params string[] nspaces)
             => nspaces.Select(nspace => $"using {nspace};");
