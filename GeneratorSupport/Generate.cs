@@ -45,7 +45,7 @@ namespace GeneratorSupport
         public abstract string CtorDeclaration(string className, Scope scope = Scope.Public, params string[] ctorParameters);
         public abstract string Field(Scope scope, string type, string name);
         public abstract string GenericType(string type, params string[] genericArgs);
-        public abstract GenerateCSharp InitStatement(string newObject, params string[] assignments);
+        public abstract GenerateCSharp InitStatement(string newObject, params string[] assignments); //
         public abstract string Lambda(string lambdaDeclaration, string expression);
         public abstract string LambdaDeclaration(params string[] parameters);
         public abstract GenerateCSharp Method(Scope scope, string name, IEnumerable<string> methodBody, string returnType, bool isAsync = false, bool isOverriden = false, params string[] arguments);
@@ -204,6 +204,16 @@ namespace GeneratorSupport
             StringBuilder.AppendLine("}");
 
             return this;
+        }
+
+        public override GenerateCSharp ReturnStatement(params string[] returnValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void AssignStatement(string v1, string v2)
+        {
+            throw new NotImplementedException();
         }
     }
 
