@@ -71,25 +71,23 @@ namespace Starfruit2
         { }
 
         protected virtual IEnumerable<CommandDescriptor> GetSubCommands(CommandDescriptor parent,
-                                                                        INamedTypeSymbol parentSymbol,
-                                                                        CommandDescriptor root)
+                                                                        INamedTypeSymbol parentSymbol)
         {
             IEnumerable<ISymbol> members = config.GetSubCommandMembers(parentSymbol);
             return members.Select(s => s switch
                 {
-                    IMethodSymbol x => CreateCommandDescriptor(parent, x, root),
-                    INamedTypeSymbol x => CreateCommandDescriptor(parent, x, root),
+                    IMethodSymbol x => CreateCommandDescriptor(parent, x),
+                    INamedTypeSymbol x => CreateCommandDescriptor(parent, x),
                     _ => throw new NotImplementedException()
                 });
         }
 
         protected virtual CommandDescriptor CreateCommandDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
-                                                                                    TCommandSymbol symbol,
-                                                                                    CommandDescriptor? root)
+                                                                                    TCommandSymbol symbol)
             where TCommandSymbol : class, ISymbol
         {
             Assert.NotNull(symbol);
-            var command = new CommandDescriptor(parent, symbol.Name, symbol, root)
+            var command = new CommandDescriptor(parent, symbol.Name, symbol)
             {
                 Name = config.CommandNameToName(symbol.Name),
                 CliName = config.CommandNameToCliName(symbol.Name),
@@ -103,7 +101,7 @@ namespace Starfruit2
             command.AddOptions(GetOptions(command, symbol));
             if (symbol is INamedTypeSymbol s)
             {
-                IEnumerable<CommandDescriptor> subCommands = GetSubCommands(command, s, root);
+                IEnumerable<CommandDescriptor> subCommands = GetSubCommands(command, s);
                 command.AddCommands(subCommands);
             }
             return command;
@@ -185,7 +183,7 @@ namespace Starfruit2
             var cliDesriptor = new CliDescriptor
             {
                 GeneratedComandSourceNamespace = symbol.ContainingNamespace.ToString(),
-                CommandDescriptor = CreateCommandDescriptor(parent, symbol,null)
+                CommandDescriptor = CreateCommandDescriptor(parent, symbol)
             };
             return cliDesriptor;
         }

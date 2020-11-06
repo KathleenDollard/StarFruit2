@@ -14,8 +14,9 @@ namespace TwoLayerCli
 
         protected CliRootCommandSourceResult(ParseResult parseResult,
                                              CommandSourceMemberResult<string> stringProperty_Result,
-                                             CommandSourceMemberResult<bool> ctorParam_Result)
-            :base( parseResult)
+                                             CommandSourceMemberResult<bool> ctorParam_Result,
+                                             int exitCode)
+            :base( parseResult,  exitCode)
         {
             StringProperty_Result = stringProperty_Result;
             CtorParam_Result = ctorParam_Result;
@@ -38,10 +39,12 @@ namespace TwoLayerCli
     public class FindCommandSourceResult : CliRootCommandSourceResult
     {
         public FindCommandSourceResult(ParseResult parseResult,
-                                       FindCommandSource findCommandSource)
+                                       FindCommandSource findCommandSource,
+                                       int exitCode)
             : base(parseResult,
                    CommandSourceMemberResult.Create(findCommandSource.StringProperty, parseResult),
-                   CommandSourceMemberResult.Create(findCommandSource.CtorParam, parseResult))
+                   CommandSourceMemberResult.Create(findCommandSource.CtorParam, parseResult),
+                   exitCode )
         {
             IntArg_Result = CommandSourceMemberResult.Create(findCommandSource.IntArg, parseResult);
             StringOption_Result = CommandSourceMemberResult.Create(findCommandSource.StringOption, parseResult);
@@ -62,10 +65,12 @@ namespace TwoLayerCli
     public class ListCommandSourceResult : CliRootCommandSourceResult
     {
         public ListCommandSourceResult(ParseResult parseResult,
-                                       ListCommandSource listCommandSource)
+                                       ListCommandSource listCommandSource,
+                                       int exitCode)
             : base(parseResult,
                    CommandSourceMemberResult.Create(listCommandSource.StringProperty, parseResult),
-                   CommandSourceMemberResult.Create(listCommandSource.CtorParam, parseResult))
+                   CommandSourceMemberResult.Create(listCommandSource.CtorParam, parseResult),
+                   exitCode)
         {
              VerbosityOption_Result = CommandSourceMemberResult.Create(listCommandSource.VerbosityOption, parseResult);
         }

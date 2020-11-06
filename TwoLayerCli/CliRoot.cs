@@ -17,7 +17,7 @@ namespace TwoLayerCli
         /// <summary>
         /// This is a string property
         /// </summary>
-        [Aliases("s")]
+        [Aliases("o")]
         [Required]
         public string StringProperty { get; set; } = "abc";
 

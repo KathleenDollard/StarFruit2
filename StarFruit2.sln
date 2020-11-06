@@ -28,6 +28,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiLayerCli", "MultiLayerCli\MultiLayerCli.csproj", "{EC68E495-8BAF-4D63-8789-510A2606953A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneratorSupport", "GeneratorSupport\GeneratorSupport.csproj", "{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneratorSupport.Tests", "GeneratorSupport.Tests\GeneratorSupport.Tests.csproj", "{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +70,14 @@ Global
 		{EC68E495-8BAF-4D63-8789-510A2606953A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC68E495-8BAF-4D63-8789-510A2606953A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC68E495-8BAF-4D63-8789-510A2606953A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

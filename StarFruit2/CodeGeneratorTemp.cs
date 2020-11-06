@@ -98,7 +98,7 @@ namespace StarFruit2
                 ctorArgs = new List<string>
                 {
                     generate.Parameter($"{commandDescriptor.Root.Name}CommandSource", "root"),
-                    generate.Parameter($"{commandDescriptor.Parent.Name}CommandSource", "parent")
+                    generate.Parameter($"{commandDescriptor.ParentSymbolDescriptorBase.Name}CommandSource", "parent")
                 };
 
                 strCollection.Add(generate.Assign($"{generate.This}.parent", "parent"));
@@ -182,7 +182,7 @@ namespace StarFruit2
         private IEnumerable<string> GetFields(CommandDescriptor commandDescriptor)
             => new List<string>
             {
-                generate.Field(Scope.Internal, commandDescriptor.Parent.Name, "parent")
+                generate.Field(Scope.Internal, commandDescriptor.ParentSymbolDescriptorBase.Name, "parent")
             };
 
         private List<string> GetProperties(CommandDescriptor commandDescriptor)

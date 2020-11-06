@@ -1,4 +1,5 @@
-﻿using StarFruit2.Common.Descriptors;
+﻿using StarFruit.Common;
+using StarFruit2.Common.Descriptors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,20 +28,17 @@ namespace StarFruit2
                 "System.CommandLine.Parsing"
             };
 
-            var commandDescriptors = new List<CommandDescriptor>
-            {
-                cliDescriptor.CommandDescriptor
-            };
+            var commandDescriptors = cliDescriptor.Descendants.OfType<CommandDescriptor>();
 
             List<string> strCollection = new List<string>();
             strCollection.AddRange(generate.Usings(Libraries));
             strCollection.AddRange(generate.Namespace(cliDescriptor.GeneratedComandSourceNamespace,
                                commandDescriptors.SelectMany(c =>
                                             generate.Class(scope: Scope.Public,
-                                              isPartial: true,
-                                              className: $"{c.OriginalName}CommandSourceResult",
-                                              baseClassName: GetBaseClassName(c),
-                                              classBody: GeClassBody(c)))));
+                                                           isPartial: true,
+                                                           className: $"{c.OriginalName}CommandSourceResult",
+                                                           baseClassName: GetBaseClassName(c),
+                                                           classBody: GetClassBody(c)))));
 
             return strCollection;
 
@@ -52,12 +50,12 @@ namespace StarFruit2
             }
         }
 
-        private List<string> GeClassBody(CommandDescriptor commandDescriptor)
+        private List<string> GetClassBody(CommandDescriptor commandDescriptor)
         {
             var strCollection = new List<string> { };
 
             var commandSourceName = $"{commandDescriptor.OriginalName}CommandSourceResult";
-            List<string> ctorArgs = GetCtorArgs(commandSourceName);
+            List<string> ctorArgs = GetCtorArgs(commandSourceName, generate);
             List<string> baseArgs = GetBaseArgs(commandDescriptor, commandSourceName);
 
             // Jean: Constructor needs a scope
@@ -66,7 +64,7 @@ namespace StarFruit2
                                                         baseArgs,
                                                         commandDescriptor.GetOptionsAndArgs()
                                                                          .Select(PropertyAssignment(generate))));
-            strCollection.AddRange(Properties(commandDescriptor));
+            strCollection.AddRange(commandDescriptor.GetOptionsAndArgs().Select(o => Property(o)));
             strCollection.AddRange(CreateInstanceMethod(commandDescriptor));
             return strCollection;
 
@@ -105,6 +103,41 @@ namespace StarFruit2
             }
         }
 
+        private string Property(SymbolDescriptor optionOrArgument)
+        {
+            var typeString = optionOrArgument switch
+            {
+                OptionDescriptor o => o.Arguments.First().ArgumentType.TypeAsString(),
+                ArgumentDescriptor a => a.ArgumentType.TypeAsString(),
+                _ => ""
+            };
+            return generate.Property(scope: Scope.Public,
+                                      type: generate.GenericType("CodeSourceMemberResult", typeString),
+                                      name: $"{optionOrArgument.OriginalName}_Result",
+                                      setterScope: Scope.Public);
+        }
 
+        private IEnumerable<string> CreateInstanceMethod(CommandDescriptor commandDescriptor)
+        {
+            return generate.Method(scope: Scope.Public,
+                            name: "CreateInstance",
+                            methodBody: MethodBody(generate, commandDescriptor),
+                            returnType: commandDescriptor.OriginalName,
+                            isOverriden: true);
+
+            static IEnumerable<string> MethodBody(Generate generate, CommandDescriptor commandDescriptor)
+            {
+                var ctorArgs = commandDescriptor.GetOptionsAndArgs()
+                                                .Where(x => x.CodeElement == CodeElement.CtorParameter)
+                                                .Select(x => generate.Assign(x.OriginalName, $"{ResultName(x)}.Value"));
+                var assignments = commandDescriptor.GetOptionsAndArgs()
+                                                   .Where(x => x.CodeElement != CodeElement.CtorParameter)
+                                                   .Select(x => generate.Assign(x.OriginalName, $"{ResultName(x)}.Value"));
+                return generate.NewObjectWithInit(commandDescriptor.OriginalName, ctorArgs, assignments);
+            }
+        }
+
+        private static string ResultName(SymbolDescriptor symbolDescriptor)
+            => $"{symbolDescriptor.OriginalName}_Result";
     }
 }

@@ -11,6 +11,8 @@ namespace StarFruit2.Common.Descriptors
         string? CliName { get; }
         string OriginalName { get; }
         bool IsHidden { get; set; }
+        ISymbolDescriptor? ParentSymbolDescriptorBase { get; }
+
         string Report(int tabsCount, VerbosityLevel verbosity);
     }
 }

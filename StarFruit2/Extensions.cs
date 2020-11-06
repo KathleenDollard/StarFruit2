@@ -79,5 +79,13 @@ namespace StarFruit2
         {
             return symbol.AttributeValueForList<T>(typeof(TAttribute));
         }
+
+        // This does not yet handle snake case
+        public static string CamelCase(this string input)
+        {
+            var arr = input.ToCharArray();
+            arr[0] = char.ToLowerInvariant(arr[0]);
+            return arr.ToString();
+        }
     }
 }

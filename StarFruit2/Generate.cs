@@ -5,6 +5,11 @@ using System.CommandLine;
 using System.Linq;
 using System.Text;
 
+// JEAN:    
+// * We need Assign and Init assign to be different methods because VB uses .PropertyName
+// * Parameters in generate should be IEnumerable
+// * I have forgotten why the right of an assign is an collection.Can you add a comment explaining the scenario
+
 namespace StarFruit2
 {
     public enum Scope
@@ -101,7 +106,7 @@ namespace StarFruit2
             return nspace;
         }
 
-        public List<string> Class(Scope scope, bool isPartial, string className, string? baseClassName, List<string> classBody)
+        public List<string> Class(Scope scope, bool isPartial, string className, string? baseClassName, IEnumerable<string> classBody)
         {
             var strPartial = isPartial ? "partial" : "";
             // TODO: this somewhat screws indenting whitespace but is much simpler to test!
@@ -136,7 +141,7 @@ namespace StarFruit2
         // generate.MakeParam("BindingContext", "bindingContext")
         // could do String.join(",",generate.MakeParam(...), generate.MakeParam(...))
         // TODO: re-eval this interface for prettiness
-        public List<string> Method(Scope scope, string name, List<string> methodBody, string returnType, bool isAsync = false, bool isOverriden = false, params string[] arguments)
+        public List<string> Method(Scope scope, string name, IEnumerable<string> methodBody, string returnType, bool isAsync = false, bool isOverriden = false, params string[] arguments)
         {
             if (isAsync && !returnType.StartsWith("Task<"))
             {
@@ -156,7 +161,7 @@ namespace StarFruit2
             return strCollection;
         }
 
-        public string MethodCall(string methodName, List<string>? args = null)
+        public string MethodCall(string methodName, IEnumerable<string>? args = null)
             => $"{methodName}({FormattedArgs(args)})";
         public string MethodCall(string methodName, params string[] args)
             => MethodCall(methodName, args.ToList());
@@ -177,7 +182,7 @@ namespace StarFruit2
         }
 
         // FIXME: delete me
-        public List<string> BuildBlock(string firstLine, List<string> body)
+        public List<string> BuildBlock(string firstLine, IEnumerable<string> body)
         {
             var strCollection = new List<string>
             {
@@ -203,22 +208,24 @@ namespace StarFruit2
         public string Assign(string leftHand, string rightHand, string op = "=")
             => $"{leftHand} {op} {rightHand}";
 
-        public List<string> Assign(string leftHand, List<string> rightHand, string op = "=")
+        public List<string> Assign(string leftHand, IEnumerable<string> rightHand, string op = "=")
         {
+            var rightHandArr = rightHand.ToArray();
             var strCollection = new List<string>
             {
-                Assign(leftHand, rightHand[0], op)
+                Assign(leftHand, rightHandArr[0], op)
                 //$"return{(await == true ? " await " : " ")}{returnValue[0]}"
             };
 
-            switch (rightHand.Count())
+            switch (rightHandArr.Count())
             {
                 case 1:
                     return strCollection;
             }
 
-            strCollection.AddRange(rightHand.ToArray()[1..^1]);
-            strCollection.Add(rightHand[^1]);
+            // JEAN: What are we doing here?
+            strCollection.AddRange(rightHandArr[1..^1]);
+            strCollection.Add(rightHandArr[^1]);
 
             return strCollection;
         }
@@ -261,15 +268,15 @@ namespace StarFruit2
         public string Return(string returnValue, bool await = false)
             => $"return{(await == true ? " await " : " ")}{returnValue}".EndStatement();
 
-        public List<string> Return(List<string> returnValue, bool await = false)
+        public List<string> Return(IEnumerable<string> returnValue, bool await = false)
         {
-
+            var returnValueArr = returnValue.ToArray();
             var strCollection = new List<string>
             {
-                $"return{(await == true ? " await " : " ")}{returnValue[0]}"
+                $"return{(await == true ? " await " : " ")}{returnValueArr[0]}"
             };
 
-            switch (returnValue.Count())
+            switch (returnValueArr.Count())
             {
                 case 0:
                     return new List<string> { };
@@ -277,8 +284,8 @@ namespace StarFruit2
                     return strCollection.EndStatement();
             }
 
-            strCollection.AddRange(returnValue.ToArray()[1..^1]);
-            strCollection.Add(returnValue[^1]);
+            strCollection.AddRange(returnValueArr[1..^1]);
+            strCollection.Add(returnValueArr[^1]);
 
             return strCollection.EndStatement();
         }

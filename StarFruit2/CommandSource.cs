@@ -2,6 +2,7 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Binding;
+using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -104,9 +105,9 @@ namespace StarFruit2
             Command = command;
         }
 
-        protected internal virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult)
+        protected internal virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult, int exitCode)
         {
-            return new NotInvocableCommandSourceResult(parseResult);
+            return new NotInvocableCommandSourceResult(parseResult, exitCode);
         }
     }
 
@@ -114,7 +115,8 @@ namespace StarFruit2
     {
         protected RootCommandSource(Command command) : base(command) { }
 
-        public CommandSource? CurrentCommandSource { get;  set; }
+        public CommandSource? CurrentCommandSource { get; set; }
+        public ParseResult ? CurrentParseResult { get; set; }
 
         public CommandSourceResult Parse(string[] args)
         {
@@ -122,16 +124,22 @@ namespace StarFruit2
             // This does not call the user's method, but an invoke in the CommandSource that sets the result
             // This allows the user to validate and manipulate the results prior to running their method
             // or sidestepping implementation if they just want the data
-            var parseResult = Command.Parse(args);
+            var parser = new CommandLineBuilder(Command)
+                               .UseDefaults()
+                               .Build();
+
+            var parseResult = parser.Parse(args);
+
             var exit = parseResult.Invoke();
             if (exit != 0)
             {
                 // TODO: should we allow this?
             }
-            Assert.NotNull(CurrentCommandSource);
-            var result = CurrentCommandSource.GetCommandSourceResult(parseResult);
-            Assert.NotNull(result);
-            return result;
+            return CurrentCommandSource switch
+            {
+                null => new EmptyCommandSourceResult(parseResult, exit),
+                _ => CurrentCommandSource.GetCommandSourceResult(parseResult, exit)
+            };
         }
 
 
