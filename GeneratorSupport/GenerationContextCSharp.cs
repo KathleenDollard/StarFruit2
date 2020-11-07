@@ -143,7 +143,12 @@ namespace GeneratorSupport.Context.CSharp
             throw new NotImplementedException();
         }
 
-        public override void AssignStatement(string v1, string v2)
+        public override CodeBlock AssignStatement(string v1, string v2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override CodeBlock EndBody()
         {
             throw new NotImplementedException();
         }
@@ -163,6 +168,11 @@ namespace GeneratorSupport.Context.CSharp
             throw new NotImplementedException();
         }
 
+        public override CodeBlock MethodCallStatement(string methodName, params string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         public override string MultiLineLambda(string lambdaDeclaration, params string[] statements)
         {
             throw new NotImplementedException();
@@ -178,12 +188,17 @@ namespace GeneratorSupport.Context.CSharp
             throw new NotImplementedException();
         }
 
-        public override GenerateCSharp ReturnStatement(bool await = false, params string[] returnValue)
+        public override CodeBlock ReturnStatement(bool await = false, params string[] returnValue)
         {
             throw new NotImplementedException();
         }
 
-        public override GenerateCSharp ReturnStatement(params string[] returnValue)
+        public override CodeBlock ReturnStatement(params string[] returnValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override CodeBlock StartBody()
         {
             throw new NotImplementedException();
         }

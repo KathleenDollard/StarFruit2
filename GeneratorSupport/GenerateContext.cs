@@ -135,14 +135,18 @@ namespace GeneratorSupport.Context
 
         public abstract string Assign(string leftHand, string rightHand, string op = "=");
         public abstract string Assign(string leftHand, string rightHand);
-        public abstract void AssignStatement(string v1, string v2);
         public abstract string Lambda(string lambdaDeclaration, string expression);
         public abstract string LambdaDeclaration(params string[] parameters);
         public abstract string MethodCall(string methodName, params string[] args);
         public abstract string MultiLineLambda(string lambdaDeclaration, params string[] statements);
         public abstract string NewObject(string objName, params string[] ctorArgs);
-        public abstract GenerateCSharp ReturnStatement(bool await = false, params string[] returnValue);
-        public abstract GenerateCSharp ReturnStatement(params string[] returnValue);
+        public abstract CodeBlock MethodCallStatement(string methodName, params string[] args);
+        public abstract CodeBlock AssignStatement(string v1, string v2);
+        public abstract CodeBlock ReturnStatement(bool await = false, params string[] returnValue);
+        public abstract CodeBlock ReturnStatement(params string[] returnValue);
+        public abstract CodeBlock StartBody();
+        public abstract CodeBlock EndBody();
+
     }
 
     //Property accessors will not have parameters

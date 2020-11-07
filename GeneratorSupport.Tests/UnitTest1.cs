@@ -46,7 +46,6 @@ namespace GeneratorSupport.Tests
                 genClass.Field("parent",cmd.ParentSymbolDescriptorBase.Name,Scope.Internal);
             }
 
-
             genClass.EndBody();
             genNamespace.EndBody();
         }
