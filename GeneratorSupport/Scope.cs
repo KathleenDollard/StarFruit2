@@ -6,6 +6,7 @@ namespace GeneratorSupport
 {
     public enum Scope
     {
+        None,
         Public,
         Private,
         Internal,

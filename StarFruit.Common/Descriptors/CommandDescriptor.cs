@@ -20,6 +20,10 @@ namespace StarFruit2.Common.Descriptors
         public InvokeMethodInfo? InvokeMethod { get; set; } // in Reflection models, this is a MethodInfo, in Roslyn it will be something else
         public List<CommandDescriptor> SubCommands { get; } = new List<CommandDescriptor>();
         public bool IsAsync { get; set; }
+        public object baseClass { get; set; }
+
+        public IEnumerable<SymbolDescriptor> GetChildren()
+            => Arguments.OfType<SymbolDescriptor>().Union(Options).Union(SubCommands);
 
         public IEnumerable<SymbolDescriptor> GetOptionsAndArgs()
             => Arguments.OfType<SymbolDescriptor>().Union(Options);

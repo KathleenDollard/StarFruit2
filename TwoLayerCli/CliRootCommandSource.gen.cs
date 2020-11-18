@@ -67,7 +67,6 @@ namespace TwoLayerCli
             BoolOption = GetBoolOption();
             Command.Add(BoolOption);
 
-
             Command.Handler = CommandHandler.Create(() => { root.CurrentCommandSource = this; return 0; });
         }
 

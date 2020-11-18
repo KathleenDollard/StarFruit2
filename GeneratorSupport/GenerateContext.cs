@@ -202,7 +202,7 @@ namespace GeneratorSupport.Context
 
     }
 
-    public abstract class MultiLineLambda : CodeBlockWithParameters
+    public class MultiLineLambda : CodeBlockWithParameters
     {
         public MultiLineLambda(StringBuilder sb)
              : base(sb) { }
