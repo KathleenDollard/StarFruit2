@@ -1,5 +1,4 @@
-﻿using GeneratorSupport.SimpleDom;
-using StarFruit2.Common;
+﻿using FluentDom;
 using StarFruit2.Common.Descriptors;
 using System.Linq;
 
@@ -8,12 +7,12 @@ namespace GeneratorSupport.Tests
     public static class Helpers
     {
 
-         public static string GetOptionPropertyName(string name)
-           => $"{name}Option";
+        public static string GetOptionPropertyName(string name)
+          => $"{name}Option";
         public static string GetArgumentPropertyName(string name)
            => $"{name}Argument";
         public static string GetCommandPropertyName(string name)
-           => $"{name}Command"; 
+           => $"{name}Command";
 
         public static TypeRep GetArgumentType(this OptionDescriptor o)
         => o.Arguments.Any()
@@ -28,6 +27,15 @@ namespace GeneratorSupport.Tests
         => new Property(GetOptionPropertyName(option.Name), new TypeRep("Option", option.GetArgumentType()));
 
         public static Property NewProperty(this ArgumentDescriptor argument)
-        => new Property(GetArgumentPropertyName(argument.Name), new TypeRep ("Argument", argument.GetArgumentType()));
+        => new Property(GetArgumentPropertyName(argument.Name), new TypeRep("Argument", argument.GetArgumentType()));
+
+        public static TypeRep GetFluentArgumentType(this OptionDescriptor o)
+        => o.Arguments.Any()
+            ? GetFluentArgumentType(o.Arguments.First())
+            : new TypeRep("bool");
+
+        // TODO: Arguments do not currently support generic types
+        public static TypeRep GetFluentArgumentType(this ArgumentDescriptor o)
+          => new TypeRep(o.ArgumentType.TypeAsString());
     }
 }

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FluentDom\FluentDom.csproj" />
+    <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
+    <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
+  </ItemGroup>
+
+</Project>
