@@ -13,6 +13,9 @@ namespace GeneratorSupport.Tests
            => $"{name}Argument";
         public static string GetCommandPropertyName(string name)
            => $"{name}Command";
+        public static string CommandSourceClassName(this CommandDescriptor cmd) 
+            => $"{cmd.OriginalName}CommandSource";
+
 
         public static TypeRep GetArgumentType(this OptionDescriptor o)
         => o.Arguments.Any()

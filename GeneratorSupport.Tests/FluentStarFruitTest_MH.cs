@@ -49,6 +49,14 @@
 //                        "StarFruit2.Common",
 //                        "System.CommandLine.Invocation",
 //                        "System.CommandLine.Parsing")
+//                    .Class(new Class($"{cmd.OriginalName}CommandSource")
+//                        .Base(baseClass)
+//                        .Constructor(GetRootCtor(cmd, null, null))
+//                        .Members(
+//                            cmd.Options.Select(x => x.NewProperty()),
+//                            cmd.Arguments.Select(x => x.NewProperty()),
+//                            cmd.Options.Select(x => GetOptionMethod(x)),
+//                            cmd.Arguments.Select(x => GetArgumentMethod(x))))
 //                    .Class($"{cmd.OriginalName}CommandSource")
 //                        .Base(baseClass)
 //                        .Constructor(GetRootCtor(cmd, null, null))

@@ -44,19 +44,20 @@ namespace GeneratorSupport.Tests
 
         protected virtual Class RootClass(CommandDescriptor cmd)
         {
-            return new Class($"{cmd.OriginalName}CommandSource")
-                        .Base($"RootCommandSource<{cmd.OriginalName}>")
+            return new Class(cmd.CommandSourceClassName())
+                        .Base($"RootCommandSource<{cmd.CommandSourceClassName()}>")
                         .Constructor(GetRootCtor(cmd, null, null))
-                        .Members(cmd.GetChildren(),
-                                 s => Property(s))
-                        .Members(cmd.GetOptionsAndArgs(),
+                        .Properties(cmd.GetChildren(),
+                                    s => Property(s))
+                        .Methods(cmd.GetOptionsAndArgs(),
                                  s => GetMethod(s));
 
         }
 
+
         protected virtual Constructor GetRootCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
         {
-            Constructor newCtor = new Constructor()
+            Constructor newCtor = new Constructor(cmd.CommandSourceClassName())
                 .BaseCall(NewObject("Command", cmd.CliName))
                 .Statements(cmd.GetOptionsAndArgs(),
                             o => Assign(o.OriginalName, MethodCall(GetOptArgMethodName(o.OriginalName))),
@@ -85,9 +86,9 @@ namespace GeneratorSupport.Tests
 
         protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
         {
-            Constructor newCtor = new Constructor();
+            Constructor newCtor = new Constructor(cmd.CommandSourceClassName());
             newCtor.Parameter("root", $"{cmd.Root.OriginalName}CommandSource");
-            newCtor.Parameter("root", $"{cmd.ParentSymbolDescriptorBase.OriginalName}CommandSource");
+            newCtor.Parameter("parent", $"{cmd.ParentSymbolDescriptorBase.OriginalName}CommandSource");
             return newCtor;
         }
 
@@ -127,18 +128,18 @@ namespace GeneratorSupport.Tests
             var method = new Method(GetOptArgMethodName(o.OriginalName))
                 .ReturnType(OptionType(o))
                 .Statements(
-                      AssignVar("option", NewObject(OptionType(o).ToString(), o.CliName)),
+                      AssignVar("option", OptionType(o).ToString(), NewObject(OptionType(o).ToString(), o.CliName)),
                       Assign("option.Description", o.Description),
                       Assign("option.IsRequired", Value(o.Required)),
                       Assign("option.IsHidden", Value(o.IsHidden)),
-                      AssignVar("optionArg", Value(o.IsHidden)),
+                      AssignVar("optionArg", "Boolean", Value(o.IsHidden)),
                       Assign("option.Argument", "optionArg"))
                  .Optional(
                       o.Arguments.First().DefaultValue is not null,
-                      ()=> MethodCall("optionArg.SetDefaultValue", Value(o.Arguments.First().DefaultValue.DefaultValue)))
+                      () => MethodCall("optionArg.SetDefaultValue", Value(o.Arguments.First().DefaultValue.DefaultValue)))
                  .Statements(
                       o.Aliases,
-                      alias=> MethodCall("option.AddAlias", Value($"-{alias}")))
+                      alias => MethodCall("option.AddAlias", Value($"-{alias}")))
                  .Return("option");
 
             //// This or optional in statements group
@@ -160,7 +161,7 @@ namespace GeneratorSupport.Tests
 
     public static class StarFruitExtensions
     {
-   
+
     }
 }
 
