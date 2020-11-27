@@ -29,7 +29,7 @@ namespace StarFruit2.Tests
             actual.Should().Match(testData.CliDescriptor);
         }
 
-        [Theory]
+        [Theory(Skip ="Old generator")]
         [InlineData(typeof(EmptyTestData))]
         public void Descriptor_to_source(Type type)
         {

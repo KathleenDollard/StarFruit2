@@ -1,4 +1,5 @@
 ﻿using FluentDom;
+using FluentDom.Generator;
 using StarFruit2.Common.Descriptors;
 using System;
 using System.Linq;
@@ -8,7 +9,7 @@ using static FluentDom.Expression;
 // * Use a base/derived overlad extensibility mechanism.Overriding methods may need to navigate DOM
 // * Use a two phase appraoch to evaluation, maintaining Select methods as IENumerable and Funcs for extension
 // * Have a separate calculate values method for each method so it can be called at any point
-namespace GeneratorSupport.Tests
+namespace GeneratorSupport
 {
     public class GenerateCommandSource
     {
@@ -18,6 +19,7 @@ namespace GeneratorSupport.Tests
             var cli = new CliDescriptor();
             cli.CommandDescriptor = new CommandDescriptor(null, "Fizz", null);
             var code = CreateCode(cli);
+            var ouptput = new GeneratorBase().Generate(code);
         }
 
         public virtual Code CreateCode(CliDescriptor cli)

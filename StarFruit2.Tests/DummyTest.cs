@@ -54,7 +54,7 @@ namespace StarFruit2.Tests
                 CommandDescriptor = commandDescriptor,
             };
         }
-        [Fact]
+        [Fact(Skip = "Old generator")]
         public void TestGenerateOutput()
         {
             var cliDescriptor = GetCliDescriptor();

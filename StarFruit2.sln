@@ -26,9 +26,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneratorSupport", "Generat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneratorSupport.Tests", "GeneratorSupport.Tests\GeneratorSupport.Tests.csproj", "{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentDom.Tests", "..\FluentDom.Tests\FluentDom.Tests.csproj", "{DC26D3A7-24F9-4C7B-8B5D-A4BE2A8BD9E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentDom.Tests", "..\FluentDom.Tests\FluentDom.Tests.csproj", "{DC26D3A7-24F9-4C7B-8B5D-A4BE2A8BD9E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFruit.FluentDomSourceGen", "StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj", "{2605CC20-823A-499D-B64A-027AE5EF598B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit.FluentDomSourceGen", "StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj", "{2605CC20-823A-499D-B64A-027AE5EF598B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentDom", "..\FluentDom\FluentDom.csproj", "{8D03D68F-E6EB-4651-88B4-ADC9D81217E1}"
 EndProject
@@ -37,6 +37,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleLayerCli", "Samples\SingleLayerCli\SingleLayerCli.csproj", "{AEFFEE23-B095-4FE2-AD45-B430C64FA386}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwoLayerCli", "Samples\TwoLayerCli\TwoLayerCli.csproj", "{B7CBFA55-151D-4F2D-8D81-76BA1C9BB0CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFruit.FluentDomSourceGen.Tests", "StarFruit.FluentDomSourceGen.Tests\StarFruit.FluentDomSourceGen.Tests.csproj", "{4DDF7E91-6E5A-4639-B3A2-76A6C98AB692}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +98,10 @@ Global
 		{B7CBFA55-151D-4F2D-8D81-76BA1C9BB0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7CBFA55-151D-4F2D-8D81-76BA1C9BB0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7CBFA55-151D-4F2D-8D81-76BA1C9BB0CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DDF7E91-6E5A-4639-B3A2-76A6C98AB692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DDF7E91-6E5A-4639-B3A2-76A6C98AB692}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DDF7E91-6E5A-4639-B3A2-76A6C98AB692}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DDF7E91-6E5A-4639-B3A2-76A6C98AB692}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

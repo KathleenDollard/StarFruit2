@@ -22,7 +22,7 @@ namespace TestData
                 GeneratedCommandSourceClassName = generatedClassName,
                 CommandDescriptor = new CommandDescriptor(null, "MyClass", null)
                 {
-                    Name = "my-class"
+                    Name = "MyClass"
                 }
             };
 

@@ -22,7 +22,7 @@ namespace StarFruit2.Tests
         public GeneratorTests()
            => cliDescriptor = new EmptyTestData().CliDescriptor;
 
-        [Fact]
+        [Fact(Skip = "Old generator")]
         public void Include_usings_outputs_only_using()
         {
             var expected = usings;
@@ -59,7 +59,7 @@ namespace StarFruit2.Tests
         }
 
 
-        [Fact]
+        [Fact(Skip = "Old generator")]
         public void Include_commandCode_outputs_only_command_code()
         {
             var expected = commandCode;
@@ -68,11 +68,10 @@ namespace StarFruit2.Tests
             actual.Should().Be(Utils.Normalize(expected));
         }
 
-        [Fact]
+        [Fact(Skip ="Old generator")]
         public void Include_all_outputs_all()
         {
-            var expected = $@"{usings}
-{nspace}
+            var expected = $@"{nspace}
 {cls}
 {method}
 {commandCode}
