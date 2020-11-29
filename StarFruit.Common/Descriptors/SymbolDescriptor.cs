@@ -98,7 +98,7 @@ namespace StarFruit2.Common.Descriptors
             get
             {
                 ISymbolDescriptor? candidate = this;
-                while (!(candidate is null))
+                while (!(candidate.ParentSymbolDescriptorBase is null))
                 {
                     candidate = candidate.ParentSymbolDescriptorBase;
                 }

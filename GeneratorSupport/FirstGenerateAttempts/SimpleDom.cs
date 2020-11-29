@@ -149,7 +149,7 @@
 //        public List<Expression> SetterStatements { get; } = new List<Expression>();
 //    }
 
-//    public class LocalDeclaration : Expression
+//    public class LocalDeclaration : IExpression
 //    {
 //        public string Name { get; init; }
 
@@ -170,7 +170,7 @@
 //        public Expression? Value { get; init; }
 //    }
 
-//    public class MethodCall : Expression
+//    public class MethodCall : IExpression
 //    {
 //        public MethodCall(string name)
 //        {
@@ -190,7 +190,7 @@
 //        public List<Expression> Arguments { get; } = new List<Expression>();
 //    }
 
-//    public class NewObject : Expression
+//    public class NewObject : IExpression
 //    {
 //        public NewObject(TypeRep typeRepresentation, params string[] arguments)
 //        {
@@ -201,7 +201,7 @@
 //        public List<string> Arguments { get; } = new List<string>();
 //    }
 
-//    public class Assignment : Expression
+//    public class Assignment : IExpression
 //    {
 //        public string Name { get; init; }
 
@@ -223,7 +223,7 @@
 //        public BaseOrThis BaseOrThis { get; }
 //    }
 
-//    public class Direct : Expression
+//    public class Direct : IExpression
 //    {
 //        public Direct(string value)
 //        {
@@ -233,12 +233,12 @@
 //        public string Value { get; }
 //    }
 
-//    public class This : Expression
+//    public class This : IExpression
 //    { }
-//    public class Base : Expression
+//    public class Base : IExpression
 //    { }
 
-//    public class Return : Expression
+//    public class Return : IExpression
 //    {
 //        public Expression Value { get; init; }
 
@@ -252,7 +252,7 @@
 //            Value = new Direct(value);
 //        }
 
-//        public class MultilineLambda : Expression
+//        public class MultilineLambda : IExpression
 //        {
 //            public MultilineLambda(List<string> arguments, params Expression[] statements)
 //            {

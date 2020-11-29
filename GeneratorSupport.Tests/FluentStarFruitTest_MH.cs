@@ -297,7 +297,7 @@
 
 //    }
 
-//    public class MultilineLambda : Expression
+//    public class MultilineLambda : IExpression
 //    {
 
 //        public MultilineLambda()
