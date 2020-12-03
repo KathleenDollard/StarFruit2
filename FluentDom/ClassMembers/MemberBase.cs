@@ -8,6 +8,7 @@ namespace FluentDom
 {
     public enum MemberModifiers
     {
+        None=0,
         Static = 0b_0000_0001,
         Partial = 0b_0000_0010,
         Sealed = 0b_0000_0100,
@@ -18,9 +19,14 @@ namespace FluentDom
         Async = 0b_0001_0000,
     }
 
-    public abstract class MemberBase : IClassMember 
+    public abstract class MemberBase : IClassMember
     {
-        public Scope Scope { get; init; }
-        public MemberModifiers Modifiers { get; init; }
+        protected MemberBase(Scope scope, MemberModifiers modifiers)
+        {
+            Scope = scope;
+            Modifiers = modifiers;
+        }
+        public Scope Scope { get; }
+        public MemberModifiers Modifiers { get; }
     }
 }

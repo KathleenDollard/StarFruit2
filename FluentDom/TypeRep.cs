@@ -74,11 +74,11 @@ namespace FluentDom
         {
             var pos = name.IndexOf("`");
             return pos > 0 
-                ? name[..pos] 
+                ? name.Substring(0, pos)
                 : name;
         }
 
-        public string Name { get; init; }
+        public string Name { get;  }
         public bool IsImplicit { get; set; }
 
         private TypeRep(bool isImplicit)

@@ -223,9 +223,9 @@ namespace StarFruit2
                     return strCollection;
             }
 
-            // JEAN: What are we doing here?
-            strCollection.AddRange(rightHandArr[1..^1]);
-            strCollection.Add(rightHandArr[^1]);
+            //// JEAN: What are we doing here?
+            //strCollection.AddRange(rightHandArr[1..^1]);
+            //strCollection.Add(rightHandArr[^1]);
 
             return strCollection;
         }
@@ -284,8 +284,8 @@ namespace StarFruit2
                     return strCollection.EndStatement();
             }
 
-            strCollection.AddRange(returnValueArr[1..^1]);
-            strCollection.Add(returnValueArr[^1]);
+            //strCollection.AddRange(returnValueArr[1..^1]);
+            //strCollection.Add(returnValueArr[^1]);
 
             return strCollection.EndStatement();
         }

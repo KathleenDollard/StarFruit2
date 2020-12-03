@@ -11,10 +11,10 @@ namespace FluentDom
         private PropertySetter setterStatements = new();
         private PropertyGetter getterStatements = new();
 
-        public Property(string name, TypeRep typeRep, Scope scope = Scope.Public, bool readOnly = false)
+        public Property(string name, TypeRep typeRep, Scope scope = Scope.Public, bool readOnly = false, MemberModifiers modifiers = MemberModifiers.None)
+            :base(scope, modifiers)
         {
             Name = name;
-            Scope = scope;
             ReadOnly = readOnly;
             TypeRep = typeRep;
         }
@@ -23,8 +23,8 @@ namespace FluentDom
             : this(name,  new TypeRep(typeName), scope, readOnly)
         { }
 
-        public string Name { get; init; }
-        public TypeRep TypeRep { get; init; }
+        public string Name { get;  }
+        public TypeRep TypeRep { get;  }
         public PropertyGetter GetterStatementStore
             => getterStatements;
         public PropertySetter SetterStatementStore

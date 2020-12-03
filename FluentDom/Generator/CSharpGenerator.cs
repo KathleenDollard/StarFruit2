@@ -68,7 +68,7 @@ namespace FluentDom.Generator
         protected internal override GeneratorBase CloseNamespace(Code code)
                 => CloseCurly();
 
-        protected internal override CSharpGenerator OpenClass(Class cls)
+        protected internal override GeneratorBase OpenClass(Class cls)
         {
             OutputLine(ClassDeclaration(cls));
             OpenCurly();

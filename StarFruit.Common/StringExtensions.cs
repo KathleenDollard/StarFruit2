@@ -9,7 +9,7 @@ namespace StarFruit.Common
         public static string AfterLast(this string input, string afterString)
         {
             var pos = input.LastIndexOf(afterString);
-            return input[(pos + 1)..];
+            return input.Substring(pos + 1);
         }
     }
 }

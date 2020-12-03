@@ -9,11 +9,10 @@ namespace FluentDom
     public class Constructor : MethodBase<Constructor>
     {
 
-        public Constructor(TypeRep containingType, Scope scope = Scope.Public)
-           :  base()
+        public Constructor(TypeRep containingType, Scope scope = Scope.Public, MemberModifiers modifiers = MemberModifiers.None )
+           :  base(scope, modifiers)
         {
             ContainingType = containingType;
-            Scope = scope;
         }
 
         public TypeRep ContainingType { get; }

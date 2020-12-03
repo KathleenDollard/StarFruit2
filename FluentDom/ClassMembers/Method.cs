@@ -9,12 +9,12 @@ namespace FluentDom
     public class Method : MethodBaseWithReturn <Method>
     {
 
-        public string Name { get; init; }
+        public string Name { get; }
  
         public Method(string name, Scope scope = Scope.Public)
+            : base(scope)
         {
             Name = name;
-            Scope = scope;
         }
     }
 }

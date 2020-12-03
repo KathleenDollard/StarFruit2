@@ -45,7 +45,7 @@ namespace FluentDom
 
         public StringBuilderWithTabs AppendJoin(string separator, params string[] values)
         {
-            sb.AppendJoin(separator, values);
+            sb.Append(string.Join(separator, values));
             return this;
         }
 

@@ -9,6 +9,10 @@ namespace FluentDom
     {
         private List<IExpression> statements = new List<IExpression>();
 
+        public StatementContainer(Scope scope = Scope.Public, MemberModifiers modifiers = MemberModifiers.None)
+           : base(scope, modifiers)
+        { }
+
         public IEnumerable<IExpression> StatementStore
         => statements;
 
@@ -56,7 +60,7 @@ namespace FluentDom
             return (T)this;
         }
 
-        public T OptionalStatements(bool condition, params  Func<IExpression>[] expressionMakers)
+        public T OptionalStatements(bool condition, params Func<IExpression>[] expressionMakers)
         {
             if (condition)
             {
@@ -95,6 +99,10 @@ namespace FluentDom
     public abstract class MethodBase<T> : StatementContainer<T>
         where T : MethodBase<T>
     {
+        protected MethodBase(Scope scope = Scope.Public, MemberModifiers modifiers = MemberModifiers.None)
+            : base(scope, modifiers)
+        { }
+
         public ParameterStore ParameterStore { get; } = new ParameterStore();
 
         public T Parameter(string name, TypeRep type)
@@ -119,6 +127,9 @@ namespace FluentDom
     public abstract class MethodBaseWithReturn<T> : MethodBase<T>
         where T : MethodBaseWithReturn<T>
     {
+        public MethodBaseWithReturn(Scope scope, MemberModifiers modifiers = MemberModifiers.None)
+            : base(scope, modifiers)
+        { }
 
         public Return? ReturnStore { get; private set; }
         public TypeRep? ReturnTypeStore { get; private set; }

@@ -4,6 +4,10 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20478.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)/System.Diagnostics.CodeAnalysis.cs" />
+  </ItemGroup>
+
   <!--<ItemGroup>
     <Reference Include="System.CommandLine">-->
       <!--<HintPath>..\..\artifacts\System.CommandLine\System.CommandLine.dll</HintPath>-->

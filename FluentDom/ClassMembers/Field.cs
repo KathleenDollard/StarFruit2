@@ -8,10 +8,10 @@ namespace FluentDom
 {
   public  class Field : MemberBase
     {
-        public Field(string name, TypeRep typeRep, Scope scope = Scope.Public, bool readOnly = false)
+        public Field(string name, TypeRep typeRep, Scope scope = Scope.Public, bool readOnly = false, MemberModifiers modifiers = MemberModifiers.None)
+            :base(scope,modifiers)
         {
             Name = name;
-            Scope = scope;
             ReadOnly = readOnly;
             TypeRep = typeRep;
         }
@@ -20,9 +20,9 @@ namespace FluentDom
             : this(name, new TypeRep(typeName), scope, readOnly)
         { }
 
-        public string Name { get; init; }
-        public TypeRep TypeRep { get; init; }
-        public bool ReadOnly { get; internal set; }
+        public string Name { get; }
+        public TypeRep TypeRep { get;  }
+        public bool ReadOnly { get;  }
 
     }
 }
