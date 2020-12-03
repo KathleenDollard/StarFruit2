@@ -8,8 +8,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Tests.Utility;
+using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using System.CommandLine;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace StarFruit.FluentDomSourceGen.Tests
@@ -208,7 +211,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 
 
         [Fact]
-        public void Compiled_command_has_expect_values()
+        public async System.Threading.Tasks.Task Compiled_command_has_expect_valuesAsync()
         {
             var descriptor = new CliDescriptor();
             descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null);
@@ -237,20 +240,21 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 }}
 ";
 
-                                var dom = new GenerateCommandSource().CreateCode(descriptor);
-                                var actual = new CSharpGenerator().Generate(dom);
+            var dom = new GenerateCommandSource().CreateCode(descriptor);
+            var actual = new CSharpGenerator().Generate(dom);
 
-                                var syntaxTree = CSharpSyntaxTree.ParseText(actual);
-                                var compilation = syntaxTree.GetStarFruitCompilation();
-                                var compileDiagnostics = compilation.GetDiagnostics();
-                                compileDiagnostics.Should().BeEmpty();
+            //var syntaxTree = CSharpSyntaxTree.ParseText(actual);
+            //var compilation = syntaxTree.GetStarFruitCompilation();
+            //var compileDiagnostics = compilation.GetDiagnostics();
+            //compileDiagnostics.Should().BeEmpty();
 
 
-            //using var kernel = new CSharpKernel();
+            using var kernel = new CSharpKernel();
+            await SetupKernel(kernel);
 
-            //var result = await kernel.SubmitCodeAsync(actual);
-            // While assert in arrange is unusual, if this goes bad, the test is toast. 
-            //// result.KernelEvents.ToSubscribedList().Should().NotContainErrors();
+            var result = await kernel.SubmitCodeAsync(actual);
+           // While assert in arrange is unusual, if this goes bad, the test is toast.
+            result.KernelEvents.ToSubscribedList().Should().NotContainErrors();
 
             //// act
             //var resultWithInstance = await kernel.SubmitCodeAsync($"new {className}().{methodName}()");
@@ -262,6 +266,18 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
             //var cmd = foo as Command;
             //cmd.Name.Should().Be("my-class");
 
+        }
+
+        private async Task SetupKernel(CSharpKernel kernel)
+        {
+            var code = $@"
+#r ""{typeof(RequiredAttribute).Assembly.Location}""
+#r ""{typeof(CommandSource).Assembly.Location}""
+#r ""{typeof(Command).Assembly.Location}""
+#r ""{typeof(object).Assembly.Location}""
+";
+
+            await kernel.SubmitCodeAsync(code);
         }
     }
 }
