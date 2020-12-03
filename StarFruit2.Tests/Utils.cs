@@ -20,8 +20,6 @@ namespace StarFruit2.Tests
     {
         private const string testNamespace = "StarFruit2.Tests";
 
-        // From StackOverflow user11523568 with modification
-        // This is a bit of a hack. 
         internal static string Normalize(string value)
         {
             if (value is null)

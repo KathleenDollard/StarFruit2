@@ -40,6 +40,7 @@ namespace StarFruit2.Common.Descriptors
             ParentSymbolDescriptorBase = parentSymbolDescriptorBase;
             Raw = raw;
             OriginalName = originalName;
+            Name = originalName;
             SymbolType = symbolType;
         }
 

@@ -39,7 +39,7 @@ namespace GeneratorSupport
                     .Usings(usings)
                     .Class(CommandClass(cmd, new TypeRep("RootCommandSource", cmd.OriginalName), null))
                     .Classes(new CommandDescriptor[] { cli.CommandDescriptor },
-                             c => SubCommands(c));
+                             c => SubCommandClasses(c));
         }
 
         protected virtual Class CommandClass(CommandDescriptor cmd,
@@ -61,7 +61,7 @@ namespace GeneratorSupport
    
         protected virtual Constructor GetRootCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
             => new Constructor(cmd.CommandSourceClassName())
-                .BaseCall(NewObject("Command", Value(cmd.CliName)))
+                .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)))
                 .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
                 .Statements(cmd.SubCommands, CtorSubCommands())
                 .Statements(Assign("CommandHandler", MethodCall("CommandHandler.Create",
@@ -74,7 +74,7 @@ namespace GeneratorSupport
 
         protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
             => new Constructor(cmd.CommandSourceClassName())
-                .BaseCall(NewObject("Command", Value(cmd.CliName)))
+                .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)))
                 .Statements(Assign(Dot(This(), "parent"), "parent"))
                 .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
                 .Statements(cmd.SubCommands, CtorSubCommands())
@@ -94,7 +94,7 @@ namespace GeneratorSupport
         protected virtual Func<SymbolDescriptor, IExpression>[] CtorSubCommands()
             => new List<Func<SymbolDescriptor, IExpression>>
             {
-                o => Assign(o.OriginalName, NewObject($"Get{o.OriginalName}CommandSource", This(), This())),
+                o => Assign(o.OriginalName, NewObject($"{o.OriginalName}CommandSource", This(), This())),
                 o => MethodCall($"Command.AddCommand", o.OriginalName)
             }.ToArray();
 
@@ -119,85 +119,6 @@ namespace GeneratorSupport
             };
         }
 
-        protected virtual IEnumerable<Class> SubCommands(CommandDescriptor cmd)
-        {
-            List<Class> list = new();
-            //CommandClass(c, new TypeRep(cmd.Root.CommandSourceClassName());
-            foreach (var subCommand in cmd.SubCommands)
-            {
-                list.Add(CommandClass(subCommand, cmd.CommandSourceClassName(), cmd.ParentSymbolDescriptorBase as CommandDescriptor));
-                if (subCommand.SubCommands.Any())
-                {
-                    list.AddRange(SubCommands(subCommand));
-                }
-            }
-            return list;
-        }
-
-        private Class CommandSourceResultMethod(Class cls, CommandDescriptor cmd)
-            => cls.Method(new Method("GetCommandSourceResult")
-                          .ReturnType("CommandSourceResult")
-                          .Parameter("parseResult", "ParseResult")
-                          .Parameter("int", "exitCode")
-                          .Return(NewObject(cmd.CommandSourceClassName(),
-                                              VariableReference("parseResult"),
-                                              This(),
-                                              VariableReference("exitCode")))
-                                );
-        //protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
-        //{
-        //    var isRoot = parent is null;
-        //    Constructor newCtor = new Constructor(cmd.CommandSourceClassName())
-        //        .BaseCall(NewObject("Command", Value(cmd.CliName)))
-        //        .OptionalStatements(!isRoot,
-        //                             () => Assign(Dot(This(), "parent"), "parent"))
-        //        .Statements(cmd.GetOptionsAndArgs(),
-        //                    o => Assign(o.OriginalName, MethodCall(GetOptArgMethodName(o.OriginalName))),
-        //                    o => MethodCall($"Command.Add", o.OriginalName))
-        //        .Statements(cmd.SubCommands,
-        //                    o => Assign(o.OriginalName, NewObject("$Get{o.OriginalName}CommandSource", This(), This())),
-        //                    o => MethodCall($"Command.AddCommand", o.OriginalName))
-        //        .Statements(Assign("CommandHandler", MethodCall("CommandHandler.Create", CreateLambda(isRoot))));
-        //    if (!isRoot)
-        //    {
-        //        newCtor.Parameter("root", $"{cmd.Root.OriginalName}CommandSource");
-        //        newCtor.Parameter("parent", $"{cmd.ParentSymbolDescriptorBase.OriginalName}CommandSource");
-        //    }
-        //    return newCtor;
-
-        //    static IExpression CreateLambda(bool isRoot)
-        //    {
-        //        if (isRoot)
-        //        {
-        //            return Expression.MultilineLambda()
-        //                .Parameter("context", "InvocationContext")
-        //                .Statements(
-        //                    Assign("CurrentCommandSource", This()),
-        //                    Assign("CurrentParseResult", "context.ParseResult"))
-        //                .Return("0");
-        //        }
-        //        return Expression.MultilineLambda()
-        //            .Statements(
-        //                Assign(Dot("root", "CurrentCommandSource"), This()))
-        //            .Return("0");
-        //    }
-        //}
-
-        protected virtual string GetOptArgMethodName(string name)
-        {
-            return $"Get{name}";
-        }
-
-        private static TypeRep ArgumentType(ArgumentDescriptor a)
-        {
-            return new TypeRep("Argument", a.GetFluentArgumentType());
-        }
-
-        private static TypeRep OptionType(OptionDescriptor o)
-        {
-            return new TypeRep("Option", o.GetFluentArgumentType());
-        }
-
         protected virtual Method GetArgumentMethod(ArgumentDescriptor o)
         {
             var method = new Method(GetOptArgMethodName(o.OriginalName))
@@ -210,7 +131,7 @@ namespace GeneratorSupport
                  .OptionalStatements(
                       o.DefaultValue is not null,
                       () => MethodCall("optionArg.SetDefaultValue", Value(o.DefaultValue.DefaultValue)))
-                 .Return("argument");
+                 .Statements(Return(VariableReference("argument")));
 
             return method;
         }
@@ -230,9 +151,50 @@ namespace GeneratorSupport
                  .Statements(
                       o.Aliases,
                       alias => MethodCall("option.AddAlias", Value($"-{alias}")))
-                 .Return("option");
+                 .Statements(Return(VariableReference("option")));
 
             return method;
+        }
+
+        protected virtual IEnumerable<Class> SubCommandClasses(CommandDescriptor cmd)
+        {
+            List<Class> list = new();
+            //CommandClass(c, new TypeRep(cmd.Root.CommandSourceClassName());
+            foreach (var subCommand in cmd.SubCommands)
+            {
+                list.Add(CommandClass(subCommand, cmd.CommandSourceClassName(), subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
+                if (subCommand.SubCommands.Any())
+                {
+                    list.AddRange(SubCommandClasses(subCommand));
+                }
+            }
+            return list;
+        }
+
+        private Class CommandSourceResultMethod(Class cls, CommandDescriptor cmd)
+            => cls.Method(new Method("GetCommandSourceResult")
+                          .ReturnType("CommandSourceResult")
+                          .Parameter("parseResult", "ParseResult")
+                          .Parameter("int", "exitCode")
+                          .Statements(Return(NewObject(cmd.CommandSourceClassName(),
+                                              VariableReference("parseResult"),
+                                              This(),
+                                              VariableReference("exitCode"))))
+                                );
+
+        protected virtual string GetOptArgMethodName(string name)
+        {
+            return $"Get{name}";
+        }
+
+        private static TypeRep ArgumentType(ArgumentDescriptor a)
+        {
+            return new TypeRep("Argument", a.GetFluentArgumentType());
+        }
+
+        private static TypeRep OptionType(OptionDescriptor o)
+        {
+            return new TypeRep("Option", o.GetFluentArgumentType());
         }
     }
 

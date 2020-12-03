@@ -1,6 +1,11 @@
-﻿using FluentAssertions;
+﻿using ApprovalTests;
+using ApprovalTests.Reporters;
+using FluentAssertions;
 using FluentDom.Generator;
 using GeneratorSupport;
+using Microsoft.DotNet.Interactive;
+using Microsoft.DotNet.Interactive.CSharp;
+using Microsoft.DotNet.Interactive.Tests.Utility;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
 using System;
@@ -10,42 +15,41 @@ namespace StarFruit.FluentDomSourceGen.Tests
 {
     public class CommandSourceGenTests
     {
+        [UseReporter(typeof(VisualStudioReporter))]
         [Fact]
         public void Simple_command()
         {
             var descriptor = new CliDescriptor();
             descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null);
+            descriptor.CommandDescriptor.CliName = "my-command";
             var expected = $@"using StarFruit2;
 using System.CommandLine;
 using StarFruit2.Common;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
+public class MyCommandCommandSource : RootCommandSource<MyCommand>
 {{
-   public class MyCommandCommandSource()
-   : base(new Command(null))
+   public MyCommandCommandSource()
+   : base(new Command(""my-command"", null))
    {{
       CommandHandler = CommandHandler.Create((InvocationContext context) =>
              {{  
                 CurrentCommandSource = this;
                 CurrentParseResult = context.ParseResult;
+                return 0;
              }});
    }}
 
 
-
 }}
 ";
-            expected = Utils.NormalizeLineEndings(expected);
 
-            var template = new GenerateCommandSource();
-            var code = template.CreateCode(descriptor);
-            var generator = new CSharpGenerator();
-            var actual = generator.Generate(code);
-            actual = Utils.NormalizeLineEndings(actual);
+            var dom = new GenerateCommandSource().CreateCode(descriptor);
+            var actual = new CSharpGenerator().Generate(dom);
 
-            actual.Should().Be(expected);
+            //Approvals.Verify(actual);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -53,17 +57,60 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         {
             var descriptor = new CliDescriptor();
             descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null);
-            descriptor.CommandDescriptor.SubCommands.Add(new CommandDescriptor(descriptor.CommandDescriptor,"SubCommand",null));
-            var expected = $@"";
-            expected = Utils.NormalizeLineEndings(expected);
+            descriptor.CommandDescriptor.CliName = "my-command";
+            descriptor.CommandDescriptor.Name = "MyCommand";
+            descriptor.CommandDescriptor.SubCommands.Add(new CommandDescriptor(descriptor.CommandDescriptor, "SubCommand", null));
+            var expected = $@"using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 
-            var template = new GenerateCommandSource();
-            var code = template.CreateCode(descriptor);
-            var generator = new CSharpGenerator();
-            var actual = generator.Generate(code);
-            actual = Utils.NormalizeLineEndings(actual);
+public class MyCommandCommandSource : RootCommandSource<MyCommand>
+{{
+   public MyCommandCommandSource()
+   : base(new Command(""my-command"", null))
+   {{
+       SubCommand = new SubCommandCommandSource(this, this);
+       Command.AddCommand(SubCommand);
+       CommandHandler = CommandHandler.Create((InvocationContext context) =>
+              {{
+                  CurrentCommandSource = this;
+                  CurrentParseResult = context.ParseResult;
+                  return 0;
+              }});
+   }}
 
-            actual.Should().Be(expected);
+   public SubCommandCommandSource SubCommand {{ get; set; }}
+}}
+
+public class SubCommandCommandSource : MyCommandCommandSource
+{{
+    public SubCommandCommandSource()
+    : base(new Command(null, null))
+    {{
+        this.parent = parent;
+        CommandHandler = CommandHandler.Create(() =>
+        {{
+            CurrentCommandSource = this;
+            return 0;
+        }});
+    }}
+
+    public MyCommandCommandSource parent;
+    public CommandSourceResult GetCommandSourceResult(ParseResult parseResult, exitCode int)
+    {{
+        return new SubCommandCommandSource(parseResult, this, exitCode);
+    }}
+
+
+}}
+    ";
+
+            var dom = new GenerateCommandSource().CreateCode(descriptor);
+            var actual = new CSharpGenerator().Generate(dom);
+
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -71,17 +118,17 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         {
             var descriptor = new CliDescriptor();
             descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null);
-            descriptor.CommandDescriptor.Options.Add(new OptionDescriptor (descriptor.CommandDescriptor, "Option1", null));
+            descriptor.CommandDescriptor.Options.Add(new OptionDescriptor(descriptor.CommandDescriptor, "Option1", null));
             var expected = $@"using StarFruit2;
 using System.CommandLine;
 using StarFruit2.Common;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
+public class MyCommandCommandSource : RootCommandSource<MyCommand>
 {{
-   public class MyCommandCommandSource()
-   : base(new Command(null))
+   public MyCommandCommandSource()
+   : base(new Command(null, null))
    {{
       Option1 = GetOption1();
       Command.Add(Option1);
@@ -89,6 +136,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
              {{  
                 CurrentCommandSource = this;
                 CurrentParseResult = context.ParseResult;
+                return 0;
              }});
    }}
 
@@ -100,18 +148,15 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
       option.Description = null;
       option.IsRequired = false;
       option.IsHidden = false;
+      return option;
    }}
 }}
 ";
-            expected = Utils.NormalizeLineEndings(expected);
 
-            var template = new GenerateCommandSource();
-            var code = template.CreateCode(descriptor);
-            var generator = new CSharpGenerator();
-            var actual = generator.Generate(code);
-            actual = Utils.NormalizeLineEndings(actual);
+            var dom = new GenerateCommandSource().CreateCode(descriptor);
+            var actual = new CSharpGenerator().Generate(dom);
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -119,17 +164,17 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         {
             var descriptor = new CliDescriptor();
             descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null);
-            descriptor.CommandDescriptor.Arguments .Add(new ArgumentDescriptor (new ArgTypeInfoRoslyn(typeof(string)),descriptor.CommandDescriptor, "Argument1", null));
+            descriptor.CommandDescriptor.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), descriptor.CommandDescriptor, "Argument1", null));
             var expected = $@"using StarFruit2;
 using System.CommandLine;
 using StarFruit2.Common;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
+public class MyCommandCommandSource : RootCommandSource<MyCommand>
 {{
-   public class MyCommandCommandSource()
-   : base(new Command(null))
+   public MyCommandCommandSource()
+   : base(new Command(null, null))
    {{
       Argument1 = GetArgument1();
       Command.Add(Argument1);
@@ -137,6 +182,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
              {{  
                 CurrentCommandSource = this;
                 CurrentParseResult = context.ParseResult;
+                return 0;
              }});
    }}
 
@@ -148,18 +194,66 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
       argument.Description = null;
       argument.IsRequired = false;
       argument.IsHidden = false;
+      return argument;
    }}
 }}
 ";
-            expected = Utils.NormalizeLineEndings(expected);
 
-            var template = new GenerateCommandSource();
-            var code = template.CreateCode(descriptor);
-            var generator = new CSharpGenerator();
-            var actual = generator.Generate(code);
-            actual = Utils.NormalizeLineEndings(actual);
+            var dom = new GenerateCommandSource().CreateCode(descriptor);
+            var actual = new CSharpGenerator().Generate(dom);
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
+        }
+
+
+       [Fact]
+        public async void Compiled_command_has_expect_values()
+        {
+            var descriptor = new CliDescriptor();
+            descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null);
+            descriptor.CommandDescriptor.CliName = "my-command";
+            var expected = $@"using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+
+public class MyCommandCommandSource : RootCommandSource<MyCommand>
+{{
+   public MyCommandCommandSource()
+   : base(new Command(""my-command"", null))
+   {{
+      CommandHandler = CommandHandler.Create((InvocationContext context) =>
+             {{  
+                CurrentCommandSource = this;
+                CurrentParseResult = context.ParseResult;
+                return 0;
+             }});
+   }}
+
+
+}}
+";
+
+            var dom = new GenerateCommandSource().CreateCode(descriptor);
+            var actual = new CSharpGenerator().Generate(dom);
+
+            using var kernel = new CSharpKernel();
+
+            var result = await kernel.SubmitCodeAsync(actual);
+            // While assert in arrange is unusual, if this goes bad, the test is toast. 
+            result.KernelEvents.ToSubscribedList().Should().NotContainErrors();
+
+            //// act
+            //var resultWithInstance = await kernel.SubmitCodeAsync($"new {className}().{methodName}()");
+            //resultWithInstance.KernelEvents.ToSubscribedList().Should().NotContainErrors();
+
+            //// assert
+            //var returnValue = await resultWithInstance.KernelEvents.OfType<ReturnValueProduced>().SingleAsync();
+            //var foo = returnValue.Value;
+            //var cmd = foo as Command;
+            //cmd.Name.Should().Be("my-class");
+
         }
     }
 }
