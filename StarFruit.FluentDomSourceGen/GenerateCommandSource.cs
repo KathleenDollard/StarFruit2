@@ -37,7 +37,7 @@ namespace GeneratorSupport
 
             return Code.Create(cli.GeneratedComandSourceNamespace)
                     .Usings(usings)
-                    .Class(CommandClass(cmd, new TypeRep("RootCommandSource", cmd.OriginalName), null))
+                    .Class(CommandClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
                     .Classes(new CommandDescriptor[] { cli.CommandDescriptor },
                              c => SubCommandClasses(c));
         }
@@ -64,7 +64,7 @@ namespace GeneratorSupport
                 .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)))
                 .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
                 .Statements(cmd.SubCommands, CtorSubCommands())
-                .Statements(Assign("CommandHandler", MethodCall("CommandHandler.Create",
+                .Statements(Assign("Command.Handler", MethodCall("CommandHandler.Create",
                         MultilineLambda()
                                 .Parameter("context", "InvocationContext")
                                 .Statements(
@@ -78,7 +78,7 @@ namespace GeneratorSupport
                 .Statements(Assign(Dot(This(), "parent"), "parent"))
                 .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
                 .Statements(cmd.SubCommands, CtorSubCommands())
-                .Statements(Assign("CommandHandler", MethodCall("CommandHandler.Create",
+                .Statements(Assign("Command.Handler", MethodCall("CommandHandler.Create",
                         MultilineLambda()
                                 .Statements(
                                      Assign("CurrentCommandSource", This()),
@@ -196,15 +196,6 @@ namespace GeneratorSupport
         {
             return new TypeRep("Option", o.GetFluentArgumentType());
         }
-    }
-
-    public static class GenerateCommandSourceExtensions
-    {
-        internal static Constructor CommandHandler(this Constructor ctor, MultilineLambda lambda)
-        {
-            return ctor.Statements(Assign("CommandHandler", MethodCall("CommandHandler.Create", lambda)));
-        }
-
     }
 }
 

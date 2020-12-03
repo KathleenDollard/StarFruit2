@@ -3,6 +3,8 @@ using ApprovalTests.Reporters;
 using FluentAssertions;
 using FluentDom.Generator;
 using GeneratorSupport;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Tests.Utility;
@@ -27,12 +29,12 @@ using StarFruit2.Common;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommand>
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {{
    public MyCommandCommandSource()
    : base(new Command(""my-command"", null))
    {{
-      CommandHandler = CommandHandler.Create((InvocationContext context) =>
+      Command.Handler = CommandHandler.Create((InvocationContext context) =>
              {{  
                 CurrentCommandSource = this;
                 CurrentParseResult = context.ParseResult;
@@ -65,14 +67,14 @@ using StarFruit2.Common;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommand>
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {{
    public MyCommandCommandSource()
    : base(new Command(""my-command"", null))
    {{
        SubCommand = new SubCommandCommandSource(this, this);
        Command.AddCommand(SubCommand);
-       CommandHandler = CommandHandler.Create((InvocationContext context) =>
+       Command.Handler = CommandHandler.Create((InvocationContext context) =>
               {{
                   CurrentCommandSource = this;
                   CurrentParseResult = context.ParseResult;
@@ -89,7 +91,7 @@ public class SubCommandCommandSource : MyCommandCommandSource
     : base(new Command(null, null))
     {{
         this.parent = parent;
-        CommandHandler = CommandHandler.Create(() =>
+        Command.Handler = CommandHandler.Create(() =>
         {{
             CurrentCommandSource = this;
             return 0;
@@ -124,14 +126,14 @@ using StarFruit2.Common;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommand>
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {{
    public MyCommandCommandSource()
    : base(new Command(null, null))
    {{
       Option1 = GetOption1();
       Command.Add(Option1);
-      CommandHandler = CommandHandler.Create((InvocationContext context) =>
+      Command.Handler = CommandHandler.Create((InvocationContext context) =>
              {{  
                 CurrentCommandSource = this;
                 CurrentParseResult = context.ParseResult;
@@ -170,14 +172,14 @@ using StarFruit2.Common;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommand>
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {{
    public MyCommandCommandSource()
    : base(new Command(null, null))
    {{
       Argument1 = GetArgument1();
       Command.Add(Argument1);
-      CommandHandler = CommandHandler.Create((InvocationContext context) =>
+      Command.Handler = CommandHandler.Create((InvocationContext context) =>
              {{  
                 CurrentCommandSource = this;
                 CurrentParseResult = context.ParseResult;
@@ -205,8 +207,8 @@ public class MyCommandCommandSource : RootCommandSource<MyCommand>
         }
 
 
-       [Fact]
-        public async void Compiled_command_has_expect_values()
+        [Fact]
+        public void Compiled_command_has_expect_values()
         {
             var descriptor = new CliDescriptor();
             descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null);
@@ -214,15 +216,16 @@ public class MyCommandCommandSource : RootCommandSource<MyCommand>
             var expected = $@"using StarFruit2;
 using System.CommandLine;
 using StarFruit2.Common;
+using StarFruit2;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
-public class MyCommandCommandSource : RootCommandSource<MyCommand>
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {{
    public MyCommandCommandSource()
    : base(new Command(""my-command"", null))
    {{
-      CommandHandler = CommandHandler.Create((InvocationContext context) =>
+      Command.Handler = CommandHandler.Create((InvocationContext context) =>
              {{  
                 CurrentCommandSource = this;
                 CurrentParseResult = context.ParseResult;
@@ -234,14 +237,20 @@ public class MyCommandCommandSource : RootCommandSource<MyCommand>
 }}
 ";
 
-            var dom = new GenerateCommandSource().CreateCode(descriptor);
-            var actual = new CSharpGenerator().Generate(dom);
+                                var dom = new GenerateCommandSource().CreateCode(descriptor);
+                                var actual = new CSharpGenerator().Generate(dom);
 
-            using var kernel = new CSharpKernel();
+                                var syntaxTree = CSharpSyntaxTree.ParseText(actual);
+                                var compilation = syntaxTree.GetStarFruitCompilation();
+                                var compileDiagnostics = compilation.GetDiagnostics();
+                                compileDiagnostics.Should().BeEmpty();
 
-            var result = await kernel.SubmitCodeAsync(actual);
+
+            //using var kernel = new CSharpKernel();
+
+            //var result = await kernel.SubmitCodeAsync(actual);
             // While assert in arrange is unusual, if this goes bad, the test is toast. 
-            result.KernelEvents.ToSubscribedList().Should().NotContainErrors();
+            //// result.KernelEvents.ToSubscribedList().Should().NotContainErrors();
 
             //// act
             //var resultWithInstance = await kernel.SubmitCodeAsync($"new {className}().{methodName}()");
