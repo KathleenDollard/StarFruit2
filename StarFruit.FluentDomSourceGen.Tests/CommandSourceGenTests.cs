@@ -8,7 +8,6 @@ using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Tests.Utility;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
-using System;
 using Xunit;
 
 namespace StarFruit.FluentDomSourceGen.Tests
@@ -48,7 +47,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommand>
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
 
-            //Approvals.Verify(actual);
+            Approvals.Verify(actual);
             actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 

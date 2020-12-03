@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+     <ProjectReference Include="..\FluentDom\FluentDom.csproj" />
      <ProjectReference Include="..\StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj" />
   </ItemGroup>
 

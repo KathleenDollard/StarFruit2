@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\FluentDom\FluentDom.csproj" />
+    <ProjectReference Include="..\FluentDom\FluentDom.csproj" />
     <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
     <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
   </ItemGroup>

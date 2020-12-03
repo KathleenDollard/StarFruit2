@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+// Single reponsibility: Writing to a wrapped string builder
+// Knows nothing about:
+// * FluentDom structures like Class or Statement
+// * Language like C# or VB
+// * Problem space like StarFruit
+
+namespace FluentDom
+{
+    public class StringBuilderWithTabs
+    {
+        private readonly StringBuilder sb = new();
+        private int tabs = 0;
+        private int tabWidth = 3;
+
+        public StringBuilderWithTabs AppendLine()
+        {
+            sb.AppendLine();
+            return this;
+        }
+
+        public StringBuilderWithTabs AppendLine(string line)
+        {
+            sb.Append(new string(' ', tabs * tabWidth));
+            sb.AppendLine(line);
+            return this;
+        }
+
+        internal void AppendBlankLine()
+        {
+            sb.AppendLine();
+        }
+
+
+        public StringBuilderWithTabs Append(string part)
+        {
+            sb.Append(part);
+            return this;
+        }
+
+        public StringBuilderWithTabs AppendJoin(string separator, params string[] values)
+        {
+            sb.AppendJoin(separator, values);
+            return this;
+        }
+
+        // Stack of integers
+        public StringBuilderWithTabs IncreaseTabs(int extraTabs = 0)
+        {
+            tabs += 1 + extraTabs;
+            return this;
+        }
+
+        public StringBuilderWithTabs DecreaseTabs(int extraTabs = 0)
+        {
+            tabs -= 1 - extraTabs;
+            return this;
+        }
+
+        public override string ToString()
+        {
+            return sb.ToString();
+        }
+    }
+}
