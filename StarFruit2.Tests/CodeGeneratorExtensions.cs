@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace StarFruit2.Generator
+namespace StarFruit2.Tests
 {
     public static class CodeGeneratorExtensions
     {

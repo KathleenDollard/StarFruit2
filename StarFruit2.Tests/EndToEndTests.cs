@@ -1,15 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.IO;
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 using StarFruit2.Common.Descriptors;
 using TestData;
 using System;
-using FluentAssertions;
-using Microsoft.CodeAnalysis;
-using StarFruit2.Generator;
-using Starfruit2;
 
 namespace StarFruit2.Tests
 {
@@ -28,22 +20,6 @@ namespace StarFruit2.Tests
 
             actual.Should().Match(testData.CliDescriptor);
         }
-
-        [Theory(Skip ="Old generator")]
-        [InlineData(typeof(EmptyTestData))]
-        public void Descriptor_to_source(Type type)
-        {
-            var testData = Activator.CreateInstance(type) as BaseTestData;
-
-            var actual = CodeGenerator.GetSourceCode(testData.CliDescriptor, CodeGenerator.Include.CommandCode);
-
-            actual.Should().NotBeNullOrEmpty();
-            var normActual = Utils.Normalize(actual);
-            var normExpected = Utils.Normalize(testData.GeneratedSource);
-            normActual.Should().Be(normExpected);
-        }
-
-
     }
 }
 

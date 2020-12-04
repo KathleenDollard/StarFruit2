@@ -2,8 +2,6 @@
 using FluentAssertions.Execution;
 using StarFruit.Common;
 using StarFruit2.Common.Descriptors;
-using StarFruit2.Generator;
-using System;
 using System.Linq;
 using Xunit;
 

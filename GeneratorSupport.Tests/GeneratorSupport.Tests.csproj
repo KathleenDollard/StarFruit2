@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GeneratorSupport\GeneratorSupport.csproj" />
     <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
     <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
   </ItemGroup>

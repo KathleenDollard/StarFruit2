@@ -4,13 +4,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Starfruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
-using StarFruit2.Generator;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 

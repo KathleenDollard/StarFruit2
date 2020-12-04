@@ -54,14 +54,6 @@ namespace StarFruit2.Tests
                 CommandDescriptor = commandDescriptor,
             };
         }
-        [Fact(Skip = "Old generator")]
-        public void TestGenerateOutput()
-        {
-            var cliDescriptor = GetCliDescriptor();
-            var generate = new Generate();
-            var codeGen = new CodeGeneratorTemp(generate);
 
-            var output = string.Join("\n", codeGen.GenerateSourceCode(cliDescriptor));
-        }
     }
 }

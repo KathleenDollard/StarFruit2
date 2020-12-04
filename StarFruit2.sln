@@ -23,10 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		System.Diagnostics.CodeAnalysis.cs = System.Diagnostics.CodeAnalysis.cs
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneratorSupport", "GeneratorSupport\GeneratorSupport.csproj", "{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneratorSupport.Tests", "GeneratorSupport.Tests\GeneratorSupport.Tests.csproj", "{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit.FluentDomSourceGen", "StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj", "{2605CC20-823A-499D-B64A-027AE5EF598B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiLayerCli", "Samples\MultiLayerCli\MultiLayerCli.csproj", "{3C9D765C-74DE-42DB-B07C-65AA87016724}"
@@ -40,6 +36,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentDom", "FluentDom\FluentDom.csproj", "{8A63521A-86D1-4752-BF96-EA3C44DE68DC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentDom.Tests", "FluentDom.Tests\FluentDom.Tests.csproj", "{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttributeArgIssueRepro", "AttributeArgIssueRepro\AttributeArgIssueRepro.csproj", "{E0CD8D16-2EC1-43A4-B585-8A13BE48BF02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,14 +65,6 @@ Global
 		{3AE711CF-63EF-4B28-AD33-247DA9792FC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AE711CF-63EF-4B28-AD33-247DA9792FC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AE711CF-63EF-4B28-AD33-247DA9792FC2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7F581EB5-E3C0-4F20-8ED9-9008C8AA3406}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7505ED94-4C0D-4B8C-A929-9BFCE9D5339A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2605CC20-823A-499D-B64A-027AE5EF598B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2605CC20-823A-499D-B64A-027AE5EF598B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2605CC20-823A-499D-B64A-027AE5EF598B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -103,6 +93,10 @@ Global
 		{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0CD8D16-2EC1-43A4-B585-8A13BE48BF02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0CD8D16-2EC1-43A4-B585-8A13BE48BF02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0CD8D16-2EC1-43A4-B585-8A13BE48BF02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0CD8D16-2EC1-43A4-B585-8A13BE48BF02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
