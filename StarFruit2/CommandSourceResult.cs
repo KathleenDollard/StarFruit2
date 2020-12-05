@@ -5,9 +5,10 @@ namespace StarFruit2
 {
     public abstract class CommandSourceResult
     {
-        public CommandSourceResult(ParseResult parseResult)
+        public CommandSourceResult(ParseResult parseResult,int exitCode, bool earlyReturn =false)
         {
             ParseResult = parseResult;
+            ExitCode = exitCode;
         }
 
         public bool EarlyReturn { get; }
@@ -17,6 +18,13 @@ namespace StarFruit2
         public virtual int Run() => 0;
         public virtual async Task<int> RunAsync() => await Task.FromResult(0);
 
+    }
+
+    public class EmptyCommandSourceResult : CommandSourceResult
+    {
+        public EmptyCommandSourceResult(ParseResult parseResult, int exitCode)
+            : base(parseResult, exitCode, earlyReturn:true )
+        { }
     }
 
     /// <summary>
@@ -31,11 +39,11 @@ namespace StarFruit2
     public abstract class CommandSourceResult<T> : CommandSourceResult
     {
 
-        protected CommandSourceResult(ParseResult parseResult)
-            : base(parseResult )
-        {   }
+        protected CommandSourceResult(ParseResult parseResult, int exitCode)
+            : base(parseResult, exitCode)
+        { }
 
-   
+
         public abstract T CreateInstance();
 
         public T NewInstance { get; }

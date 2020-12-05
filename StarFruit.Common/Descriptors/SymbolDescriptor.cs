@@ -6,94 +6,45 @@ using System.Reflection;
 namespace StarFruit2.Common.Descriptors
 {
 
-    public class EmptySymbolDescriptor : ISymbolDescriptor
-    {
-        public EmptySymbolDescriptor()
-        {
-            OriginalName = string.Empty;
-        }
-        public SymbolType SymbolType { get; }
-        public object? Raw { get; }
-        public List<string> Aliases { get; } = new List<string>();
-        public string? Description { get; }
+    //public class EmptySymbolDescriptor : ISymbolDescriptor
+    //{
+    //    public EmptySymbolDescriptor()
+    //    {
+    //        OriginalName = string.Empty;
+    //    }
+    //    public SymbolType SymbolType { get; }
+    //    public object? Raw { get; }
+    //    public List<string> Aliases { get; } = new List<string>();
+    //    public string? Description { get; }
 
-        public string Name { get; }
+    //    public string Name { get; }
 
-        public string? CliName { get; }
+    //    public string? CliName { get; }
 
-        public string OriginalName { get; }
+    //    public string OriginalName { get; }
 
-        public bool IsHidden { get; set; }
-        public string Report(int tabsCount, VerbosityLevel verbosity)
-            => "Empty SymbolDescriptor - used for testing";
-    }
+    //    public bool IsHidden { get; set; }
+    //    public string Report(int tabsCount, VerbosityLevel verbosity)
+    //        => "Empty SymbolDescriptor - used for testing";
+    //}
 
     public abstract class SymbolDescriptor : ISymbolDescriptor
     {
-        public static ISymbolDescriptor Empty = new EmptySymbolDescriptor();
+       // public static ISymbolDescriptor Empty = new EmptySymbolDescriptor();
 
-        public SymbolDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
-                                    string originalName,
-                                    object? raw,
-                                    SymbolType symbolType)
+        public SymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
+                                string originalName,
+                                object? raw,
+                                SymbolType symbolType)
         {
             ParentSymbolDescriptorBase = parentSymbolDescriptorBase;
             Raw = raw;
             OriginalName = originalName;
+            Name = originalName;
             SymbolType = symbolType;
         }
 
-        public CodeElement CodeElement { get; set; }
-        public int Position { get; set; }
 
-        public abstract string ReportInternal(int tabsCount, VerbosityLevel verbosity);
-
-        public virtual string Report(int tabsCount, VerbosityLevel verbosity)
-        {
-            string whitespace = CommonExtensions.NewLineWithTabs(tabsCount);
-            string whitespace2 = CommonExtensions.NewLineWithTabs(tabsCount + 1);
-            return $"{whitespace}{Name}" +
-                   $"{whitespace2}Kind:{SymbolType }" +
-                   $"{whitespace2}Description:{Description }" +
-                   $"{whitespace2}IsHidden:{IsHidden  }" +
-                   ReportInternal(tabsCount + 1, verbosity) +
-                   $"{whitespace2}Raw:{ReportRaw(Raw)}";
-            //$"{whitespace2}Symbol:{ReportBound(SymbolToBind)}";
-
-            static string ReportRaw(object? raw)
-            {
-                return raw switch
-                {
-                    null => string.Empty,
-                    Type t => $"Type: {t.Name}",
-                    MethodInfo m => $"Method: {m.Name}",
-                    PropertyInfo p => $"Property: {p.Name}",
-                    ParameterInfo p => $"Parameter: {p.Name}",
-                    _ => string.Empty
-                };
-            }
-
-            //static string ReportBound(ISymbol? symbolToBind)
-            //{
-            //    return symbolToBind is null
-            //           ? string.Empty
-            //           : symbolToBind.GetType().Name;
-            //}
-        }
-
-        //public ISymbol? SymbolToBind { get; private set; }
-
-        //internal void SetSymbol(ISymbol symbol)
-        //    => SymbolToBind = symbol;
-
-        /// <summary>
-        /// Rules sometimes rely on the parent, although the only current known
-        /// instance is Argument rules being different for Command and Option arguments
-        /// <br/>
-        /// The setting of this value makes depth first much easier, so that is the only option.
-        /// If sibling evaluation is needed, plan a post processing step.
-        /// </summary>
-        public ISymbolDescriptor ParentSymbolDescriptorBase { get; }
 
         /// <summary>
         /// This is the underlying thing rules were evaluated against. For
@@ -133,16 +84,71 @@ namespace StarFruit2.Common.Descriptors
         public string OriginalName { get; }
 
         public bool IsHidden { get; set; }
+        /// <summary>
+        /// Rules sometimes rely on the parent, although the only current known
+        /// instance is Argument rules being different for Command and Option arguments
+        /// <br/>
+        /// The setting of this value makes depth first much easier, so that is the only option.
+        /// If sibling evaluation is needed, plan a post processing step.
+        /// </summary>
+        public ISymbolDescriptor? ParentSymbolDescriptorBase { get; }
+        public CodeElement CodeElement { get; set; }
+        public int Position { get; set; }
+        public CommandDescriptor Root
+        {
+            get
+            {
+                ISymbolDescriptor? candidate = this;
+                while (!(candidate.ParentSymbolDescriptorBase is null))
+                {
+                    candidate = candidate.ParentSymbolDescriptorBase;
+                }
+                var commandDescriptor = candidate as CommandDescriptor;
+                Assert.NotNull(commandDescriptor);
+                return commandDescriptor;
+            }
+        }
+        public bool IsRoot => Root == this;
 
+
+
+        public abstract string ReportInternal(int tabsCount, VerbosityLevel verbosity);
+
+        public virtual string Report(int tabsCount, VerbosityLevel verbosity)
+        {
+            string whitespace = CommonExtensions.NewLineWithTabs(tabsCount);
+            string whitespace2 = CommonExtensions.NewLineWithTabs(tabsCount + 1);
+            return $"{whitespace}{Name}" +
+                   $"{whitespace2}Kind:{SymbolType }" +
+                   $"{whitespace2}Description:{Description }" +
+                   $"{whitespace2}IsHidden:{IsHidden  }" +
+                   ReportInternal(tabsCount + 1, verbosity) +
+                   $"{whitespace2}Raw:{ReportRaw(Raw)}";
+            //$"{whitespace2}Symbol:{ReportBound(SymbolToBind)}";
+
+            static string ReportRaw(object? raw)
+            {
+                return raw switch
+                {
+                    null => string.Empty,
+                    Type t => $"Type: {t.Name}",
+                    MethodInfo m => $"Method: {m.Name}",
+                    PropertyInfo p => $"Property: {p.Name}",
+                    ParameterInfo p => $"Parameter: {p.Name}",
+                    _ => string.Empty
+                };
+            }
+
+        }
 
     }
 
     public abstract class IdentitySymbolDescriptor : SymbolDescriptor
     {
-        public IdentitySymbolDescriptor(ISymbolDescriptor parentSymbolDescriptorBase,
-                                     string originalName,
-                                     object? raw,
-                                     SymbolType symbolType)
+        public IdentitySymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
+                                        string originalName,
+                                        object? raw,
+                                        SymbolType symbolType)
             : base(parentSymbolDescriptorBase, originalName, raw, symbolType)
         { }
         public List<string> Aliases { get; } = new List<string>();

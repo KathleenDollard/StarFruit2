@@ -39,13 +39,13 @@ namespace StarFruit2
             var argumentResult = symbolResult as ArgumentResult;
             return argumentResult is null
                 ? GetDefaultSymbolResult(argument)
-                : new CommandSourceMemberResult<T>(argumentResult.GetValueOrDefault<T>(), GetValueFrom(argumentResult), argument,argumentResult);
+                : new CommandSourceMemberResult<T>(argumentResult.GetValueOrDefault<T>(), GetValueFrom(argumentResult), argument, argumentResult);
         }
 
         private static CommandSourceMemberResult<T> GetDefaultSymbolResult<T>(Option<T> option)
         {
             return option.Argument.HasDefaultValue
-                         ? new CommandSourceMemberResult<T>((T)option.Argument.GetDefaultValue(), MemberResultValueFrom.DefaultFromCli,option,null)
+                         ? new CommandSourceMemberResult<T>((T)option.Argument.GetDefaultValue(), MemberResultValueFrom.DefaultFromCli, option, null)
                          : new CommandSourceMemberResult<T>(default(T), MemberResultValueFrom.DefaultFromType, option, null);
         }
 
@@ -70,7 +70,7 @@ namespace StarFruit2
         {
             return argumentResult is null
                 ? MemberResultValueFrom.DefaultFromType
-                : !argumentResult.Tokens.Any() 
+                : !argumentResult.Tokens.Any()
                     ? MemberResultValueFrom.DefaultFromCli
                     : MemberResultValueFrom.UserEntry;
         }
@@ -120,8 +120,8 @@ namespace StarFruit2
     /// <typeparam name="T"></typeparam>
     public class CommandSourceMemberResult<T> : CommandSourceMemberResult
     {
-       
-        public CommandSourceMemberResult( [MaybeNull]T value, MemberResultValueFrom  valueFrom, Symbol symbol, SymbolResult? symbolResult)
+
+        public CommandSourceMemberResult([MaybeNull] T value, MemberResultValueFrom valueFrom, Symbol symbol, SymbolResult? symbolResult)
         {
             this.value = value;
             Symbol = symbol;
@@ -130,8 +130,8 @@ namespace StarFruit2
         }
 
         // This is writeable so changes can be made during validation stage
-       private T value;
-       public T Value
+        private T value;
+        public T Value
         {
             get => value;
             set
@@ -149,7 +149,6 @@ namespace StarFruit2
         public bool IsTypeDefault => From == MemberResultValueFrom.DefaultFromType;
         public bool IsChangedDuringValidation => From == MemberResultValueFrom.DefaultFromType;
 
-   
     }
 
 

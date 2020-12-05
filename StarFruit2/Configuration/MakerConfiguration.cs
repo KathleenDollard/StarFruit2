@@ -34,7 +34,7 @@ namespace StarFruit2
 
         internal string CommandNameToName(string name)
         => name = name.EndsWith("Command")
-                   ? name = name[..^7]
+                   ? name = name.Substring(0,name.Length-7)
                    : name;
 
         internal string CommandNameToCliName(string name)
@@ -43,7 +43,7 @@ namespace StarFruit2
 
         public virtual string ArgumentNameToName(string name)
         => name.EndsWith("Arg")
-                   ? name = name[..^3]
+                   ? name = name.Substring(0, name.Length - 3)
                    : name;
 
         public virtual string ArgumentNameToCliName(string name)
@@ -51,7 +51,7 @@ namespace StarFruit2
 
         public virtual string OptionNameToName(string name)
         => name = name.EndsWith("Option")
-                   ? name = name[..^6]
+                   ? name = name.Substring(0, name.Length - 6)
                    : name;
 
         public virtual string OptionNameToCliName(string name)
@@ -152,7 +152,7 @@ namespace StarFruit2
         public virtual string OptionArgumentNameToCliName(string name)
         {
             name = name.EndsWith("Option")
-                   ? name = name[^6..]
+                   ? name.Substring(0, name.Length - 6)
                    : name;
             return $"--{name.ToKebabCase().ToLowerInvariant()}";
         }

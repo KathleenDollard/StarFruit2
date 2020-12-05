@@ -15,9 +15,9 @@ namespace StarFruit2.Tests
             var commandDescriptor = new CommandDescriptor(null, "MyClass", null)
             {
                 Name = "my-class",
-                Parent = null,
+               // Parent = null,
             };
-            commandDescriptor.Root = commandDescriptor;
+           // commandDescriptor.Root = commandDescriptor;
             var testName = "testName";
             var GeneratedNamespace = "StarFruit2.Tests.TestSampleData" + testName;
             var GeneratedSourceClassName = testName + "CommandSource";
@@ -54,14 +54,6 @@ namespace StarFruit2.Tests
                 CommandDescriptor = commandDescriptor,
             };
         }
-        [Fact]
-        public void TestGenerateOutput()
-        {
-            var cliDescriptor = GetCliDescriptor();
-            var generate = new Generate();
-            var codeGen = new CodeGeneratorTemp(generate);
 
-            var output = string.Join("\n", codeGen.GenerateSourceCode(cliDescriptor));
-        }
     }
 }

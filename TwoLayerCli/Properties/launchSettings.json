@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "TwoLayerCli": {
-      "commandName": "Project",
-      "commandLineArgs": "cli-root find --string-option Fred"
-    }
-  }
-}

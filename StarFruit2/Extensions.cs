@@ -35,6 +35,9 @@ namespace StarFruit2
                 return defaultValue;
             }
 
+            //if (attribute is BoolAttribute boolAttribute)
+            //{ }
+
             var attributeArgs = attribute.ConstructorArguments;
             if (attributeArgs.Any() && !attributeArgs.First().IsNull)
             {
@@ -49,7 +52,7 @@ namespace StarFruit2
 
         public static bool BoolAttributeValue<TAttribute>(this ISymbol symbol, bool defaultValue = false)
         {
-            return symbol.BoolAttributeValue(typeof(TAttribute), defaultValue);
+                return symbol.BoolAttributeValue(typeof(TAttribute), defaultValue);
         }
 
         public static IEnumerable<T> AttributeValueForList<T>(this ISymbol symbol, Type attributeType)
@@ -78,6 +81,14 @@ namespace StarFruit2
         public static IEnumerable<T> AttributeValueForList<TAttribute, T>(this ISymbol symbol)
         {
             return symbol.AttributeValueForList<T>(typeof(TAttribute));
+        }
+
+        // This does not yet handle snake case
+        public static string CamelCase(this string input)
+        {
+            var arr = input.ToCharArray();
+            arr[0] = char.ToLowerInvariant(arr[0]);
+            return arr.ToString();
         }
     }
 }

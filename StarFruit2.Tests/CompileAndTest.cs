@@ -1,13 +1,6 @@
 ﻿using FluentAssertions;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using TestData;
 using Xunit;
@@ -17,7 +10,6 @@ using Microsoft.DotNet.Interactive.Tests.Utility;
 using System.Reactive.Linq;
 using Microsoft.DotNet.Interactive.Events;
 using System.CommandLine;
-using StarFruit2.Generator;
 
 namespace StarFruit2.Tests
 {

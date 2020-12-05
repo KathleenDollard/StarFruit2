@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TwoLayerCli": {
+      "commandName": "Project",
+      "commandLineArgs": "cli-root --help"
+    }
+  }
+}

@@ -70,7 +70,7 @@ namespace Starfruit2
            : base(config, semanticModel)
         { }
 
-        protected virtual IEnumerable<CommandDescriptor> GetSubCommands(ISymbolDescriptor parent,
+        protected virtual IEnumerable<CommandDescriptor> GetSubCommands(CommandDescriptor parent,
                                                                         INamedTypeSymbol parentSymbol)
         {
             IEnumerable<ISymbol> members = config.GetSubCommandMembers(parentSymbol);
@@ -208,7 +208,7 @@ namespace Starfruit2
                                                                                   p.Symbol,
                                                                                   CodeElement.MethodParameter,
                                                                                   p.Position)),
-                                       
+
                _ => throw new NotImplementedException()
            };
 

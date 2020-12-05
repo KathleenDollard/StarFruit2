@@ -7,10 +7,11 @@ namespace TestData
     public class SingleArgTestData<T> : BaseTestData
     {
         public CommandDescriptor CommandDescriptor
-            => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
+            => new CommandDescriptor(null, "MyClass", null) { Name = "MyClass" };
 
         public SingleArgTestData(string testName,
                                          string originalName,
+                                         string name,
                                          string commandLineName,
                                          string typeStringRepresentation,
                                          string? description,
@@ -18,7 +19,7 @@ namespace TestData
             : base(testName)
         {
             string sourceCode = $@"
-                var command = new Command(""my-class"", """");
+                var command = new Command(""MyClass"", """");
                 command.Arguments.Add(GetArg<{typeStringRepresentation}>(""{commandLineName}"", ""{description}"", {defaultValue.CodeRepresentation}));
                 return command;";
 
@@ -30,7 +31,7 @@ namespace TestData
             commandDescriptor.AddArguments(arguments: new List<ArgumentDescriptor>(){
                 new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(T)), null, originalName, null)
                 {
-                    Name = originalName,
+                    Name = name,
                     CliName = commandLineName,
                     Description = description,
                     DefaultValue = defaultValue,
@@ -57,6 +58,7 @@ namespace TestData
         public SingleArgStringTestData()
             : base(testName: "SingleArgString",
                    originalName: "MyPropertyArg",
+                   name: "MyProperty",
                    commandLineName: "my-property",
                    typeStringRepresentation: "String",
                    description: "",
@@ -69,6 +71,7 @@ namespace TestData
         public SingleIntArgTestData()
             : base(testName: "SingleArgInt",
                    originalName: "MyPropertyArg",
+                   name: "MyProperty",
                    commandLineName: "my-property",
                    typeStringRepresentation: "Int32",
                    description: "This is an int description",
@@ -80,7 +83,8 @@ namespace TestData
     {
         public SingleBoolArgTestData()
             : base(testName: "SingleArgBool",
-                   originalName: "MyPropertyArg",
+                   originalName: "MyPropertyArg", 
+                   name: "MyProperty",
                    commandLineName: "my-property",
                    typeStringRepresentation: "Boolean",
                    description: "This is a bool description",
