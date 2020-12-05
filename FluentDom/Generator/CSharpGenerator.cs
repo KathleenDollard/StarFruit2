@@ -87,7 +87,7 @@ namespace FluentDom.Generator
                 return $"{cls.Scope.CSharpString()}{cls.Modifiers.CSharpString()}class {cls.Name}" + baseString;
             }
         }
-        protected internal override GeneratorBase CloseClass(Class cls) 
+        protected internal override GeneratorBase CloseClass(Class cls)
             => CloseCurly();
 
         protected internal override GeneratorBase OpenConstructor(Constructor ctor)
@@ -126,17 +126,17 @@ namespace FluentDom.Generator
         protected internal override GeneratorBase CloseMethod(Method method)
            => CloseCurly();
 
-         protected internal override GeneratorBase OutputProperty(Property property)
+        protected internal override GeneratorBase OutputProperty(Property property)
         {
             return property.ReadOnly
                         && property.GetterStatementStore.StatementStore.Count() == 1
                 ? OutputExpressionBodyProperty(property)
                 : property.GetterStatementStore.AnyStatements() || property.SetterStatementStore.AnyStatements()
-                    ? base.OutputProperty (property)
+                    ? base.OutputProperty(property)
                     : OutputAutoBodyProperty(property);
         }
 
-       protected internal override GeneratorBase OpenProperty(Property property)
+        protected internal override GeneratorBase OpenProperty(Property property)
         {
             OutputLine(PropertyDeclaration(property));
             OpenCurly();

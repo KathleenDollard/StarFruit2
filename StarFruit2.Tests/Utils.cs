@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Starfruit2;
@@ -57,6 +58,8 @@ namespace StarFruit2.Tests
         {
             var tree = CSharpSyntaxTree.ParseText(code);
             var compilation = GetCompilation(tree);
+            var warningsAndErrors=compilation.GetDiagnostics().Where(x=>x.Severity.HasFlag(DiagnosticSeverity.Error)|| x.Severity.HasFlag(DiagnosticSeverity.Warning)) ;
+            warningsAndErrors.Should().NotHaveWarningsOrErrors();
             var rootCommand = tree.GetRoot().DescendantNodes()
                                .OfType<ClassDeclarationSyntax>()
                                .FirstOrDefault();
@@ -68,28 +71,43 @@ namespace StarFruit2.Tests
             return cli;
         }
 
-        internal static CSharpCompilation GetCompilation(SyntaxTree tree)
+        internal static CSharpCompilation GetCompilation(SyntaxTree syntaxTree)
         {
-            const string longName = "System.Runtime, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-            var systemCollectionsAssembly = Assembly.Load(longName);
+            var references = new List<MetadataReference>();
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                if (!assembly.IsDynamic&& !string.IsNullOrWhiteSpace(assembly.Location ))
+                {
+                    references.Add(MetadataReference.CreateFromFile(assembly.Location));
+                }
+            }
 
-            MetadataReference fixcCS0012 =
-                       MetadataReference.CreateFromFile(systemCollectionsAssembly.Location);
-            MetadataReference mscorlib =
-                       MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-            MetadataReference starFruit2Common =
-                       MetadataReference.CreateFromFile(typeof(RequiredAttribute).Assembly.Location);
-            MetadataReference systemRuntime =
-                        MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
-            MetadataReference[] references = { mscorlib, starFruit2Common, systemRuntime, fixcCS0012 };
-
-            var compilation = CSharpCompilation.Create("TransformationCS",
-                                            new SyntaxTree[] { tree },
-                                            references,
-                                            new CSharpCompilationOptions(
-                                                    OutputKind.DynamicallyLinkedLibrary));
-            return compilation;
+            return  CSharpCompilation.Create("foo", new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         }
+
+        //internal static CSharpCompilation GetCompilatioOldn(SyntaxTree tree)
+        //{
+        //    const string longName = "System.Runtime, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+        //    var systemCollectionsAssembly = Assembly.Load(longName);
+
+        //    MetadataReference fixcCS0012 =
+        //               MetadataReference.CreateFromFile(systemCollectionsAssembly.Location);
+        //    MetadataReference mscorlib =
+        //               MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+        //    MetadataReference starFruit2Common =
+        //               MetadataReference.CreateFromFile(typeof(RequiredAttribute).Assembly.Location);
+        //    MetadataReference systemRuntime =
+        //                MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
+        //    MetadataReference[] references = { mscorlib, starFruit2Common, systemRuntime, fixcCS0012 };
+
+        //    var compilation = CSharpCompilation.Create("TransformationCS",
+        //                                    new SyntaxTree[] { tree },
+        //                                    references,
+        //                                    new CSharpCompilationOptions(
+        //                                            OutputKind.DynamicallyLinkedLibrary));
+        //    return compilation;
+        //}
 
         internal static CliDescriptor WrapInCliDescriptor(this CommandDescriptor commandDescriptor)
             => new CliDescriptor

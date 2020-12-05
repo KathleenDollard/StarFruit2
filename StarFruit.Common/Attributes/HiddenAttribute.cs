@@ -2,13 +2,11 @@
 
 namespace StarFruit2
 {
-    public class HiddenAttribute : Attribute 
+    public class HiddenAttribute : BoolAttribute 
     {
         public HiddenAttribute(bool value = true)
-        {
-            Value = value;
-        }
-
-        public bool Value { get; set; }
+            : base(value)
+        { }
+  
     }
 }

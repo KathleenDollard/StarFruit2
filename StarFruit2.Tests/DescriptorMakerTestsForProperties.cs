@@ -4,6 +4,7 @@ using StarFruit.Common;
 using System.Linq;
 using Xunit;
 using FluentAssertions.Execution;
+using System.Threading.Tasks;
 
 namespace StarFruit2.Tests
 {
@@ -47,7 +48,7 @@ namespace StarFruit2.Tests
 
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
- 
+
             actual.ArgumentType.TypeAsString().Should().Be("Boolean");
         }
 
@@ -208,7 +209,7 @@ namespace StarFruit2.Tests
         public void DefaultValue_as_property_from_property_initialize_on_argument()
         {
             var code = @"
-                public int MyPropertyArg { get; set; } = Int32.MinValue"
+                public int MyPropertyArg { get; set; } = Int32.MinValue;"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
@@ -486,7 +487,7 @@ namespace StarFruit2.Tests
         public void DefaultValue_from_property_initialize_on_option()
         {
             var code = @"
-                public int MyProperty { get; set; } = 42"
+                public int MyProperty { get; set; } = 42;"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
@@ -499,7 +500,7 @@ namespace StarFruit2.Tests
         public void DefaultValue_as_new_object_from_property_initialize_on_option()
         {
             var code = @"
-                public DateTime MyProperty { get; set; } = new DateTime(2020, 12, 31) "
+                public DateTime MyProperty { get; set; } = new DateTime(2020, 12, 31);"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
@@ -512,7 +513,7 @@ namespace StarFruit2.Tests
         public void DefaultValue_as_property_from_property_initialize_on_option()
         {
             var code = @"
-                public int MyProperty { get; set; } = Int32.MinValue"
+                public int MyProperty { get; set; } = Int32.MinValue;"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
@@ -765,11 +766,11 @@ namespace StarFruit2.Tests
         public void Single_SubCommand_is_found_and_names_are_as_expected()
         {
             var code = @"
-                public int MyMethod(int myParam) {}"
+                public int MyMethod(int myParam) { return 0; }"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First() ;
+            var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.OriginalName.Should().Be("MyMethod");
             actual.Name.Should().Be("MyMethod");
@@ -780,9 +781,9 @@ namespace StarFruit2.Tests
         public void Multiple_SubCommands_are_found_and_names_are_as_expected()
         {
             var code = @"
-                public int MyMethod1() {}
-                public int MyMethod2(int myParam) { }
-                public int MyMethod3() { }"
+                public int MyMethod1() { return 0; }
+                public int MyMethod2(int myParam) { return 0; }
+                public int MyMethod3() {  return 0; }"
                 .WrapInStandardClass();
 
             CliDescriptor actualCli = Utils.GetCli(code);
@@ -805,9 +806,10 @@ namespace StarFruit2.Tests
         public void SubCommand_marked_as_async_as_expected()
         {
             var code = @"
-                public async int MyMethod(int myParam) {}
-                public int MyMethod2(int myParam) { }"     
-                .WrapInStandardClass();
+                public async Task<int> MyMethod(int myParam) { return await Task.FromResult(0); }
+                public int MyMethod2(int myParam) {  return 0; }"
+                .WrapInStandardClass()
+                .PrefaceWithUsing("System.Threading.Tasks"); ;
 
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual1 = actualCli.CommandDescriptor.SubCommands.First();
