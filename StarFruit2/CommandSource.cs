@@ -75,28 +75,28 @@ namespace StarFruit2
     // </para>
     // </remarks>
 
-    public abstract class CommandSource
-    {
-        public static RootCommandSource Create<TCli>()
+        public abstract class CommandSource
         {
-            var cliType = typeof(TCli);
-            var fullName = $"{cliType.FullName}CommandSource";
-            var type = cliType.Assembly.GetType(fullName);
-            Assert.NotNull(type);
-            var ret = Activator.CreateInstance(type) as RootCommandSource;
-            Assert.NotNull(ret); // throw here if generator is broken
-            return ret;
-        }
+            public static RootCommandSource Create<TCli>()
+            {
+                var cliType = typeof(TCli);
+                var fullName = $"{cliType.FullName}CommandSource";
+                var type = cliType.Assembly.GetType(fullName);
+                Assert.NotNull(type);
+                var ret = Activator.CreateInstance(type) as RootCommandSource;
+                Assert.NotNull(ret); // throw here if generator is broken
+                return ret;
+            }
 
-        public static async Task<int> RunAsync<TCli>(string[] args)
-        {
-            return await Create<TCli>().Parse(args).RunAsync();
-        }
+            public static async Task<int> RunAsync<TCli>(string[] args)
+            {
+                return await Create<TCli>().Parse(args).RunAsync();
+            }
 
-        public static int Run<TCli>(string[] args)
-        {
-            return Create<TCli>().Parse(args).Run();
-        }
+            public static int Run<TCli>(string[] args)
+            {
+                return Create<TCli>().Parse(args).Run();
+            }
 
         public Command Command { get; }
 

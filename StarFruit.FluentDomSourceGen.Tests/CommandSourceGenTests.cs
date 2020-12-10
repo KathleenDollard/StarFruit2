@@ -2,15 +2,13 @@
 using ApprovalTests.Reporters;
 using FluentAssertions;
 using FluentDom.Generator;
-using GeneratorSupport;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.DotNet.Interactive.Tests.Utility;
 using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Generate;
 using System.CommandLine;
 using System.Threading.Tasks;
 using Xunit;

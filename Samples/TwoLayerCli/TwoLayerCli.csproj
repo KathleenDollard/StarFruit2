@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,7 +7,14 @@
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
+  <!--<ItemGroup>
+    <None Include="Kittitas.csproj" />
+  </ItemGroup>-->
+
   <ItemGroup>
+    <ProjectReference Include="..\..\StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
   </ItemGroup>
 

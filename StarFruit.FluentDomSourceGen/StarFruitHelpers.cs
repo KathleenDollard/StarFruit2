@@ -2,7 +2,7 @@
 using StarFruit2.Common.Descriptors;
 using System.Linq;
 
-namespace GeneratorSupport
+namespace StarFruit2.Generate
 {
     public static class Helpers
     {

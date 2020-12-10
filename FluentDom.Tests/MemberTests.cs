@@ -8,7 +8,6 @@ namespace FluentDom.Tests
     {
         private const string PropertyName = "PropertyName";
         private const string MethodName = "MethodName";
-        private const string ClassName = "ClassName";
 
         [Fact]
         public void Generated_auto_property_is_correct()

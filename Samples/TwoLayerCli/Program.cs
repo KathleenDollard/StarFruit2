@@ -23,8 +23,7 @@ namespace TwoLayerCli
             var commandSource = CommandSource.Create<CliRoot>() as CliRootCommandSource;
             // modify System.CommandLine elements here
             commandSource.CtorParam.Argument.SetDefaultValue(DateTime.Today.Day);
-
-
+            var x = new CliRootTest();
 
             var commandSourceResult = commandSource.Parse(args);
             if (commandSourceResult.EarlyReturn)

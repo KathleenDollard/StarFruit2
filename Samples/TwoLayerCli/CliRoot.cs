@@ -8,7 +8,7 @@ namespace TwoLayerCli
     /// <summary>
     /// This is the entry point, the end user types the executable name
     /// </summary>
-    public partial class CliRoot
+    public partial class CliRoot : ICliRoot
     {
         /// <summary> </summary>
         /// <param name="ctorParam">This is a constructor parameter</param>

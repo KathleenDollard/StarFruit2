@@ -8,7 +8,7 @@ using static FluentDom.Expression;
 // * Use a base/derived overlad extensibility mechanism.Overriding methods may need to navigate DOM
 // * Use a two phase appraoch to evaluation, maintaining Select methods as IENumerable and Funcs for extension
 // * Have a separate calculate values method for each method so it can be called at any point
-namespace GeneratorSupport.Tests
+namespace StarFruit2.Generate
 {
     public class GenerateCommandSourceResult
     {
