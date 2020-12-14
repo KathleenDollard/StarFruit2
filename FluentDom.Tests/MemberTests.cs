@@ -16,7 +16,7 @@ namespace FluentDom.Tests
 
             var expected = @"public string PropertyName { get; set; }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -28,7 +28,7 @@ namespace FluentDom.Tests
 
             var expected = @"public string PropertyName { get; }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -43,7 +43,7 @@ namespace FluentDom.Tests
 => 42;
 
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -68,7 +68,7 @@ namespace FluentDom.Tests
    }
 }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -91,7 +91,7 @@ namespace FluentDom.Tests
    }
 }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -114,7 +114,7 @@ namespace FluentDom.Tests
    }
 }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -128,7 +128,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -144,7 +144,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -160,7 +160,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -176,7 +176,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -192,7 +192,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -206,7 +206,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -221,7 +221,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -237,7 +237,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -254,7 +254,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -269,7 +269,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }

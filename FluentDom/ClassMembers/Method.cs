@@ -11,7 +11,7 @@ namespace FluentDom
 
         public string Name { get; }
  
-        public Method(string name, Scope scope = Scope.Public)
+        public Method(string name, Scope scope = Scope.Public, MemberModifiers modifiers = MemberModifiers.None)
             : base(scope)
         {
             Name = name;

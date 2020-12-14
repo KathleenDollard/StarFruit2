@@ -1,5 +1,4 @@
 ﻿using FluentDom;
-using FluentDom.Generator;
 using StarFruit2.Common.Descriptors;
 using System;
 using System.Collections.Generic;
@@ -15,14 +14,6 @@ namespace StarFruit2.Generate
     public class GenerateCommandSource
     {
 
-        public void Can_create_code()
-        {
-            var cli = new CliDescriptor();
-            cli.CommandDescriptor = new CommandDescriptor(null, "Fizz", null);
-            var code = CreateCode(cli);
-            var ouptput = new CSharpGenerator().Generate(code);
-        }
-
         public virtual Code CreateCode(CliDescriptor cli)
         {
             var cmd = cli.CommandDescriptor;
@@ -37,14 +28,14 @@ namespace StarFruit2.Generate
 
             return Code.Create(cli.GeneratedComandSourceNamespace)
                     .Usings(usings)
-                    .Class(CommandClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
+                    .Class(CommandSourceClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
                     .Classes(new CommandDescriptor[] { cli.CommandDescriptor },
                              c => SubCommandClasses(c));
         }
 
-        protected virtual Class CommandClass(CommandDescriptor cmd,
-                                              TypeRep baseClass,
-                                              CommandDescriptor parent) 
+        protected virtual Class CommandSourceClass(CommandDescriptor cmd,
+                                                   TypeRep baseClass,
+                                                   CommandDescriptor parent) 
             => new Class(cmd.CommandSourceClassName())
                     .Base(baseClass)
                     .Constructor(parent is null ? GetRootCtor(cmd, cmd.Root, parent) : GetCtor(cmd, cmd.Root, parent))
@@ -98,33 +89,29 @@ namespace StarFruit2.Generate
                 o => MethodCall($"Command.AddCommand", o.OriginalName)
             }.ToArray();
 
-        protected virtual Property ChildProperty(SymbolDescriptor symbol)
-        {
-            return symbol switch
+        protected virtual Property ChildProperty(SymbolDescriptor symbol) 
+            => symbol switch
             {
-                OptionDescriptor o => new Property(o.OriginalName, OptionType(o)),
-                ArgumentDescriptor a => new Property(a.OriginalName, ArgumentType(a)),
-                CommandDescriptor c => new Property(c.OriginalName, $"{c.OriginalName}CommandSource"),
+                OptionDescriptor o => new Property(o.GetPropertyName(), o.OptionType()),
+                ArgumentDescriptor a => new Property(a.GetPropertyName(), a.ArgumentType()),
+                CommandDescriptor c => new Property(c.GetPropertyName(), $"{c.CommandSourceClassName()}"),
                 _ => throw new InvalidOperationException("Unexpected symbol type")
             };
-        }
 
-        protected virtual Method ChildGetMethod(SymbolDescriptor symbol)
-        {
-            return symbol switch
+        protected virtual Method ChildGetMethod(SymbolDescriptor symbol) 
+            => symbol switch
             {
                 OptionDescriptor o => GetOptionMethod(o),
                 ArgumentDescriptor a => GetArgumentMethod(a),
                 _ => throw new InvalidOperationException("Unexpected symbol type")
             };
-        }
 
         protected virtual Method GetArgumentMethod(ArgumentDescriptor o)
         {
             var method = new Method(GetOptArgMethodName(o.OriginalName))
-                .ReturnType(ArgumentType(o))
+                .ReturnType(o.ArgumentType())
                 .Statements(
-                      AssignVar("argument", ArgumentType(o), NewObject(ArgumentType(o), o.CliName)),
+                      AssignVar("argument", o.ArgumentType(), NewObject(o.ArgumentType(), o.CliName)),
                       Assign("argument.Description", Value(o.Description)),
                       Assign("argument.IsRequired", Value(o.Required)),
                       Assign("argument.IsHidden", Value(o.IsHidden)))
@@ -139,9 +126,9 @@ namespace StarFruit2.Generate
         protected virtual Method GetOptionMethod(OptionDescriptor o)
         {
             var method = new Method(GetOptArgMethodName(o.OriginalName))
-                .ReturnType(OptionType(o))
+                .ReturnType(o.OptionType())
                 .Statements(
-                      AssignVar("option", OptionType(o), NewObject(OptionType(o), o.CliName)),
+                      AssignVar("option", o.OptionType(), NewObject(o.OptionType(), o.CliName)),
                       Assign("option.Description", Value(o.Description)),
                       Assign("option.IsRequired", Value(o.Required)),
                       Assign("option.IsHidden", Value(o.IsHidden)))
@@ -162,7 +149,7 @@ namespace StarFruit2.Generate
             //CommandClass(c, new TypeRep(cmd.Root.CommandSourceClassName());
             foreach (var subCommand in cmd.SubCommands)
             {
-                list.Add(CommandClass(subCommand, cmd.CommandSourceClassName(), subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
+                list.Add(CommandSourceClass(subCommand, cmd.CommandSourceClassName(), subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
                 if (subCommand.SubCommands.Any())
                 {
                     list.AddRange(SubCommandClasses(subCommand));
@@ -187,15 +174,7 @@ namespace StarFruit2.Generate
             return $"Get{name}";
         }
 
-        private static TypeRep ArgumentType(ArgumentDescriptor a)
-        {
-            return new TypeRep("Argument", a.GetFluentArgumentType());
-        }
-
-        private static TypeRep OptionType(OptionDescriptor o)
-        {
-            return new TypeRep("Option", o.GetFluentArgumentType());
-        }
+  
     }
 }
 

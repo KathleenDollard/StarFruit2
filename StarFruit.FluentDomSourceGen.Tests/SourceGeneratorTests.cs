@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using ApprovalTests;
+using ApprovalTests.Reporters;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using StarFruit2;
 using StarFruit2.Generate;
 using Xunit;
 using Xunit.Abstractions;
+
+[assembly: UseReporter(typeof(VisualStudioReporter))]
 
 namespace SourceGeneratorTests
 {
@@ -44,11 +48,10 @@ namespace TwoLayerCli
 
     }
 }";
-            string output = GetGeneratedOutput(source);
+            var actual = GetGeneratedOutput(source);
 
-            Assert.NotNull(output);
+            Approvals.Verify(actual);
 
-            Assert.Equal("class Foo { }", output);
         }
 
         private string GetGeneratedOutput(string source)
@@ -69,13 +72,13 @@ namespace TwoLayerCli
 
             // TODO: Uncomment this line if you want to fail tests when the injected program isn't valid _before_ running generators
             var compileDiagnostics = compilation.GetDiagnostics();
-            Assert.False(compileDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error), "Failed: " + compileDiagnostics.FirstOrDefault()?.GetMessage());
+            Assert.False(compileDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error), "Input failed to compile: " + compileDiagnostics.FirstOrDefault()?.GetMessage());
 
             ISourceGenerator generator = new Generator();
 
             var driver = CSharpGeneratorDriver.Create(generator);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
-            Assert.False(generateDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error), "Failed: " + generateDiagnostics.FirstOrDefault()?.GetMessage());
+            Assert.False(generateDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error), "Output failed to compile: " + generateDiagnostics.FirstOrDefault()?.GetMessage());
 
             string output = outputCompilation.SyntaxTrees.Last().ToString();
 

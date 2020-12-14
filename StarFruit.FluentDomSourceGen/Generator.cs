@@ -19,19 +19,17 @@ namespace StarFruit2.Generate
 
         public void Execute(GeneratorExecutionContext context)
         {
-            System.Diagnostics.Debugger.Launch();
+            //System.Diagnostics.Debugger.Launch();
             if (context.SyntaxReceiver is not SyntaxReceiver receiver)
                 return;
 
-            var source = "// Test Message\r";
+            var source = "";
             foreach (var declaration in receiver.CandidateCliTypes)
             {
-                //var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation );
-                source += @$"namespace TwoLayerCli
-{{
-    public class {declaration.ChildTokens().FirstOrDefault(x=>x.IsKind(SyntaxKind.IdentifierToken))}Test {{ }}
-}}";
-
+                var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation );
+                var code = new GenerateCommandSource().CreateCode(cliDescriptor);
+                var output = new FluentDom.Generator.CSharpGenerator().Generate(code);
+                source += output;
             }
 
             // TODO: Try to resolve doing this from the callsite, to allow a true POCO

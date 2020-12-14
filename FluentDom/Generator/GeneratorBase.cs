@@ -28,7 +28,7 @@ namespace FluentDom.Generator
             return sb.ToString();
         }
 
-        public override string ToString()
+        public string GetOutput()
         {
             return sb.ToString();
         }

@@ -1,9 +1,6 @@
 ﻿using StarFruit2;
 using StarFruit2.Common;
-using System;
-using System.Collections.Generic;
 using System.CommandLine.Parsing;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TwoLayerCli

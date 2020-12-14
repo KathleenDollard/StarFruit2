@@ -11,6 +11,9 @@ namespace FluentDom
         public static implicit operator TypeRep(string b)
             => new(b);
 
+        public static implicit operator TypeRep(Type t)
+            => new(t);
+
         public static TypeRep Var { get; } = new TypeRep(true) { };
 
         public static TypeRep Bool { get; } = new TypeRep(typeof(System.Boolean)) { };
@@ -53,6 +56,7 @@ namespace FluentDom
                 _ => name
             };
         }
+
         public TypeRep(string name, params TypeRep[] genericTypeArguments)
             : this(name)
         {
