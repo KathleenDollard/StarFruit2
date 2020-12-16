@@ -1,0 +1,32 @@
+using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
+{
+   public MyCommandCommandSource()
+   : base(new Command(null, null))
+   {
+      Option1Option = GetOption1();
+      Command.Add(Option1Option);
+      Command.Handler = CommandHandler.Create((InvocationContext context) =>
+             {  
+                CurrentCommandSource = this;
+                CurrentParseResult = context.ParseResult;
+                return 0;
+             });
+   }
+
+   public Option<bool> Option1Option { get; set; }
+
+   public Option<bool> GetOption1()
+   {
+      Option<bool> option = new Option<bool>();
+      option.Description = null;
+      option.IsRequired = false;
+      option.IsHidden = false;
+      return option;
+   }
+}
