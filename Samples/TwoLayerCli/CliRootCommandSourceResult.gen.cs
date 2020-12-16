@@ -13,7 +13,7 @@ namespace TwoLayerCli
                                              CommandSourceMemberResult<string> stringProperty_Result,
                                              CommandSourceMemberResult<bool> ctorParam_Result,
                                              int exitCode)
-            :base( parseResult,  exitCode)
+            : base(parseResult, exitCode)
         {
             StringProperty_Result = stringProperty_Result;
             CtorParam_Result = ctorParam_Result;
@@ -41,7 +41,7 @@ namespace TwoLayerCli
             : base(parseResult,
                    CommandSourceMemberResult.Create(findCommandSource.StringProperty, parseResult),
                    CommandSourceMemberResult.Create(findCommandSource.CtorParam, parseResult),
-                   exitCode )
+                   exitCode)
         {
             IntArg_Result = CommandSourceMemberResult.Create(findCommandSource.IntArg, parseResult);
             StringOption_Result = CommandSourceMemberResult.Create(findCommandSource.StringOption, parseResult);
@@ -58,7 +58,7 @@ namespace TwoLayerCli
         }
 
     }
-  
+
     public class ListCommandSourceResult : CliRootCommandSourceResult
     {
         public ListCommandSourceResult(ParseResult parseResult,
@@ -69,7 +69,7 @@ namespace TwoLayerCli
                    CommandSourceMemberResult.Create(listCommandSource.CtorParam, parseResult),
                    exitCode)
         {
-             VerbosityOption_Result = CommandSourceMemberResult.Create(listCommandSource.VerbosityOption, parseResult);
+            VerbosityOption_Result = CommandSourceMemberResult.Create(listCommandSource.VerbosityOption, parseResult);
         }
 
         public CommandSourceMemberResult<VerbosityLevel> VerbosityOption_Result { get; set; }

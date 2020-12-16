@@ -88,7 +88,7 @@ namespace StarFruit2
         {
             var arr = input.ToCharArray();
             arr[0] = char.ToLowerInvariant(arr[0]);
-            return arr.ToString();
+            return new string(arr);
         }
     }
 }

@@ -204,6 +204,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
 
+            Approvals.Verify(actual);
             actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FluentDom
 {
+    [Flags]
     public enum MemberModifiers
     {
         None=0,
@@ -15,8 +16,8 @@ namespace FluentDom
         Abstract = 0b_0000_1000,
         New = 0b_0001_0000,
         Virtual = 0b_0001_0000,
-        Override = 0b_0001_0000,
-        Async = 0b_0001_0000,
+        Override = 0b_0010_0000,
+        Async = 0b_0100_0000,
     }
 
     public abstract class MemberBase : IClassMember

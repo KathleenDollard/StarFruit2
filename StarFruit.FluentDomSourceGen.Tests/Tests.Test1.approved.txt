@@ -11,10 +11,10 @@ namespace TwoLayerCli
       public CliRootCommandSource()
       : base(new Command("cli-root", ""))
       {
-         StringProperty = GetStringProperty();
-         Command.Add(StringProperty);
-         InvokeAsync = new InvokeAsyncCommandSource(this, this);
-         Command.AddCommand(InvokeAsync);
+         StringPropertyOption = GetStringProperty();
+         Command.Add(StringPropertyOption);
+         InvokeAsyncCommand = new InvokeAsyncCommandSource(this, this);
+         Command.AddCommand(InvokeAsyncCommand);
          Command.Handler = CommandHandler.Create((InvocationContext context) =>
              {  
                 CurrentCommandSource = this;
@@ -23,8 +23,8 @@ namespace TwoLayerCli
              });
       }
 
-      public Option<string> StringProperty { get; set; }
-      public InvokeAsyncCommandSource InvokeAsync { get; set; }
+      public Option<string> StringPropertyOption { get; set; }
+      public InvokeAsyncCommandSource InvokeAsyncCommand { get; set; }
 
       public Option<string> GetStringProperty()
       {
@@ -41,12 +41,12 @@ namespace TwoLayerCli
       : base(new Command("invoke-async", ""))
       {
          this.parent = parent;
-         intArg = GetintArg();
-         Command.Add(intArg);
-         stringOption = GetstringOption();
-         Command.Add(stringOption);
-         boolOption = GetboolOption();
-         Command.Add(boolOption);
+         intArgArgument = GetintArg();
+         Command.Add(intArgArgument);
+         stringOptionOption = GetstringOption();
+         Command.Add(stringOptionOption);
+         boolOptionOption = GetboolOption();
+         Command.Add(boolOptionOption);
          Command.Handler = CommandHandler.Create(() =>
              {  
                 CurrentCommandSource = this;
@@ -60,9 +60,9 @@ namespace TwoLayerCli
          return new InvokeAsyncCommandSource(parseResult, this, exitCode);
       }
 
-      public Argument<int> intArg { get; set; }
-      public Option<string> stringOption { get; set; }
-      public Option<bool> boolOption { get; set; }
+      public Argument<int> intArgArgument { get; set; }
+      public Option<string> stringOptionOption { get; set; }
+      public Option<bool> boolOptionOption { get; set; }
 
       public Argument<int> GetintArg()
       {
@@ -87,6 +87,55 @@ namespace TwoLayerCli
          option.IsRequired = false;
          option.IsHidden = false;
          return option;
+      }
+   }
+}
+using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+
+namespace TwoLayerCli
+{
+   public class CliRootCommandSourceResult : CommandSourceResult<CliRoot>
+   {
+      public CliRootCommandSource(ParseResult parseResult, CommandSourceMemberResult<Option<string>> stringPropertyOption_result, int exitCode)
+      : base("parseResult", "exitCode")
+      {
+         StringPropertyOption_Result = stringPropertyOption_result;
+      }
+      public CommandSourceMemberResult<Option<string>> stringPropertyOption_result { get; set; }
+
+      public void CreateInstance()
+      {
+         newItem = new CliRoot();
+         StringProperty = StringPropertyOption_Result;
+      }
+   }
+   public class InvokeAsyncCommandSourceResult : CliRoot
+   {
+      public InvokeAsyncCommandSource(ParseResult parseResult, CommandSourceMemberResult<Argument<int>> intArgArgument_result, CommandSourceMemberResult<Option<string>> stringOptionOption_result, CommandSourceMemberResult<Option<bool>> boolOptionOption_result, int exitCode)
+      : base(parseResult, CommandSourceMemberResult.Create(InvokeAsyncCommandSource), exitCode)
+      {
+         intArgArgument_Result = intArgArgument_result;
+         stringOptionOption_Result = stringOptionOption_result;
+         boolOptionOption_Result = boolOptionOption_result;
+      }
+      public CommandSourceMemberResult<Argument<int>> intArgArgument_result { get; set; }
+      public CommandSourceMemberResult<Option<string>> stringOptionOption_result { get; set; }
+      public CommandSourceMemberResult<Option<bool>> boolOptionOption_result { get; set; }
+
+      public void CreateInstance()
+      {
+         newItem = new InvokeAsync();
+         intArg = intArgArgument_Result;
+         stringOption = stringOptionOption_Result;
+         boolOption = boolOptionOption_Result;
+      }
+      public int RunAsync()
+      {
+         return CreateInstance().InvokeAsyncAsync(intArgArgument_Result.Value, stringOptionOption_Result.Value, boolOptionOption_Result.Value);
       }
    }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentDom;
+using StarFruit.Common;
 using StarFruit2.Common.Descriptors;
 using System;
 using System.Collections.Generic;
@@ -28,46 +29,66 @@ namespace StarFruit2.Generate
 
             return Code.Create(cli.GeneratedComandSourceNamespace)
                     .Usings(usings)
-                    .Class(CommandResultClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
-                    .Classes(new CommandDescriptor[] { cli.CommandDescriptor },
-                             c => SubCommandClasses(c));
+                    .Class(RootCommandResultClass(cmd))
+                    .Classes(cli.CommandDescriptor.SubCommands,
+                             c => SubCommandResultClass(c));
         }
 
+        private Class RootCommandResultClass(CommandDescriptor cmd)
+            => new Class(cmd.CommandSourceResultClassName())
+                .Base(new TypeRep("CommandSourceResult", cmd.OriginalName))
+                .Constructor(GetRootCtor(cmd, cmd.Root))
+                .Properties(cmd.GetOptionsAndArgs(),
+                            s => ChildProperty(s))
+                .BlankLine()
+                .Method(CreateInstance(cmd));
 
-        private Class CommandResultClass(CommandDescriptor cmd,
-                                         TypeRep baseClass,
-                                         object parent)
-              => new Class(cmd.CommandSourceResultClassName())
-                    .Base(baseClass)
-                    .Constructor(parent is null ? GetRootCtor(cmd, cmd.Root, parent) : GetCtor(cmd, cmd.Root, parent))
-                    .Properties(cmd.GetChildren(),
-                                s => ChildProperty(s))
-                    .BlankLine()
-                    .Method(CreateInstance(cmd));
+        private Class SubCommandResultClass(CommandDescriptor cmd)
+            => new Class(cmd.CommandSourceResultClassName())
+                .Base((cmd.ParentSymbolDescriptorBase as CommandDescriptor)?.OriginalName)
+                .Constructor(GetCtor(cmd))
+                .Properties(cmd.GetChildren(),
+                            s => ChildProperty(s))
+                .BlankLine()
+                .Method(CreateInstance(cmd))
+                .Method(RunAsync(cmd));
 
-        private Constructor GetRootCtor(CommandDescriptor cmd, CommandDescriptor root, object parent)
+
+        private Constructor GetRootCtor(CommandDescriptor cmd, CommandDescriptor root)
+           => new Constructor(cmd.CommandSourceClassName())
+                   .Parameter("parseResult", "ParseResult")
+                   .Parameters(cmd.GetOptionsAndArgs(), x => ResultParameterMaker(x))
+                   .Parameter("exitCode", "int")
+                   .BaseCall("parseResult", "exitCode")
+                   .Statements(cmd.GetOptionsAndArgs(), x => CtorAssigns(x));
+
+        private Constructor GetCtor(CommandDescriptor cmd)
             => new Constructor(cmd.CommandSourceClassName())
                     .Parameter("parseResult", "ParseResult")
                     .Parameters(cmd.GetOptionsAndArgs(), x => ResultParameterMaker(x))
                     .Parameter("exitCode", "int")
-                    .BaseCall(NewObject("parseResult", "exitCode"))
+                    .BaseCall(CtorBaseCallArgs(cmd))
                     .Statements(cmd.GetOptionsAndArgs(), x => CtorAssigns(x));
 
+        private IExpression[] CtorBaseCallArgs(CommandDescriptor cmd)
+        {
+            if (cmd?.ParentSymbolDescriptorBase is not CommandDescriptor parent)
+            {
+                return new IExpression[] { };
+            }
+            var args = parent.GetOptionsAndArgs()
+                             .Select(x => (IExpression)MethodCall("CommandSourceMemberResult.Create", cmd.CommandSourceClassName()))
+                             .ToList();
+            args.Insert(0, VariableReference("parseResult"));
+            args.Add(VariableReference("exitCode"));
+            return args.ToArray(); ;
+        }
+
         private IExpression CtorAssigns(SymbolDescriptor symbol)
-            => Assign(symbol.GetPropertyName(), symbol.GetPropertyResultName());
+            => Assign(symbol.GetPropertyResultName(), symbol.GetParameterResultName());
 
         private Parameter ResultParameterMaker(ISymbolDescriptor item)
             => new Parameter(item.GetParameterResultName(), new TypeRep("CommandSourceMemberResult", item.SymbolType()));
-
-        private Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, object parent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private IEnumerable<Class> SubCommandClasses(CommandDescriptor c)
-        {
-            throw new NotImplementedException();
-        }
 
         private Property ChildProperty(SymbolDescriptor symbol)
             => symbol switch
@@ -80,11 +101,28 @@ namespace StarFruit2.Generate
         private Method CreateInstance(CommandDescriptor cmd)
         {
             const string leftHand = "newItem";
-            var arguments = cmd.GetOptionsAndArgs().Where(x=>x.ParentSymbolDescriptorBase is ).(.Select(s => s.GetParameterResultName());
-            return method = new Method("CreateInstance", modifiers: MemberModifiers.Override)
-                           .Statements(Assign(leftHand, NewObject(cmd.OriginalName, arguments.ToArray())))
+            var arguments = cmd.GetOptionsAndArgs()
+                               .Where(x => x.CodeElement == CodeElement.CtorParameter)
+                               .Select(s => s.GetParameterResultName())
+                               .ToArray();
+            return new Method("CreateInstance", modifiers: MemberModifiers.Override)
+                           .Statements(Assign(leftHand, NewObject(cmd.OriginalName, arguments)))
                            .Statements(cmd.GetOptionsAndArgs(), x => Assign(VariableReference(x.OriginalName), VariableReference(x.GetPropertyResultName())));
         }
+
+        private Method RunAsync(CommandDescriptor cmd)
+        {
+            return new Method("RunAsync", modifiers: MemberModifiers.Async | MemberModifiers.Override)
+                       .ReturnType("int")
+                       .Statements(Return(MethodCall($"CreateInstance().{cmd.OriginalName}Async", GetArgs(cmd))));
+
+            static IExpression[] GetArgs(CommandDescriptor cmd)
+                => cmd.GetOptionsAndArgs()
+                      .Select(x => Dot(x.GetPropertyResultName(), "Value"))
+                      .ToArray();
+        }
+
+
     }
 }
 

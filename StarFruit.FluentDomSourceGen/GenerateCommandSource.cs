@@ -78,15 +78,15 @@ namespace StarFruit2.Generate
         protected virtual Func<SymbolDescriptor, IExpression>[] CtorOptionsAndArgs()
             => new List<Func<SymbolDescriptor, IExpression>>
             {
-                o => Assign(o.OriginalName, MethodCall(GetOptArgMethodName(o.OriginalName))),
-                o => MethodCall($"Command.Add", o.OriginalName)
+                o => Assign(o.GetPropertyName(), MethodCall(GetOptArgMethodName(o))),
+                o => MethodCall($"Command.Add", o.GetPropertyName())
             }.ToArray();
 
-        protected virtual Func<SymbolDescriptor, IExpression>[] CtorSubCommands()
-            => new List<Func<SymbolDescriptor, IExpression>>
+        protected virtual Func<CommandDescriptor , IExpression>[] CtorSubCommands()
+            => new List<Func<CommandDescriptor, IExpression>>
             {
-                o => Assign(o.OriginalName, NewObject($"{o.OriginalName}CommandSource", This(), This())),
-                o => MethodCall($"Command.AddCommand", o.OriginalName)
+                o => Assign(o.GetPropertyName(), NewObject($"{o.CommandSourceClassName()}", This(), This())),
+                o => MethodCall($"Command.AddCommand", o.GetPropertyName())
             }.ToArray();
 
         protected virtual Property ChildProperty(SymbolDescriptor symbol) 
@@ -108,7 +108,7 @@ namespace StarFruit2.Generate
 
         protected virtual Method GetArgumentMethod(ArgumentDescriptor o)
         {
-            var method = new Method(GetOptArgMethodName(o.OriginalName))
+            var method = new Method(GetOptArgMethodName(o))
                 .ReturnType(o.ArgumentType())
                 .Statements(
                       AssignVar("argument", o.ArgumentType(), NewObject(o.ArgumentType(), o.CliName)),
@@ -125,7 +125,7 @@ namespace StarFruit2.Generate
 
         protected virtual Method GetOptionMethod(OptionDescriptor o)
         {
-            var method = new Method(GetOptArgMethodName(o.OriginalName))
+            var method = new Method(GetOptArgMethodName(o))
                 .ReturnType(o.OptionType())
                 .Statements(
                       AssignVar("option", o.OptionType(), NewObject(o.OptionType(), o.CliName)),
@@ -169,9 +169,9 @@ namespace StarFruit2.Generate
                                               VariableReference("exitCode"))))
                                 );
 
-        protected virtual string GetOptArgMethodName(string name)
+        protected virtual string GetOptArgMethodName(SymbolDescriptor symbol)
         {
-            return $"Get{name}";
+            return $"Get{symbol.OriginalName}";
         }
 
   

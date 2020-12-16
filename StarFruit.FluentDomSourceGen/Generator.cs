@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using FluentDom;
 
 namespace StarFruit2.Generate
 {
@@ -26,27 +27,19 @@ namespace StarFruit2.Generate
             var source = "";
             foreach (var declaration in receiver.CandidateCliTypes)
             {
-                var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation );
-                var code = new GenerateCommandSource().CreateCode(cliDescriptor);
-                var output = new FluentDom.Generator.CSharpGenerator().Generate(code);
-                source += output;
+                var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation);
+                //source += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
+                source += OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor));
+                source += OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor));
             }
-
-            // TODO: Try to resolve doing this from the callsite, to allow a true POCO
-            //foreach (var typeSyntax in receiver.CandidateCliTypeferences)
-            //{
-            //    //var semanticModel = context.Compilation.GetSemanticModel(typeSyntax.SyntaxTree);
-            //    //source += $"// SemanticModel: {semanticModel}";
-            //    //var declaration = semanticModel.GetSymbolInfo(typeSyntax);
-            //    //source += $"// Declaration: {declaration}";
-            //    //var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(typeSyntax,context.Compilation as CSharpCompilation );
-            //    source += $"public class {typeSyntax}Test {{ }}";
-            //}
 
             if (source != null)
             {
                 context.AddSource("generated.cs", source);
             }
+
+            static string OutputCode(Code code) 
+                => new FluentDom.Generator.CSharpGenerator().Generate(code);
         }
 
 
