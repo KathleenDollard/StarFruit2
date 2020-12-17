@@ -22,7 +22,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="all" />
   </ItemGroup>
   
-  <PropertyGroup>
+  <!--<PropertyGroup>
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>
 
@@ -30,6 +30,6 @@
     <ItemGroup>
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_CommandLine)\lib\netstandard2.0\System.CommandLine.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
-  </Target>
+  </Target>-->
 
 </Project>

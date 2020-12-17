@@ -27,7 +27,9 @@ namespace StarFruit2.Generate
                         "System.CommandLine.Parsing"
             };
 
-            return Code.Create(cli.GeneratedComandSourceNamespace)
+            _ = cli ?? throw new InvalidOperationException("CliDescriptor cannot be null");
+
+            return Code.Create(cli.GeneratedComandSourceNamespace ?? "default namespace")
                     .Usings(usings)
                     .Class(RootCommandResultClass(cmd))
                     .Classes(cli.CommandDescriptor.SubCommands,
@@ -45,7 +47,7 @@ namespace StarFruit2.Generate
 
         private Class SubCommandResultClass(CommandDescriptor cmd)
             => new Class(cmd.CommandSourceResultClassName())
-                .Base((cmd.ParentSymbolDescriptorBase as CommandDescriptor)?.OriginalName)
+                .Base((cmd.ParentSymbolDescriptorBase as CommandDescriptor)?.OriginalName ?? "<missing name>")
                 .Constructor(GetCtor(cmd))
                 .Properties(cmd.GetChildren(),
                             s => ChildProperty(s))
