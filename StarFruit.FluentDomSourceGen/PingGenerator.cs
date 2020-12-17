@@ -12,56 +12,25 @@ using System.Diagnostics;
 namespace StarFruit2.Generate
 {
     [Generator]
-    public class Generator : ISourceGenerator
+    public class PingGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            context.RegisterForSyntaxNotifications(() => new PingSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            try
-            {
-                //Debugger.Launch();
-                context.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor("KD0000", "Generator entered", "", "KDGenerator", DiagnosticSeverity.Info, true),
-                    null));
-
-                if (context.SyntaxReceiver is not SyntaxReceiver receiver)
-                    return;
-
-                var source = "";
-                foreach (var declaration in receiver.CandidateCliTypes)
-                {
-                    var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation);
-                    source += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
-                    //source += OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor));
-                    //source += OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor));
-                }
-
-
-                if (source != null)
-                {
-                    //Debugger.Launch();
-                    context.AddSource("generated.cs", source);
-                }
-
-                static string OutputCode(Code code)
-                    => new FluentDom.Generator.CSharpGenerator().Generate(code);
-            }
-            catch (Exception ex)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor("KD0001", "Generator failed", ex.ToString(), "KDGenerator", DiagnosticSeverity.Error, true),
-                    null));
-            }
+            if (context.SyntaxReceiver is not PingSyntaxReceiver receiver)
+                return;
+            
+            var source = $"\npublic class TempPing4{{}}\n";
+            source += $"// {receiver.CandidateCliTypes.Count()}";
+            context.AddSource("generated.cs", source);
         }
-
-
     }
 
-    public class SyntaxReceiver : ISyntaxReceiver
+    public class PingSyntaxReceiver : ISyntaxReceiver
     {
         public List<TypeSyntax> CandidateCliTypeferences { get; } = new();
         public List<ClassDeclarationSyntax> CandidateCliTypes { get; } = new();
