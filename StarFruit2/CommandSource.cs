@@ -75,28 +75,38 @@ namespace StarFruit2
     // </para>
     // </remarks>
 
-        public abstract class CommandSource
+    public abstract class CommandSource
+    {
+        public static RootCommandSource Create<TCli>()
         {
-            public static RootCommandSource Create<TCli>()
-            {
-                var cliType = typeof(TCli);
-                var fullName = $"{cliType.FullName}CommandSource";
-                var type = cliType.Assembly.GetType(fullName);
-                Assert.NotNull(type);
-                var ret = Activator.CreateInstance(type) as RootCommandSource;
-                Assert.NotNull(ret); // throw here if generator is broken
-                return ret;
-            }
+            var cliType = typeof(TCli);
+            var fullName = $"{cliType.FullName}CommandSource";
+            var type = cliType.Assembly.GetType(fullName);
+            Assert.NotNull(type);
+            var ret = Activator.CreateInstance(type) as RootCommandSource;
+            Assert.NotNull(ret); // throw here if generator is broken
+            return ret;
+        }
 
-            public static async Task<int> RunAsync<TCli>(string[] args)
-            {
-                return await Create<TCli>().Parse(args).RunAsync();
-            }
+        public static async Task<int> RunAsync<TCli>(string[] args)
+        {
+            return await RunAsync<TCli>(string.Join("",args));
+        }
 
-            public static int Run<TCli>(string[] args)
-            {
-                return Create<TCli>().Parse(args).Run();
-            }
+        public static async Task<int> RunAsync<TCli>(string args)
+        {
+            return await Create<TCli>().Parse(args).RunAsync();
+        }
+
+        public static int Run<TCli>(string[] args)
+        {
+            return Run<TCli>(string.Join("", args));
+        }
+
+        public static int Run<TCli>(string args)
+        {
+            return Create<TCli>().Parse(args).Run();
+        }
 
         public Command Command { get; }
 
@@ -116,9 +126,9 @@ namespace StarFruit2
         protected RootCommandSource(Command command) : base(command) { }
 
         public CommandSource? CurrentCommandSource { get; set; }
-        public ParseResult ? CurrentParseResult { get; set; }
+        public ParseResult? CurrentParseResult { get; set; }
 
-        public CommandSourceResult Parse(string[] args)
+        public CommandSourceResult Parse(string args)
         {
             // See CommandExtensions.GetInvocationPipeline for breakdown of implementation
             // This does not call the user's method, but an invoke in the CommandSource that sets the result

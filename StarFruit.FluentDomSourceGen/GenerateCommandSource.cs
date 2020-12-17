@@ -35,7 +35,7 @@ namespace StarFruit2.Generate
 
         protected virtual Class CommandSourceClass(CommandDescriptor cmd,
                                                    TypeRep baseClass,
-                                                   CommandDescriptor parent) 
+                                                   CommandDescriptor parent)
             => new Class(cmd.CommandSourceClassName())
                     .Base(baseClass)
                     .Constructor(parent is null ? GetRootCtor(cmd, cmd.Root, parent) : GetCtor(cmd, cmd.Root, parent))
@@ -49,7 +49,7 @@ namespace StarFruit2.Generate
                     .BlankLine()
                     .Methods(cmd.GetOptionsAndArgs(),
                              s => ChildGetMethod(s));
-   
+
         protected virtual Constructor GetRootCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
             => new Constructor(cmd.CommandSourceClassName())
                 .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)))
@@ -82,14 +82,14 @@ namespace StarFruit2.Generate
                 o => MethodCall($"Command.Add", o.GetPropertyName())
             }.ToArray();
 
-        protected virtual Func<CommandDescriptor , IExpression>[] CtorSubCommands()
+        protected virtual Func<CommandDescriptor, IExpression>[] CtorSubCommands()
             => new List<Func<CommandDescriptor, IExpression>>
             {
                 o => Assign(o.GetPropertyName(), NewObject($"{o.CommandSourceClassName()}", This(), This())),
                 o => MethodCall($"Command.AddCommand", o.GetPropertyName())
             }.ToArray();
 
-        protected virtual Property ChildProperty(SymbolDescriptor symbol) 
+        protected virtual Property ChildProperty(SymbolDescriptor symbol)
             => symbol switch
             {
                 OptionDescriptor o => new Property(o.GetPropertyName(), o.OptionType()),
@@ -98,7 +98,7 @@ namespace StarFruit2.Generate
                 _ => throw new InvalidOperationException("Unexpected symbol type")
             };
 
-        protected virtual Method ChildGetMethod(SymbolDescriptor symbol) 
+        protected virtual Method ChildGetMethod(SymbolDescriptor symbol)
             => symbol switch
             {
                 OptionDescriptor o => GetOptionMethod(o),
@@ -174,7 +174,7 @@ namespace StarFruit2.Generate
             return $"Get{symbol.OriginalName}";
         }
 
-  
+
     }
 }
 

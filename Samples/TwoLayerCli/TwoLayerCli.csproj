@@ -11,11 +11,17 @@
     <None Include="Kittitas.csproj" />
   </ItemGroup>-->
 
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj"
                       ReferenceOutputAssembly="false"
                       OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
+    <!--<ProjectReference Include="..\..\StarFruit2.Common\StarFruit2.Common.csproj" />-->
   </ItemGroup>
 
 </Project>

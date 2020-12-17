@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using FluentDom;
+using System.Diagnostics;
 
 namespace StarFruit2.Generate
 {
@@ -20,6 +21,8 @@ namespace StarFruit2.Generate
 
         public void Execute(GeneratorExecutionContext context)
         {
+            Debugger.Launch();
+
             //System.Diagnostics.Debugger.Launch();
             if (context.SyntaxReceiver is not SyntaxReceiver receiver)
                 return;
@@ -28,13 +31,15 @@ namespace StarFruit2.Generate
             foreach (var declaration in receiver.CandidateCliTypes)
             {
                 var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation);
-                //source += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
-                source += OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor));
-                source += OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor));
+                source += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
+                //source += OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor));
+                //source += OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor));
             }
+
 
             if (source != null)
             {
+                Debugger.Launch();
                 context.AddSource("generated.cs", source);
             }
 
