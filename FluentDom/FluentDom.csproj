@@ -4,6 +4,12 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>Latest</LangVersion>
 		<Nullable>enable</Nullable>
-	</PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>CodeRapid.FluentDom</PackageId>
+    <Authors>Kathleen Dollard</Authors>
+    <Company />
+    <Product>FluentDom</Product>
+    <Version>0.0.1-beta0001A</Version>
+  </PropertyGroup>
 
 </Project>

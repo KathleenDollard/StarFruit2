@@ -162,7 +162,7 @@ namespace StarFruit2.Generate
             => cls.Method(new Method("GetCommandSourceResult")
                           .ReturnType("CommandSourceResult")
                           .Parameter("parseResult", "ParseResult")
-                          .Parameter("int", "exitCode")
+                          .Parameter("exitCode","int")
                           .Statements(Return(NewObject(cmd.CommandSourceClassName(),
                                               VariableReference("parseResult"),
                                               This(),

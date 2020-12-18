@@ -225,7 +225,7 @@ namespace FluentDom.Tests
 
             actual.Should().Be(expected);
         }
- 
+
         [Fact]
         public void Generated_method_with_parameters_is_correct()
         {
@@ -258,6 +258,42 @@ namespace FluentDom.Tests
 
             actual.Should().Be(expected);
         }
+
+        [Fact]
+        public void Generated_method_with_scope_is_correct()
+        {
+            var method = new Method(MethodName, scope: Scope.Protected)
+                            .ReturnType("string")
+                            .Parameter("value", typeof(int))
+                            .Parameter("s", typeof(string));
+
+            var expected = @"protected string MethodName(int value, string s)
+{
+}
+";
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
+
+            actual.Should().Be(expected);
+        }
+
+        [Fact]
+        public void Generated_method_with_modifiers_is_correct()
+        {
+            var method = new Method(MethodName, modifiers: MemberModifiers.Partial | MemberModifiers.Override)
+                            .ReturnType("string")
+                            .Parameter("value", typeof(int))
+                            .Parameter("s", typeof(string));
+
+            var expected = @"public partial override string MethodName(int value, string s)
+{
+}
+";
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
+
+            actual.Should().Be(expected);
+        }
+
+
         [Fact]
         public void Generated_constructor_with_parameters_is_correct()
         {

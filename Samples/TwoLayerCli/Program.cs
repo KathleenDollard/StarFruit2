@@ -34,7 +34,7 @@ namespace TwoLayerCli
         static int Main_with_CliModifications(string[] args)
         {
             return 0;
-            //var commandSource = CommandSource.Create<CliRoot>() as CliRootCommandSource;
+            var commandSource = CommandSource.Create<CliRoot>() as CliRootCommandSource;
             //_ = commandSource ?? throw new InvalidOperationException("CommandSource not found or unexpected type");
 
             //// Modify commandSource.Command CLI tree
@@ -63,26 +63,27 @@ namespace TwoLayerCli
         static async Task<int> Main_what_really_happens(string[] args)
         {
             return 0;
-            //var commandSource = CommandSource.Create<CliRoot>() as CliRootCommandSource;
-            //// modify System.CommandLine elements here
+            var commandSource = CommandSource.Create<CliRoot>() as CliRootCommandSource;
+            // modify System.CommandLine elements here
 
-            //var commandSourceResult = commandSource.Parse(args);
-            //if (commandSourceResult.EarlyReturn)
-            //{
-            //    return commandSourceResult.ExitCode;
-            //}
-            //// Property validation and modify if accessible
-            //switch (commandSourceResult)
-            //{
-            //    case FindCommandSourceResult:
-            //    // validation here and values can be changed
-            //    case ListCommandSourceResult:
-            //    default:
-            //        break;
-            //}
-            //// if you didn’t early return on help, etc, Execute does nothing
-            //var exitCode = await commandSourceResult.RunAsync();
-            //return exitCode;
+            var commandSourceResult = commandSource.Parse(string.Join("",args));
+            if (commandSourceResult.EarlyReturn)
+            {
+                return commandSourceResult.ExitCode;
+            }
+            var cliRootResult = commandSourceResult as CliRootCommandSourceResult;
+            // Property validation and modify if accessible
+            switch (cliRootResult)
+            {
+                case FindCommandSourceResult:
+                // validation here and values can be changed
+                case ListCommandSourceResult:
+                default:
+                    break;
+            }
+            // if you didn’t early return on help, etc, Execute does nothing
+            var exitCode = await commandSourceResult.RunAsync();
+            return exitCode;
         }
 
     }

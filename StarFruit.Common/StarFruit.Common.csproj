@@ -3,7 +3,13 @@
   <PropertyGroup>
 	  <TargetFramework>netstandard2.0</TargetFramework>
 	  <Nullable>enable</Nullable>
-    <LangVersion>Latest</LangVersion>
+    <LangVersion>9</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>CodeRapid.StarFruit.Common</PackageId>
+    <Authors>Kathleen Dollard</Authors>
+    <Company />
+    <Product>StarFruit2</Product>
+    <Version>0.0.1-beta0001A</Version>
   </PropertyGroup>
 
 

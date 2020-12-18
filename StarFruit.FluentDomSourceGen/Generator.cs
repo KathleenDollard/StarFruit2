@@ -8,6 +8,7 @@ using System.Text;
 using System.Linq;
 using FluentDom;
 using System.Diagnostics;
+using FluentDom.Generator;
 
 namespace StarFruit2.Generate
 {
@@ -35,9 +36,10 @@ namespace StarFruit2.Generate
                 foreach (var declaration in receiver.CandidateCliTypes)
                 {
                     var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation);
-                    //source += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
-                    source += OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor));
-                    source += OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor));
+                    //var tempSource += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
+                    //OutputCode(tempSource, context, $"Temp.generated.cs");
+                    OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}.generated.cs");
+                    OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}Result.generated.cs");
                 }
 
                 if (source != null)
@@ -46,14 +48,21 @@ namespace StarFruit2.Generate
                     context.AddSource("generated.cs", source);
                 }
 
-                static string OutputCode(Code code)
-                    => new FluentDom.Generator.CSharpGenerator().Generate(code);
-            }
+             }
             catch (Exception ex)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     new DiagnosticDescriptor("KD0002", "Generator failed", ex.ToString(), "KDGenerator", DiagnosticSeverity.Error, true),
                     null));
+            }
+
+            static void OutputCode(Code code, GeneratorExecutionContext context, string fileName)
+            {
+                var source = new CSharpGenerator().Generate(code);
+                if (source is not null)
+                {
+                    context.AddSource(fileName, source);
+                }
             }
         }
 

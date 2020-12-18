@@ -21,11 +21,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj"
-                      ReferenceOutputAssembly="false"
-                      OutputItemType="Analyzer" />
+    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001J"/> <!-- <<< Here -->
     <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
-    <!--<ProjectReference Include="..\..\StarFruit2.Common\StarFruit2.Common.csproj" />-->
   </ItemGroup>
 
 </Project>

@@ -47,17 +47,17 @@ namespace StarFruit2.Generate
 
         private Class SubCommandResultClass(CommandDescriptor cmd)
             => new Class(cmd.CommandSourceResultClassName())
-                .Base((cmd.ParentSymbolDescriptorBase as CommandDescriptor)?.OriginalName ?? "<missing name>")
+                .Base((cmd.ParentSymbolDescriptorBase as CommandDescriptor)?.CommandSourceResultClassName() ?? "<missing name>")
                 .Constructor(GetCtor(cmd))
                 .Properties(cmd.GetChildren(),
                             s => ChildProperty(s))
                 .BlankLine()
                 .Method(CreateInstance(cmd))
-                .Method(RunAsync(cmd));
+                .Method(Run(cmd));
 
 
         private Constructor GetRootCtor(CommandDescriptor cmd, CommandDescriptor root)
-           => new Constructor(cmd.CommandSourceClassName())
+           => new Constructor(cmd.CommandSourceResultClassName())
                    .Parameter("parseResult", "ParseResult")
                    .Parameters(cmd.GetOptionsAndArgs(), x => ResultParameterMaker(x))
                    .Parameter("exitCode", "int")
@@ -65,7 +65,7 @@ namespace StarFruit2.Generate
                    .Statements(cmd.GetOptionsAndArgs(), x => CtorAssigns(x));
 
         private Constructor GetCtor(CommandDescriptor cmd)
-            => new Constructor(cmd.CommandSourceClassName())
+            => new Constructor(cmd.CommandSourceResultClassName())
                     .Parameter("parseResult", "ParseResult")
                     .Parameters(cmd.GetOptionsAndArgs(), x => ResultParameterMaker(x))
                     .Parameter("exitCode", "int")
@@ -108,15 +108,16 @@ namespace StarFruit2.Generate
                                .Select(s => s.GetParameterResultName())
                                .ToArray();
             return new Method("CreateInstance", modifiers: MemberModifiers.Override)
+                           .ReturnType(cmd.OriginalName)
                            .Statements(Assign(leftHand, NewObject(cmd.OriginalName, arguments)))
                            .Statements(cmd.GetOptionsAndArgs(), x => Assign(VariableReference(x.OriginalName), VariableReference(x.GetPropertyResultName())));
         }
 
-        private Method RunAsync(CommandDescriptor cmd)
+        private Method Run(CommandDescriptor cmd)
         {
-            return new Method("RunAsync", modifiers: MemberModifiers.Async | MemberModifiers.Override)
+            return new Method("Run", modifiers: MemberModifiers.Override)
                        .ReturnType("int")
-                       .Statements(Return(MethodCall($"CreateInstance().{cmd.OriginalName}Async", GetArgs(cmd))));
+                       .Statements(Return(MethodCall($"CreateInstance().{cmd.OriginalName}", GetArgs(cmd))));
 
             static IExpression[] GetArgs(CommandDescriptor cmd)
                 => cmd.GetOptionsAndArgs()
