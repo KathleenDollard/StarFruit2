@@ -8,7 +8,6 @@ namespace FluentDom.Tests
     {
         private const string PropertyName = "PropertyName";
         private const string MethodName = "MethodName";
-        private const string ClassName = "ClassName";
 
         [Fact]
         public void Generated_auto_property_is_correct()
@@ -17,7 +16,7 @@ namespace FluentDom.Tests
 
             var expected = @"public string PropertyName { get; set; }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -29,7 +28,7 @@ namespace FluentDom.Tests
 
             var expected = @"public string PropertyName { get; }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -44,9 +43,9 @@ namespace FluentDom.Tests
 => 42;
 
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput().NormalizeWhitespace();
 
-            actual.Should().Be(expected);
+            actual.Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -69,7 +68,7 @@ namespace FluentDom.Tests
    }
 }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -92,7 +91,7 @@ namespace FluentDom.Tests
    }
 }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -115,7 +114,7 @@ namespace FluentDom.Tests
    }
 }
 ";
-            var actual = new CSharpGenerator().OutputProperty(property).ToString();
+            var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -129,7 +128,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -145,7 +144,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -161,7 +160,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -177,7 +176,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -193,7 +192,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -207,7 +206,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -222,7 +221,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -238,7 +237,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -255,10 +254,46 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputMethod(method).ToString();
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
             actual.Should().Be(expected);
         }
+
+        [Fact]
+        public void Generated_method_with_scope_is_correct()
+        {
+            var method = new Method(MethodName, scope: Scope.Protected)
+                            .ReturnType("string")
+                            .Parameter("value", typeof(int))
+                            .Parameter("s", typeof(string));
+
+            var expected = @"protected string MethodName(int value, string s)
+{
+}
+";
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
+
+            actual.Should().Be(expected);
+        }
+
+        [Fact]
+        public void Generated_method_with_modifiers_is_correct()
+        {
+            var method = new Method(MethodName, modifiers: MemberModifiers.Partial | MemberModifiers.Override)
+                            .ReturnType("string")
+                            .Parameter("value", typeof(int))
+                            .Parameter("s", typeof(string));
+
+            var expected = @"public partial override string MethodName(int value, string s)
+{
+}
+";
+            var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
+
+            actual.Should().Be(expected);
+        }
+
+
         [Fact]
         public void Generated_constructor_with_parameters_is_correct()
         {
@@ -270,7 +305,7 @@ namespace FluentDom.Tests
 {
 }
 ";
-            var actual = new CSharpGenerator().OutputConstructor(ctor).ToString();
+            var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
             actual.Should().Be(expected);
         }

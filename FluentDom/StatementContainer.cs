@@ -85,14 +85,9 @@ namespace FluentDom
             parameters.Add(new Parameter(name, type));
         }
 
-        public void Parameter(string name, string type)
+        public void Parameter(Parameter parameter)
         {
-            parameters.Add(new Parameter(name, new TypeRep(type)));
-        }
-
-        public void Parameter(string name, Type type)
-        {
-            parameters.Add(new Parameter(name, new TypeRep(type)));
+            parameters.Add(parameter);
         }
     }
 
@@ -122,6 +117,16 @@ namespace FluentDom
             ParameterStore.Parameter(name, type);
             return (T)this;
         }
+
+        public T Parameters<TItem>(IEnumerable<TItem> items, Func<TItem, Parameter> parameterMaker)
+        {
+            foreach (var item in items)
+            {
+                ParameterStore.Parameter(parameterMaker(item));
+    }
+            return (T)this;
+        }
+
     }
 
     public abstract class MethodBaseWithReturn<T> : MethodBase<T>
@@ -139,6 +144,7 @@ namespace FluentDom
             ReturnTypeStore = typeRep;
             return (T)this;
         }
+
     }
 
     public class PropertyGetter : StatementContainer<PropertyGetter>

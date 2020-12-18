@@ -7,7 +7,22 @@
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
+  <!--<ItemGroup>
+    <None Include="Kittitas.csproj" />
+  </ItemGroup>-->
+
   <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20478.1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001J"/>
+    <!-- <<< Here -->
     <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
   </ItemGroup>
 

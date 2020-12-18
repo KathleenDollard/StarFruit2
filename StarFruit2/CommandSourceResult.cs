@@ -11,7 +11,8 @@ namespace StarFruit2
             ExitCode = exitCode;
         }
 
-        public bool EarlyReturn { get; }
+        public bool EarlyReturn
+            => this is EmptyCommandSourceResult;
         public ParseResult ParseResult { get; }
         public int ExitCode { get; }
 

@@ -1,5 +1,4 @@
 ﻿using FluentDom;
-using FluentDom.Generator;
 using StarFruit2.Common.Descriptors;
 using System;
 using System.Collections.Generic;
@@ -10,18 +9,10 @@ using static FluentDom.Expression;
 // * Use a base/derived overlad extensibility mechanism.Overriding methods may need to navigate DOM
 // * Use a two phase appraoch to evaluation, maintaining Select methods as IENumerable and Funcs for extension
 // * Have a separate calculate values method for each method so it can be called at any point
-namespace GeneratorSupport
+namespace StarFruit2.Generate
 {
     public class GenerateCommandSource
     {
-
-        public void Can_create_code()
-        {
-            var cli = new CliDescriptor();
-            cli.CommandDescriptor = new CommandDescriptor(null, "Fizz", null);
-            var code = CreateCode(cli);
-            var ouptput = new CSharpGenerator().Generate(code);
-        }
 
         public virtual Code CreateCode(CliDescriptor cli)
         {
@@ -37,12 +28,12 @@ namespace GeneratorSupport
 
             return Code.Create(cli.GeneratedComandSourceNamespace)
                     .Usings(usings)
-                    .Class(CommandClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
+                    .Class(CommandSourceClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
                     .Classes(new CommandDescriptor[] { cli.CommandDescriptor },
                              c => SubCommandClasses(c));
         }
 
-        protected virtual Class CommandClass(CommandDescriptor cmd,
+        protected virtual Class CommandSourceClass(CommandDescriptor cmd,
                                               TypeRep baseClass,
                                               CommandDescriptor parent) 
             => new Class(cmd.CommandSourceClassName())
@@ -87,44 +78,40 @@ namespace GeneratorSupport
         protected virtual Func<SymbolDescriptor, IExpression>[] CtorOptionsAndArgs()
             => new List<Func<SymbolDescriptor, IExpression>>
             {
-                o => Assign(o.OriginalName, MethodCall(GetOptArgMethodName(o.OriginalName))),
-                o => MethodCall($"Command.Add", o.OriginalName)
+                o => Assign(o.GetPropertyName(), MethodCall(GetOptArgMethodName(o))),
+                o => MethodCall($"Command.Add", o.GetPropertyName())
             }.ToArray();
 
-        protected virtual Func<SymbolDescriptor, IExpression>[] CtorSubCommands()
-            => new List<Func<SymbolDescriptor, IExpression>>
+        protected virtual Func<CommandDescriptor, IExpression>[] CtorSubCommands()
+            => new List<Func<CommandDescriptor, IExpression>>
             {
-                o => Assign(o.OriginalName, NewObject($"{o.OriginalName}CommandSource", This(), This())),
-                o => MethodCall($"Command.AddCommand", o.OriginalName)
+                o => Assign(o.GetPropertyName(), NewObject($"{o.CommandSourceClassName()}", This(), This())),
+                o => MethodCall($"Command.AddCommand", o.GetPropertyName())
             }.ToArray();
 
         protected virtual Property ChildProperty(SymbolDescriptor symbol)
+            => symbol switch
         {
-            return symbol switch
-            {
-                OptionDescriptor o => new Property(o.OriginalName, OptionType(o)),
-                ArgumentDescriptor a => new Property(a.OriginalName, ArgumentType(a)),
-                CommandDescriptor c => new Property(c.OriginalName, $"{c.OriginalName}CommandSource"),
+                OptionDescriptor o => new Property(o.GetPropertyName(), o.OptionType()),
+                ArgumentDescriptor a => new Property(a.GetPropertyName(), a.ArgumentType()),
+                CommandDescriptor c => new Property(c.GetPropertyName(), $"{c.CommandSourceClassName()}"),
                 _ => throw new InvalidOperationException("Unexpected symbol type")
             };
-        }
 
         protected virtual Method ChildGetMethod(SymbolDescriptor symbol)
-        {
-            return symbol switch
+            => symbol switch
             {
                 OptionDescriptor o => GetOptionMethod(o),
                 ArgumentDescriptor a => GetArgumentMethod(a),
                 _ => throw new InvalidOperationException("Unexpected symbol type")
             };
-        }
 
         protected virtual Method GetArgumentMethod(ArgumentDescriptor o)
         {
-            var method = new Method(GetOptArgMethodName(o.OriginalName))
-                .ReturnType(ArgumentType(o))
+            var method = new Method(GetOptArgMethodName(o))
+                .ReturnType(o.ArgumentType())
                 .Statements(
-                      AssignVar("argument", ArgumentType(o), NewObject(ArgumentType(o), o.CliName)),
+                      AssignVar("argument", o.ArgumentType(), NewObject(o.ArgumentType(), o.CliName)),
                       Assign("argument.Description", Value(o.Description)),
                       Assign("argument.IsRequired", Value(o.Required)),
                       Assign("argument.IsHidden", Value(o.IsHidden)))
@@ -138,10 +125,10 @@ namespace GeneratorSupport
 
         protected virtual Method GetOptionMethod(OptionDescriptor o)
         {
-            var method = new Method(GetOptArgMethodName(o.OriginalName))
-                .ReturnType(OptionType(o))
+            var method = new Method(GetOptArgMethodName(o))
+                .ReturnType(o.OptionType())
                 .Statements(
-                      AssignVar("option", OptionType(o), NewObject(OptionType(o), o.CliName)),
+                      AssignVar("option", o.OptionType(), NewObject(o.OptionType(), o.CliName)),
                       Assign("option.Description", Value(o.Description)),
                       Assign("option.IsRequired", Value(o.Required)),
                       Assign("option.IsHidden", Value(o.IsHidden)))
@@ -162,7 +149,7 @@ namespace GeneratorSupport
             //CommandClass(c, new TypeRep(cmd.Root.CommandSourceClassName());
             foreach (var subCommand in cmd.SubCommands)
             {
-                list.Add(CommandClass(subCommand, cmd.CommandSourceClassName(), subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
+                list.Add(CommandSourceClass(subCommand, cmd.CommandSourceClassName(), subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
                 if (subCommand.SubCommands.Any())
                 {
                     list.AddRange(SubCommandClasses(subCommand));
@@ -175,27 +162,19 @@ namespace GeneratorSupport
             => cls.Method(new Method("GetCommandSourceResult")
                           .ReturnType("CommandSourceResult")
                           .Parameter("parseResult", "ParseResult")
-                          .Parameter("int", "exitCode")
+                          .Parameter("exitCode","int")
                           .Statements(Return(NewObject(cmd.CommandSourceClassName(),
                                               VariableReference("parseResult"),
                                               This(),
                                               VariableReference("exitCode"))))
                                 );
 
-        protected virtual string GetOptArgMethodName(string name)
+        protected virtual string GetOptArgMethodName(SymbolDescriptor symbol)
         {
-            return $"Get{name}";
+            return $"Get{symbol.OriginalName}";
         }
 
-        private static TypeRep ArgumentType(ArgumentDescriptor a)
-        {
-            return new TypeRep("Argument", a.GetFluentArgumentType());
-        }
 
-        private static TypeRep OptionType(OptionDescriptor o)
-        {
-            return new TypeRep("Option", o.GetFluentArgumentType());
-        }
     }
 }
 

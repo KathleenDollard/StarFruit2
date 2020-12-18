@@ -19,9 +19,9 @@ namespace FluentDom.Tests
 }}
 ";
 
-            var actual = new CSharpGenerator().OutputClass(cls).ToString();
+            var actual = new CSharpGenerator().OutputClass(cls).GetOutput().NormalizeWhitespace();
 
-            actual.Should().Be(expected);
+            actual.Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace FluentDom.Tests
 {{
 }}
 ";
-            var actual = new CSharpGenerator().OutputClass(cls).ToString();
+            var actual = new CSharpGenerator().OutputClass(cls).GetOutput();
 
             actual.Should().Be(expected);
         }
@@ -51,7 +51,7 @@ namespace FluentDom.Tests
 }}
 ";
 
-            var actual = new CSharpGenerator().OutputClass(cls).ToString();
+            var actual = new CSharpGenerator().OutputClass(cls).GetOutput();
 
             actual.Should().Be(expected);
         }

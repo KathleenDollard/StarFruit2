@@ -1,0 +1,45 @@
+using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
+{
+   public MyCommandCommandSource()
+   : base(new Command("my-command", null))
+   {
+      SubCommandCommand = new SubCommandCommandSource(this, this);
+      Command.AddCommand(SubCommandCommand);
+      Command.Handler = CommandHandler.Create((InvocationContext context) =>
+             {  
+                CurrentCommandSource = this;
+                CurrentParseResult = context.ParseResult;
+                return 0;
+             });
+   }
+
+   public SubCommandCommandSource SubCommandCommand { get; set; }
+
+}
+public class SubCommandCommandSource : MyCommandCommandSource
+{
+   public SubCommandCommandSource()
+   : base(new Command(null, null))
+   {
+      this.parent = parent;
+      Command.Handler = CommandHandler.Create(() =>
+             {  
+                CurrentCommandSource = this;
+                return 0;
+             });
+   }
+
+   public MyCommandCommandSource parent;
+   public CommandSourceResult GetCommandSourceResult(ParseResult parseResult, exitCode int)
+   {
+      return new SubCommandCommandSource(parseResult, this, exitCode);
+   }
+
+
+}

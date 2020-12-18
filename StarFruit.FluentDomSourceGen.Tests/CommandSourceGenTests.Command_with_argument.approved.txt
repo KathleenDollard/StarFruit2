@@ -1,0 +1,32 @@
+using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+
+public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
+{
+   public MyCommandCommandSource()
+   : base(new Command(null, null))
+   {
+      Argument1Argument = GetArgument1();
+      Command.Add(Argument1Argument);
+      Command.Handler = CommandHandler.Create((InvocationContext context) =>
+             {  
+                CurrentCommandSource = this;
+                CurrentParseResult = context.ParseResult;
+                return 0;
+             });
+   }
+
+   public Argument<string> Argument1Argument { get; set; }
+
+   public Argument<string> GetArgument1()
+   {
+      Argument<string> argument = new Argument<string>();
+      argument.Description = null;
+      argument.IsRequired = false;
+      argument.IsHidden = false;
+      return argument;
+   }
+}

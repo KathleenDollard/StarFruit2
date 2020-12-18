@@ -1,19 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>netstandard2.0</TargetFramework>
-	  <Nullable>enable</Nullable>
-	  <LangVersion>Latest</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>Latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>CodeRapid.StarFruit</PackageId>
+    <Authors>Kathleen Dollard</Authors>
+    <Company />
+    <Product>StarFruit2</Product>
+    <Version>0.0.1-beta0001A</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.7.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.7.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0-1.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.9.0-1.final" />
     <!--<PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20371.2" />-->
   </ItemGroup>
 
   <ItemGroup>
-		<ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
-	</ItemGroup>
+    <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
+  </ItemGroup>
 
-	</Project>
+</Project>

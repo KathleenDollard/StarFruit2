@@ -17,17 +17,18 @@ namespace FluentDom
         private readonly StringBuilder sb = new();
         private int tabs = 0;
         private int tabWidth = 3;
+        private const string newLine = "\n";
 
         public StringBuilderWithTabs AppendLine()
         {
-            sb.AppendLine();
+            sb.Append(newLine);
             return this;
         }
 
         public StringBuilderWithTabs AppendLine(string line)
         {
             sb.Append(new string(' ', tabs * tabWidth));
-            sb.AppendLine(line);
+            sb.Append(line + newLine);
             return this;
         }
 

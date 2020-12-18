@@ -8,7 +8,7 @@ namespace TwoLayerCli
     /// <summary>
     /// This is the entry point, the end user types the executable name
     /// </summary>
-    public partial class CliRoot
+    public partial class CliRoot : ICliRoot
     {
         /// <summary> </summary>
         /// <param name="ctorParam">This is a constructor parameter</param>
@@ -28,10 +28,10 @@ namespace TwoLayerCli
         /// <param name="boolOption">This is an bool argument</param>
         /// <param name="intArg">This is an integer argument</param>
         /// <returns></returns>
-        public async Task<int> FindAsync(string stringOption, bool boolOption, int intArg = 42)
+        public int Find(string stringOption, bool boolOption, int intArg = 42)
         {
             Console.WriteLine($"StringProperty: {StringProperty}   stringOption: {stringOption}   boolOption: {boolOption}    intArg: {intArg}");
-            return await Task.FromResult(0);
+            return  0;
 
         }
 
@@ -40,7 +40,7 @@ namespace TwoLayerCli
         /// </summary>
         /// <param name="verbosity">The degree of detail desired</param>
         /// <returns></returns>
-        public async Task<int> ListAsync(VerbosityLevel verbosity)
-        { return await Task.FromResult(0); }
+        public int List(VerbosityLevel verbosity)
+        { return 0; }
     }
 }

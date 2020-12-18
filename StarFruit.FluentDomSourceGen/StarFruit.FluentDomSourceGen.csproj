@@ -3,12 +3,64 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>Latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <PackageId>CodeRapid.StarFruit.Generation</PackageId>
+    <Authors>Kathleen Dollard</Authors>
+    <Company />
+    <Product>StarFruit2</Product>   
+    <Version>0.0.1-beta0001J</Version>   <!-- <<< Here -->    
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FluentDom\FluentDom.csproj" />
-    <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
-    <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
+    <ProjectReference Include="..\FluentDom\FluentDom.csproj"  GeneratePathProperty="true" />
+    <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj"  GeneratePathProperty="true" />
+    <ProjectReference Include="..\StarFruit2\StarFruit2.csproj"  GeneratePathProperty="true" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20478.1" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.9.0-1.final" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0-1.final" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="PackBuildOutputs" DependsOnTargets="ResolveProjectReferences;SatelliteDllsProjectOutputGroup;SatelliteDllsProjectOutputGroupDependencies">
+    <ItemGroup>
+      <_File Include="$(OutputPath)System.CommandLine.dll" />
+
+      <!-- Analysis of C# projects -->
+      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers\cs\" />
+      <TfmSpecificPackageFile Include="@(_File)" PackagePath="analyzers\cs\" />
+      <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupDependency)" PackagePath="analyzers\cs\%(SatelliteDllsProjectOutputGroupDependency.DestinationSubDirectory)" Condition=" '%(SatelliteDllsProjectOutputGroupDependency.DestinationSubDirectory)' != '' " />
+      <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+      <TfmSpecificPackageFile Include="%(_ResolvedProjectReferencePaths.Identity)" Condition="'%(FileName)' != 'StarFruit.FluentDomSourceGen.VisualBasic'" PackagePath="analyzers\cs\" />
+
+      <!-- Analysis of VB projects -->
+      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers\vb\" />
+      <TfmSpecificPackageFile Include="@(_File)" PackagePath="analyzers\vb\" />
+      <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupDependency)" PackagePath="analyzers\vb\%(SatelliteDllsProjectOutputGroupDependency.DestinationSubDirectory)" Condition=" '%(SatelliteDllsProjectOutputGroupDependency.DestinationSubDirectory)' != '' " />
+      <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\vb\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+      <TfmSpecificPackageFile Include="%(_ResolvedProjectReferencePaths.Identity)" Condition="'%(FileName)' != 'StarFruit.FluentDomSourceGen.CSharp'" PackagePath="analyzers\vb\" />
+    </ItemGroup>
+  </Target>
+  
+  <!--<PropertyGroup>
+    <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+  </PropertyGroup>
+
+ <Target Name="GetDependencyTargetPaths">
+  <ItemGroup>
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_CommandLine)\lib\netstandard2.0\System.CommandLine.dll" IncludeRuntimeDependency="false" />
+  </ItemGroup>
+  </Target>-->
 
 </Project>
