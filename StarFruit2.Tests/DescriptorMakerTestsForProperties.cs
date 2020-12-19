@@ -536,6 +536,19 @@ namespace StarFruit2.Tests
             actual.Arguments.First().AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
         }
 
+        [Fact]
+        public void MemberSource_correct_for_option()
+        {
+            var code = @"
+                public int MyProperty { get; set; } "
+                .WrapInStandardClass();
+
+            CliDescriptor actualCli = Utils.GetCli(code);
+            var actual = actualCli.CommandDescriptor.Options.First();
+
+            actual.CodeElement.Should().Be(CodeElement.Property);
+        }
+
         #endregion
 
         #region Commands
@@ -744,19 +757,6 @@ namespace StarFruit2.Tests
             var actual = actualCli.CommandDescriptor;
 
             actual.TreatUnmatchedTokensAsErrors.Should().BeFalse();
-        }
-
-        [Fact]
-        public void MemberSource_correct_for_option()
-        {
-            var code = @"
-                public int MyProperty { get; set; } "
-                .WrapInStandardClass();
-
-            CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.Options.First();
-
-            actual.CodeElement.Should().Be(CodeElement.Property);
         }
 
         #endregion

@@ -1,0 +1,92 @@
+using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+
+namespace TwoLayerCli
+{
+   public class CliRootCommandSource : RootCommandSource<CliRootCommandSource>
+   {
+      public CliRootCommandSource()
+      : base(new Command("cli-root", ""))
+      {
+         StringPropertyOption = GetStringProperty();
+         Command.Add(StringPropertyOption);
+         InvokeAsyncCommand = new InvokeAsyncCommandSource(this, this);
+         Command.AddCommand(InvokeAsyncCommand);
+         Command.Handler = CommandHandler.Create((InvocationContext context) =>
+             {  
+                CurrentCommandSource = this;
+                CurrentParseResult = context.ParseResult;
+                return 0;
+             });
+      }
+
+      public Option<string> StringPropertyOption { get; set; }
+      public InvokeAsyncCommandSource InvokeAsyncCommand { get; set; }
+
+      public Option<string> GetStringProperty()
+      {
+         Option<string> option = new Option<string>(--string-property);
+         option.Description = "";
+         option.IsRequired = false;
+         option.IsHidden = false;
+         return option;
+      }
+   }
+   public class InvokeAsyncCommandSource : CliRootCommandSource
+   {
+      public InvokeAsyncCommandSource()
+      : base(new Command("invoke-async", ""))
+      {
+         this.parent = parent;
+         intArgArgument = GetintArg();
+         Command.Add(intArgArgument);
+         stringOptionOption = GetstringOption();
+         Command.Add(stringOptionOption);
+         boolOptionOption = GetboolOption();
+         Command.Add(boolOptionOption);
+         Command.Handler = CommandHandler.Create(() =>
+             {  
+                CurrentCommandSource = this;
+                return 0;
+             });
+      }
+
+      public CliRootCommandSource parent;
+      public CommandSourceResult GetCommandSourceResult(ParseResult parseResult, int exitCode)
+      {
+         return new InvokeAsyncCommandSource(parseResult, this, exitCode);
+      }
+
+      public Argument<int> intArgArgument { get; set; }
+      public Option<string> stringOptionOption { get; set; }
+      public Option<bool> boolOptionOption { get; set; }
+
+      public Argument<int> GetintArg()
+      {
+         Argument<int> argument = new Argument<int>(int);
+         argument.Description = "";
+         argument.IsRequired = false;
+         argument.IsHidden = false;
+         return argument;
+      }
+      public Option<string> GetstringOption()
+      {
+         Option<string> option = new Option<string>(--string);
+         option.Description = "";
+         option.IsRequired = false;
+         option.IsHidden = false;
+         return option;
+      }
+      public Option<bool> GetboolOption()
+      {
+         Option<bool> option = new Option<bool>(--bool);
+         option.Description = "";
+         option.IsRequired = false;
+         option.IsHidden = false;
+         return option;
+      }
+   }
+}

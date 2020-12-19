@@ -100,7 +100,7 @@ namespace CodeNamespace
 {
 }
 ";
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
 

@@ -1,0 +1,49 @@
+using StarFruit2;
+using System.CommandLine;
+using StarFruit2.Common;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+
+namespace TwoLayerCli
+{
+   public class CliRootCommandSourceResult : CommandSourceResult<CliRoot>
+   {
+      public CliRootCommandSourceResult(ParseResult parseResult, CommandSourceMemberResult<Option<string>> stringPropertyOption_result, int exitCode)
+      : base("parseResult", "exitCode")
+      {
+         StringPropertyOption_Result = stringPropertyOption_result;
+      }
+      public CommandSourceMemberResult<Option<string>> stringPropertyOption_result { get; set; }
+
+      public override CliRoot CreateInstance()
+      {
+         newItem = new CliRoot();
+         StringProperty = StringPropertyOption_Result;
+      }
+   }
+   public class InvokeAsyncCommandSourceResult : CliRootCommandSourceResult
+   {
+      public InvokeAsyncCommandSourceResult(ParseResult parseResult, CommandSourceMemberResult<Argument<int>> intArgArgument_result, CommandSourceMemberResult<Option<string>> stringOptionOption_result, CommandSourceMemberResult<Option<bool>> boolOptionOption_result, int exitCode)
+      : base(parseResult, CommandSourceMemberResult.Create(InvokeAsyncCommandSource), exitCode)
+      {
+         intArgArgument_Result = intArgArgument_result;
+         stringOptionOption_Result = stringOptionOption_result;
+         boolOptionOption_Result = boolOptionOption_result;
+      }
+      public CommandSourceMemberResult<Argument<int>> intArgArgument_result { get; set; }
+      public CommandSourceMemberResult<Option<string>> stringOptionOption_result { get; set; }
+      public CommandSourceMemberResult<Option<bool>> boolOptionOption_result { get; set; }
+
+      public override InvokeAsync CreateInstance()
+      {
+         newItem = new InvokeAsync();
+         intArg = intArgArgument_Result;
+         stringOption = stringOptionOption_Result;
+         boolOption = boolOptionOption_Result;
+      }
+      public override int Run()
+      {
+         return CreateInstance().InvokeAsync(intArgArgument_Result.Value, stringOptionOption_Result.Value, boolOptionOption_Result.Value);
+      }
+   }
+}

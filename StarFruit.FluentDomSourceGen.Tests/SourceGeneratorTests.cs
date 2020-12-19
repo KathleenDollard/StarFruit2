@@ -14,21 +14,18 @@ using Xunit.Abstractions;
 
 [assembly: UseReporter(typeof(VisualStudioReporter))]
 
-namespace SourceGeneratorTests
+namespace StarFruit.FluentDomSourceGen.Tests
 {
-    public class Tests
+    public class WhereSingleLayerSource
     {
         private readonly ITestOutputHelper _output;
 
-        public Tests(ITestOutputHelper output)
+        public WhereSingleLayerSource(ITestOutputHelper output)
         {
             _output = output;
         }
 
-        [Fact]
-        public void Test1()
-        {
-            string source = @"
+        private const string source1 = @"
 using StarFruit2.Common;
 using System.Threading.Tasks;
 
@@ -48,42 +45,23 @@ namespace TwoLayerCli
 
     }
 }";
-            var actual = GetGeneratedOutput(source);
 
-            Approvals.Verify(actual);
+
+        [Fact]
+        public void CommandSource_generator_produces_correct_code()
+        {
+             var actual = SourceGeneratorUtilities.GenerateCSharpOutput<Generator>(source1);
+
+            Approvals.Verify(actual.FirstOrDefault());
 
         }
 
-        private string GetGeneratedOutput(string source)
+        [Fact]
+        public void CommandSourceResult_generator_produces_correct_code()
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var actual = SourceGeneratorUtilities.GenerateCSharpOutput<Generator>(source1);
 
-            var references = new List<MetadataReference>();
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
-            {
-                if (!assembly.IsDynamic && !string.IsNullOrWhiteSpace(assembly.Location))
-                {
-                    references.Add(MetadataReference.CreateFromFile(assembly.Location));
-                }
-            }
-
-            var compilation = CSharpCompilation.Create("foo", new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-            var compileDiagnostics = compilation.GetDiagnostics();
-            Assert.False(compileDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error), "Input failed to compile: " + compileDiagnostics.FirstOrDefault()?.GetMessage());
-
-            ISourceGenerator generator = new Generator();
-
-            var driver = CSharpGeneratorDriver.Create(generator);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
-            Assert.False(generateDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error), "Output failed to compile: " + generateDiagnostics.FirstOrDefault()?.GetMessage());
-
-            string output = outputCompilation.SyntaxTrees.Last().ToString();
-
-            _output.WriteLine(output);
-
-            return output;
+            Approvals.Verify(actual.Skip(1).FirstOrDefault());
         }
     }
 }

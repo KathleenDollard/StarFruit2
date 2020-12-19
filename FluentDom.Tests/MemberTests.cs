@@ -18,7 +18,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputProperty(property).GetOutput().NormalizeWhitespace();
 
-            actual.Should().Be(expected.NormalizeWhitespace());
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputProperty(property).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -146,7 +146,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -162,7 +162,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -208,7 +208,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -223,7 +223,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
  
         [Fact]
@@ -239,7 +239,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -256,7 +256,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact]
@@ -290,7 +290,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputMethod(method).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
 
@@ -307,7 +307,7 @@ namespace FluentDom.Tests
 ";
             var actual = new CSharpGenerator().OutputConstructor(ctor).GetOutput();
 
-            actual.Should().Be(expected);
+            actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
         [Fact(Skip = "TBD")]

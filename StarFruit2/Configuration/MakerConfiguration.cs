@@ -129,6 +129,7 @@ namespace StarFruit2
                 IPropertySymbol s => s.BoolAttributeValue<HiddenAttribute>(),
                 IParameterSymbol s => s.BoolAttributeValue<HiddenAttribute>(),
                 INamedTypeSymbol s => s.BoolAttributeValue<HiddenAttribute>(),
+                IMethodSymbol s=>s.BoolAttributeValue<HiddenAttribute>(),
                 _ => false
             };
 
@@ -146,6 +147,7 @@ namespace StarFruit2
             => symbol switch
             {
                 INamedTypeSymbol s => s.BoolAttributeValue<TreatUnmatchedTokensAsErrorsAttribute>(true),
+                IMethodSymbol  s => s.BoolAttributeValue<TreatUnmatchedTokensAsErrorsAttribute>(true),
                 _ => false
             };
 
@@ -164,6 +166,7 @@ namespace StarFruit2
                  IPropertySymbol s => s.AttributeValueForList<AliasesAttribute, string>(),
                  IParameterSymbol s => s.AttributeValueForList<AliasesAttribute, string>(),
                  INamedTypeSymbol s => s.AttributeValueForList<AliasesAttribute, string>(),
+                 IMethodSymbol s => s.AttributeValueForList<AliasesAttribute, string>(),
                  _ => new List<string>()
              };
 
