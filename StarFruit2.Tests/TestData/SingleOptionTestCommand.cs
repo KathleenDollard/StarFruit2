@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using StarFruit.Common;
+using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
 using System;
@@ -8,7 +10,7 @@ namespace TestData
 {
     public class SingleOptionTestCommand<T> : BaseTestData
     {
-        public CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
+        public CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class) { Name = "my-class" };
 
         public SingleOptionTestCommand(string testName,
                                        string originalName,
@@ -28,13 +30,13 @@ namespace TestData
 
             var commandDescriptor = CommandDescriptor;
 
-            var option = new OptionDescriptor(commandDescriptor, originalName, null)
+            var option = new OptionDescriptor(commandDescriptor, originalName, null, OriginalElementType.Property)
             {
                 Name = originalName,
                 CliName = commandLineName,
                 Description = description,
             };
-            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(T)), null, originalName, null)
+            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(T)), null, originalName, null, OriginalElementType.Property)
             {
                 Name = originalName,
                 CliName = commandLineName,

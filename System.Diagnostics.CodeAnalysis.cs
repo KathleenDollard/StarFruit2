@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 
+
 #pragma warning disable CA1801, CA1822
 
 namespace System.Diagnostics.CodeAnalysis

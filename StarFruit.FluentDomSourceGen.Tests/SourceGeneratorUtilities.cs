@@ -1,7 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using FluentAssertions;
+using FluentAssertions.Execution;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using StarFruit2.Generate;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -10,11 +15,65 @@ namespace StarFruit.FluentDomSourceGen.Tests
 {
     public class SourceGeneratorUtilities
     {
+        public static void GenerateAndTest(string generatedCodeName, string inputFileName, string outputPath)
+        {
+            var cliRootSource = File.ReadAllText(inputFileName);
+            GenerateAndTestSource(generatedCodeName, cliRootSource, outputPath);
+        }
 
-        public static IEnumerable<string?> GenerateCSharpOutput<T>(string source)
+        public static string? GenerateAndTestSource(string generatedCodeName, string inputSource, string? outputPath = null)
+        {
+            using var _ = new AssertionScope();
+            CSharpCompilation cliRootCompilation = GetCliRootCompilation(inputSource)
+                                                   ?? throw new InvalidOperationException();
+
+            var outputCompilations = SourceGeneratorUtilities.Generate<Generator>(cliRootCompilation, out var outputCompilation, out var generationDiagnostics);
+            generationDiagnostics.Should().NotHaveErrors();
+            outputCompilation.Should().NotHaveErrors();
+
+            var (compilationName, sourceCode) = outputCompilations.Where(x => x.compilationName.Contains($"{generatedCodeName}.generated"))
+                                                                               .FirstOrDefault();
+            var commandSourceCompilation = SourceGeneratorUtilities.CompileSource(sourceCode, generatedCodeName);
+
+            if (outputPath is not null)
+            {
+                File.WriteAllText($"{outputPath}/{generatedCodeName}.generated.cs", sourceCode);
+            }
+            commandSourceCompilation!.Should().NotBeNull();
+            commandSourceCompilation!.Should().NotHaveErrors();
+
+            return commandSourceCompilation?.SyntaxTrees.First().ToString();
+        }
+
+        public static CSharpCompilation? GetCliRootCompilation(string cliRootSource)
+        {
+            cliRootSource.Should().NotBeNull();
+            var cliRootCompilation = SourceGeneratorUtilities.CompileSource(cliRootSource, "cliRoot");
+            cliRootCompilation!.Should().NotBeNull();
+            cliRootCompilation!.Should().NotHaveErrors();
+            return cliRootCompilation;
+        }
+
+        public static IEnumerable<(string compilationName, string sourceCode)> Generate<T>(CSharpCompilation compilation, out Compilation outputCompilation, out ImmutableArray<Diagnostic> generationDiagnostics)
             where T : ISourceGenerator, new()
         {
+            ISourceGenerator generator = new T();
+
+            var driver = CSharpGeneratorDriver.Create(generator);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out outputCompilation, out  generationDiagnostics);
+
+            var output = outputCompilation.SyntaxTrees.Select(x => (x.FilePath, x.ToString()));
+            return output;
+        }
+
+        public static CSharpCompilation? CompileSource(string source, string? compilationName = null)
+        {
+            if (source is null)
+            {
+                return null;
+            }
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            compilationName ??= "defaultCompilation";
 
             var references = new List<MetadataReference>();
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -26,27 +85,8 @@ namespace StarFruit.FluentDomSourceGen.Tests
                 }
             }
 
-            var compilation = CSharpCompilation.Create("foo", new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-            var compileDiagnostics = compilation.GetDiagnostics();
-            if (compileDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
-            {
-                throw new GeneratorFailException("Input failed to compile: ", compileDiagnostics);
-            }
-
-            ISourceGenerator generator = new T();
-
-            var driver = CSharpGeneratorDriver.Create(generator);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
-            if (generateDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
-            {
-                throw new GeneratorFailException("Output failed to compile: ", generateDiagnostics);
-            }
-
-            var output = outputCompilation.SyntaxTrees.Skip(1)
-                                                      .Select(x => x.ToString());
-
-            return output;
+            var compilation = CSharpCompilation.Create(compilationName, new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            return compilation;
         }
     }
 }

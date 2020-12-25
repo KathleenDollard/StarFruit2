@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\StarFruit.FluentDomSourceGen.Tests\CliRoot.cs" Link="CliRoot.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StarFruit.FluentDomSourceGen.Tests\StarFruit.FluentDomSourceGen.Tests.csproj" />
+    <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
+  </ItemGroup>
+
+</Project>

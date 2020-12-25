@@ -71,6 +71,7 @@ namespace FluentDom
             }
             return (T)this;
         }
+
     }
 
     public class ParameterStore
@@ -84,6 +85,12 @@ namespace FluentDom
         {
             parameters.Add(new Parameter(name, type));
         }
+
+        public void ParameterWithDefault(string name, TypeRep type, IExpression defaultExpression)
+        {
+            parameters.Add(new Parameter(name, type, defaultExpression));
+        }
+
 
         public void Parameter(Parameter parameter)
         {
@@ -106,15 +113,9 @@ namespace FluentDom
             return (T)this;
         }
 
-        public T Parameter(string name, string type)
+        public T ParameterWithDefault(string name, TypeRep type, IExpression defaultExpression)
         {
-            ParameterStore.Parameter(name, type);
-            return (T)this;
-        }
-
-        public T Parameter(string name, Type type)
-        {
-            ParameterStore.Parameter(name, type);
+            ParameterStore.ParameterWithDefault(name, type, defaultExpression);
             return (T)this;
         }
 
@@ -123,7 +124,7 @@ namespace FluentDom
             foreach (var item in items)
             {
                 ParameterStore.Parameter(parameterMaker(item));
-    }
+            }
             return (T)this;
         }
 
@@ -136,7 +137,6 @@ namespace FluentDom
             : base(scope, modifiers)
         { }
 
-        public Return? ReturnStore { get; private set; }
         public TypeRep? ReturnTypeStore { get; private set; }
 
         public T ReturnType(TypeRep typeRep)
@@ -144,7 +144,6 @@ namespace FluentDom
             ReturnTypeStore = typeRep;
             return (T)this;
         }
-
     }
 
     public class PropertyGetter : StatementContainer<PropertyGetter>

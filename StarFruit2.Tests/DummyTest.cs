@@ -5,6 +5,7 @@ using Xunit;
 using FluentAssertions;
 using StarFruit2.Common.Descriptors;
 using StarFruit2.Common;
+using StarFruit.Common;
 
 namespace StarFruit2.Tests
 {
@@ -12,7 +13,7 @@ namespace StarFruit2.Tests
     {
         private CliDescriptor GetCliDescriptor()
         {
-            var commandDescriptor = new CommandDescriptor(null, "MyClass", null)
+            var commandDescriptor = new CommandDescriptor(null, "MyClass", null,OriginalElementType.Class  )
             {
                 Name = "my-class",
                // Parent = null,
@@ -26,13 +27,13 @@ namespace StarFruit2.Tests
             string description = "desc";
             var defaultValue = new DefaultValueDescriptor("abc");
 
-            var option = new OptionDescriptor(commandDescriptor, originalName, null)
+            var option = new OptionDescriptor(commandDescriptor, originalName, null, OriginalElementType.Property)
             {
                 Name = originalName,
                 CliName = commandLineName,
                 Description = description,
             };
-            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, originalName, null)
+            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, originalName, null, OriginalElementType.Property)
             {
                 Name = originalName,
                 CliName = commandLineName,

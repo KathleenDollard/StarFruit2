@@ -5,10 +5,12 @@ namespace StarFruit2.Common.Descriptors
 {
     public class ArgumentDescriptor : SymbolDescriptor
     {
-        public ArgumentDescriptor(ArgTypeInfoBase argumentTypeInfo, ISymbolDescriptor parentSymbolDescriptorBase,
-                                   string originalName,
-                                   object? raw)
-            : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Argument)
+        public ArgumentDescriptor(ArgTypeInfoBase argumentTypeInfo, 
+                                  ISymbolDescriptor parentSymbolDescriptorBase,
+                                  string originalName,
+                                  object? raw,
+                                  string originalElementType)
+            : base(parentSymbolDescriptorBase, originalName, raw,originalElementType, SymbolType.Argument)
         {
             ArgumentType = argumentTypeInfo;
         }

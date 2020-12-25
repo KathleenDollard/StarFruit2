@@ -38,8 +38,8 @@ namespace StarFruit2.Generate
                     var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation);
                     //var tempSource += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
                     //OutputCode(tempSource, context, $"Temp.generated.cs");
-                    OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}.generated.cs");
-                    OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}Result.generated.cs");
+                    OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}CommandSource.generated.cs");
+                    OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}CommandSourceResult.generated.cs");
                 }
 
                 if (source != null)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,10 +6,6 @@
     <Nullable>enable</Nullable>
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
-
-  <!--<ItemGroup>
-    <None Include="Kittitas.csproj" />
-  </ItemGroup>-->
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20478.1" />
@@ -21,8 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001J"/>
-    <!-- <<< Here -->
+    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001U"/>
     <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
   </ItemGroup>
 

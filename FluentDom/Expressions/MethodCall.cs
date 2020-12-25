@@ -57,4 +57,8 @@ namespace FluentDom
 
     public class This : IExpression
     {  }
+
+
+    public class Null : IExpression
+    { }
 }

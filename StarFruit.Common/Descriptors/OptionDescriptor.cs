@@ -1,5 +1,4 @@
 ﻿using StarFruit.Common;
-using StarFruit.Common.Descriptors;
 using System.Collections.Generic;
 
 namespace StarFruit2.Common.Descriptors
@@ -8,8 +7,9 @@ namespace StarFruit2.Common.Descriptors
     {
         public OptionDescriptor(ISymbolDescriptor parentSymbolDescriptorBase, 
                                 string originalName,
-                                object? raw)
-            : base(parentSymbolDescriptorBase, originalName, raw, SymbolType.Option) { }
+                                object? raw,
+                                string originalElementType)
+            : base(parentSymbolDescriptorBase, originalName, raw,originalElementType, SymbolType.Option) { }
         public List<ArgumentDescriptor> Arguments { get; } = new List<ArgumentDescriptor>();
         public bool Required { get; set; }
 

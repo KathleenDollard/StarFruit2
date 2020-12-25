@@ -125,12 +125,20 @@ namespace FluentDom
             return this;
         }
 
+        public Class OptionalMember(bool condition, params IClassMember[] members)
+        {
+            if (condition)
+            {
+                Members(members);
+            }
+            return this;
+        }
+
         public Class Field(string name, TypeRep typeRep, Scope scope = Scope.Public, bool readOnly = false)
         {
             members.Add(new Field(name, typeRep, scope, readOnly));
             return this;
         }
-
 
         public Class Fields<T>(IEnumerable<T> items, params Func<T, Property>[] makers)
         {

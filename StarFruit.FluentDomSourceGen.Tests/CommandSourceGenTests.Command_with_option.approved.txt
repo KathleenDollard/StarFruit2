@@ -7,7 +7,11 @@ using System.CommandLine.Parsing;
 public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {
    public MyCommandCommandSource()
-   : base(new Command(null, null))
+   : this(null, null)
+   {
+   }
+   public MyCommandCommandSource(RootCommandSource root, CommandSource parent)
+   : base(new Command(null, null), parent)
    {
       Option1Option = GetOption1();
       Command.Add(Option1Option);
@@ -23,7 +27,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 
    public Option<bool> GetOption1()
    {
-      Option<bool> option = new Option<bool>();
+      Option<bool> option = new Option<bool>(null);
       option.Description = null;
       option.IsRequired = false;
       option.IsHidden = false;

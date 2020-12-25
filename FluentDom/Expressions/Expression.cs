@@ -8,50 +8,32 @@ namespace FluentDom
 {
     public class Expression
     {
-        public static Assign Assign(IExpression leftHand, IExpression rightHand)
-        {
-            return new Assign(leftHand, rightHand);
-        }
+        public static Assign Assign(IExpression leftHand, IExpression rightHand) 
+            => new Assign(leftHand, rightHand);
 
-        public static Assign Assign(IExpression leftHand, string rightHand)
-        {
-            return new Assign(leftHand, VariableReference(rightHand));
-        }
+        public static Assign Assign(IExpression leftHand, string rightHand) 
+            => new Assign(leftHand, VariableReference(rightHand));
 
-        public static Assign Assign(string leftHand, IExpression rightHand)
-        {
-            return new Assign(VariableReference(leftHand), rightHand);
-        }
+        public static Assign Assign(string leftHand, IExpression rightHand) 
+            => new Assign(VariableReference(leftHand), rightHand);
 
-        public static Assign Assign(string leftHand, string rightHand)
-        {
-            return new Assign(VariableReference(leftHand), VariableReference(rightHand));
-        }
+        public static Assign Assign(string leftHand, string rightHand) 
+            => new Assign(VariableReference(leftHand), VariableReference(rightHand));
 
-        public static LocalDeclaration AssignVar(string localName, TypeRep typeRep, IExpression rightHand)
-        {
-            return new LocalDeclaration(localName, typeRep, rightHand);
-        }
+        public static LocalDeclaration AssignVar(string localName, TypeRep typeRep, IExpression rightHand) 
+            => new LocalDeclaration(localName, typeRep, rightHand);
 
-        public static MethodCall MethodCall(string name, params IExpression[] arguments)
-        {
-            return new MethodCall(name, arguments);
-        }
+        public static MethodCall MethodCall(string name, params IExpression[] arguments) 
+            => new MethodCall(name, arguments);
 
-        public static MethodCall MethodCall(string name, params string[] arguments)
-        {
-            return new MethodCall(name, arguments.Select(x => VariableReference(x)).ToArray());
-        }
+        public static MethodCall MethodCall(string name, params string[] arguments) 
+            => new MethodCall(name, arguments.Select(x => VariableReference(x)).ToArray());
 
         public static MethodCall MethodCall(string name)
-        {
-            return new MethodCall(name);
-        }
+            => new MethodCall(name);
 
         public static MultilineLambda MultilineLambda()
-        {
-            return new MultilineLambda();
-        }
+            => new MultilineLambda();
         public static NewObject NewObject(TypeRep typeRep)
            => new NewObject(typeRep, new IExpression[] { });
 
@@ -70,39 +52,31 @@ namespace FluentDom
         public static NewObject NewObject(string typeRep, params string[] arguments)
             => NewObject(new TypeRep(typeRep), arguments);
 
-        public static This This()
-        {
-            return new This();
-        }
+        public static This This() 
+            => new This();
+
+        public static Null Null() 
+            => new Null();
 
         public static Base Base()
-        {
-            return new Base();
-        }
+            => new Base();
 
-        public static Value Value<T>(T value)
-        {
-            return new Value<T>(value);
-        }
+        public static Value Value<T>(T value) 
+            => new Value<T>(value);
 
-        public static VariableReference VariableReference(string variableName)
-        {
-            return new VariableReference(variableName);
-        }
+        public static VariableReference VariableReference(string variableName) 
+            => new VariableReference(variableName);
 
-        public static Dot Dot(IExpression left, string right)
-        {
-            return new Dot(left, right);
-        }
+        public static Dot Dot(IExpression left, string right) 
+            => new Dot(left, right);
 
-        public static Dot Dot(string left, string right)
-        {
-            return new Dot(VariableReference(left), right);
-        }
+        public static Dot Dot(string left, string right) 
+            => new Dot(VariableReference(left), right);
+
+        public static As As(IExpression expression, TypeRep typeRep) 
+            => new As(expression, typeRep);
 
         public static Return Return(IExpression expression)
-        {
-            return new Return(expression);
-        }
+            => new Return(expression);
     }
 }

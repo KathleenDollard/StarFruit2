@@ -24,9 +24,9 @@ namespace TwoLayerCli
          return newItem;
       }
    }
-   public class InvokeAsyncCommandSourceResult : CliRootCommandSourceResult
+   public class FindCommandSourceResult : CliRootCommandSourceResult
    {
-      public InvokeAsyncCommandSourceResult(ParseResult parseResult, InvokeAsyncCommandSource commandSource, int exitCode)
+      public FindCommandSourceResult(ParseResult parseResult, FindCommandSource commandSource, int exitCode)
       : base(parseResult, (commandSource.ParentCommandSource as CliRootCommandSource), exitCode)
       {
          intArgArgument_Result = CommandSourceMemberResult.Create(commandSource.intArgArgument, parseResult);
@@ -36,6 +36,16 @@ namespace TwoLayerCli
       public CommandSourceMemberResult<int> intArgArgument_Result { get; set; }
       public CommandSourceMemberResult<string> stringOptionOption_Result { get; set; }
       public CommandSourceMemberResult<bool> boolOptionOption_Result { get; set; }
+
+   }
+   public class ListCommandSourceResult : CliRootCommandSourceResult
+   {
+      public ListCommandSourceResult(ParseResult parseResult, ListCommandSource commandSource, int exitCode)
+      : base(parseResult, (commandSource.ParentCommandSource as CliRootCommandSource), exitCode)
+      {
+         verbosityOption_Result = CommandSourceMemberResult.Create(commandSource.verbosityOption, parseResult);
+      }
+      public CommandSourceMemberResult<VerbosityLevel> verbosityOption_Result { get; set; }
 
    }
 }

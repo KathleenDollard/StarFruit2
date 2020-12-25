@@ -1,4 +1,6 @@
-﻿using StarFruit2.Common;
+﻿using StarFruit.Common;
+using StarFruit2;
+using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
 using System;
 using System.Collections.Generic;
@@ -20,10 +22,10 @@ namespace TestData
         {
             string sourceCode = $@"NOT YET IMPLEMENTED: Read corresponding file";
 
-            var commandDescriptor = new CommandDescriptor(null, "MyClass", null) { Name = "my-class" };
+            var commandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class) { Name = "my-class" };
 
             commandDescriptor.AddArguments(arguments: new List<ArgumentDescriptor>(){
-                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, "MyArgPropertyArg", null)
+                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, "MyArgPropertyArg", null, OriginalElementType.Property)
                 {
                     Name = "MyArgPropertyArg",
                     CliName = "my-property-arg",
@@ -31,17 +33,17 @@ namespace TestData
             });
 
             commandDescriptor.AddOptions(options: new List<OptionDescriptor>(){
-                new OptionDescriptor(    null, "MyProperty", null)
+                new OptionDescriptor(null, "MyProperty", null, OriginalElementType.Property)
                 {
                     Name = "MyProperty",
                     CliName = "my-property",
                 },
-                new OptionDescriptor( null, "MyProperty2", null)
+                new OptionDescriptor(null, "MyProperty2", null, OriginalElementType.Property)
                 {
                     Name = "MyProperty2",
                     CliName = "my-property2",
                 },
-                new OptionDescriptor( null, "MyProperty3", null)
+                new OptionDescriptor( null, "MyProperty3", null, OriginalElementType.Property)
                 {
                     Name = "MyProperty3",
                     CliName = "my-property2",
@@ -50,8 +52,8 @@ namespace TestData
 
             CliDescriptor = new CliDescriptor
             {
-                GeneratedComandSourceNamespace = "StarFruit2.Tests.TestSampleData.SeveralOptionsAndArguments" ,
-                GeneratedCommandSourceClassName =  "SeveralOptionsAndArgumentsCommandSource",
+                GeneratedComandSourceNamespace = "StarFruit2.Tests.TestSampleData.SeveralOptionsAndArguments",
+                GeneratedCommandSourceClassName = "SeveralOptionsAndArgumentsCommandSource",
                 CommandDescriptor = commandDescriptor,
             };
 

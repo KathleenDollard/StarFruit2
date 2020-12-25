@@ -39,17 +39,13 @@ namespace StarFruit2
     /// </remarks>
     public abstract class CommandSourceResult<T> : CommandSourceResult
     {
-
-        protected CommandSourceResult(ParseResult parseResult, int exitCode)
+        protected CommandSourceResult(ParseResult parseResult, CommandSource commandSource, int exitCode)
             : base(parseResult, exitCode)
-        { }
-
+        {
+            CommandSource = commandSource;
+        }
 
         public abstract T CreateInstance();
-
-        public T NewInstance { get; }
-
-
-
+        public CommandSource CommandSource { get; }
     }
 }

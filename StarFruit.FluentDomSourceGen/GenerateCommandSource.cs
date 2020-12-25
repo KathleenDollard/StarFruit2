@@ -35,66 +35,85 @@ namespace StarFruit2.Generate
 
         protected virtual Class CommandSourceClass(CommandDescriptor cmd,
                                               TypeRep baseClass,
-                                              CommandDescriptor parent) 
-            => new Class(cmd.CommandSourceClassName())
-                    .Base(baseClass)
-                    .Constructor(parent is null ? GetRootCtor(cmd, cmd.Root, parent) : GetCtor(cmd, cmd.Root, parent))
-                    .OptionalMembers(!(parent is null),
-                            cl => cl.BlankLine(),
-                            cl => cl.Field("parent", parent.CommandSourceClassName()),
-                            cl => CommandSourceResultMethod(cl, cmd))
-                    .BlankLine()
-                    .Properties(cmd.GetChildren(),
-                                s => ChildProperty(s))
-                    .BlankLine()
-                    .Methods(cmd.GetOptionsAndArgs(),
-                             s => ChildGetMethod(s));
-   
-        protected virtual Constructor GetRootCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
-            => new Constructor(cmd.CommandSourceClassName())
-                .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)))
-                .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
-                .Statements(cmd.SubCommands, CtorSubCommands())
-                .Statements(Assign("Command.Handler", MethodCall("CommandHandler.Create",
-                        MultilineLambda()
-                                .Parameter("context", "InvocationContext")
-                                .Statements(
-                                     Assign("CurrentCommandSource", This()),
-                                     Assign("CurrentParseResult", "context.ParseResult"),
-                                     Return(Value(0))))));
+                                              CommandDescriptor? parent)
+        {
+            return new Class(cmd.CommandSourceClassName())
+                               .Base(baseClass)
+                               .OptionalMember(parent is null, ParameterlessCtor(cmd))
+                               .Constructor(GetCtor(cmd, cmd.Root, parent))
+                               .BlankLine()
+                               .Properties(cmd.GetChildren(),
+                                           s => ChildProperty(s))
+                               .BlankLine()
+                               .Methods(cmd.GetOptionsAndArgs(),
+                                        s => ChildGetMethod(s));
 
-        protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, ISymbolDescriptor parent)
-            => new Constructor(cmd.CommandSourceClassName())
-                .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)))
-                .Statements(Assign(Dot(This(), "parent"), "parent"))
-                .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
-                .Statements(cmd.SubCommands, CtorSubCommands())
-                .Statements(Assign("Command.Handler", MethodCall("CommandHandler.Create",
-                        MultilineLambda()
-                                .Statements(
-                                     Assign("CurrentCommandSource", This()),
-                                     Return(Value(0))))));
+            static IClassMember ParameterlessCtor(CommandDescriptor cmd)
+                => new Constructor(cmd.CommandSourceClassName())
+                            .ThisCall(Null(), Null());
+       }
+
+
+        protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, CommandDescriptor? parent)
+        {
+            return new Constructor(cmd.CommandSourceClassName())
+                           .Parameter("root", "RootCommandSource")
+                           .Parameter("parent", "CommandSource")
+                           .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)), VariableReference("parent"))
+                           .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
+                           .Statements(cmd.SubCommands, CtorSubCommands())
+                           .Statements(Assign("Command.Handler", MethodCall("CommandHandler.Create",
+                                         GetCommandHandler(parent is null))));
+
+            static MultilineLambda GetCommandHandler(bool isRoot)
+            {
+                return isRoot
+                        ? MultilineLambda()
+                              .Parameter("context", "InvocationContext")
+                              .Statements(
+                                   Assign("CurrentCommandSource", This()),
+                                   Assign("CurrentParseResult", "context.ParseResult"),
+                                   Return(Value(0)))
+                          : MultilineLambda()
+                              .Statements(
+                                   Assign("root.CurrentCommandSource", This()),
+                                   Return(Value(0)));
+            }
+        }
+
+        //protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, CommandDescriptor parent)
+        //    => new Constructor(cmd.CommandSourceClassName())
+        //        .Parameter("root", "RootCommandSource")
+        //        .Parameter("parent", "CommandSource")
+        //        .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)), VariableReference("parent"))
+        //        .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
+        //        .Statements(cmd.SubCommands, CtorSubCommands())
+        //        .Statements(Assign("Command.Handler", MethodCall("CommandHandler.Create",
+        //                MultilineLambda()
+        //                        .Statements(
+        //                             Assign("root.CurrentCommandSource", This()),
+        //                             Return(Value(0))))));
 
         protected virtual Func<SymbolDescriptor, IExpression>[] CtorOptionsAndArgs()
             => new List<Func<SymbolDescriptor, IExpression>>
             {
-                o => Assign(o.GetPropertyName(), MethodCall(GetOptArgMethodName(o))),
-                o => MethodCall($"Command.Add", o.GetPropertyName())
+                o => Assign(o.PropertyName(), MethodCall(GetOptArgMethodName(o))),
+                o => MethodCall($"Command.Add", o.PropertyName())
             }.ToArray();
 
         protected virtual Func<CommandDescriptor, IExpression>[] CtorSubCommands()
             => new List<Func<CommandDescriptor, IExpression>>
             {
-                o => Assign(o.GetPropertyName(), NewObject($"{o.CommandSourceClassName()}", This(), This())),
-                o => MethodCall($"Command.AddCommand", o.GetPropertyName())
+                o => Assign(o.PropertyName(), NewObject($"{o.CommandSourceClassName()}", This(), This())),
+                o => MethodCall($"Command.AddCommand",$"{o.PropertyName()}.Command")
             }.ToArray();
 
         protected virtual Property ChildProperty(SymbolDescriptor symbol)
             => symbol switch
-        {
-                OptionDescriptor o => new Property(o.GetPropertyName(), o.OptionType()),
-                ArgumentDescriptor a => new Property(a.GetPropertyName(), a.ArgumentType()),
-                CommandDescriptor c => new Property(c.GetPropertyName(), $"{c.CommandSourceClassName()}"),
+            {
+                OptionDescriptor o => new Property(o.PropertyName(), o.OptionType()),
+                ArgumentDescriptor a => new Property(a.PropertyName(), a.ArgumentType()),
+                CommandDescriptor c => new Property(c.PropertyName(), $"{c.CommandSourceClassName()}"),
                 _ => throw new InvalidOperationException("Unexpected symbol type")
             };
 
@@ -111,13 +130,12 @@ namespace StarFruit2.Generate
             var method = new Method(GetOptArgMethodName(o))
                 .ReturnType(o.ArgumentType())
                 .Statements(
-                      AssignVar("argument", o.ArgumentType(), NewObject(o.ArgumentType(), o.CliName)),
+                      AssignVar("argument", o.ArgumentType(), NewObject(o.ArgumentType(), Value(o.CliName))),
                       Assign("argument.Description", Value(o.Description)),
-                      Assign("argument.IsRequired", Value(o.Required)),
                       Assign("argument.IsHidden", Value(o.IsHidden)))
                  .OptionalStatements(
                       o.DefaultValue is not null,
-                      () => MethodCall("optionArg.SetDefaultValue", Value(o.DefaultValue.DefaultValue)))
+                      () => MethodCall("argument.SetDefaultValue", Value(o.DefaultValue!.DefaultValue)))
                  .Statements(Return(VariableReference("argument")));
 
             return method;
@@ -128,12 +146,13 @@ namespace StarFruit2.Generate
             var method = new Method(GetOptArgMethodName(o))
                 .ReturnType(o.OptionType())
                 .Statements(
-                      AssignVar("option", o.OptionType(), NewObject(o.OptionType(), o.CliName)),
+                      AssignVar("option", o.OptionType(), NewObject(o.OptionType(), Value(o.CliName))),
                       Assign("option.Description", Value(o.Description)),
                       Assign("option.IsRequired", Value(o.Required)),
                       Assign("option.IsHidden", Value(o.IsHidden)))
                  .OptionalStatements(
                       o.Arguments?.FirstOrDefault()?.DefaultValue is not null,
+                      () => AssignVar("optionArg", "var", Dot(VariableReference("option"), "Argument")),
                       () => MethodCall("optionArg.SetDefaultValue", Value(o.Arguments.First().DefaultValue.DefaultValue)))
                  .Statements(
                       o.Aliases,
@@ -149,7 +168,7 @@ namespace StarFruit2.Generate
             //CommandClass(c, new TypeRep(cmd.Root.CommandSourceClassName());
             foreach (var subCommand in cmd.SubCommands)
             {
-                list.Add(CommandSourceClass(subCommand, cmd.CommandSourceClassName(), subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
+                list.Add(CommandSourceClass(subCommand, "CommandSource", subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
                 if (subCommand.SubCommands.Any())
                 {
                     list.AddRange(SubCommandClasses(subCommand));
@@ -159,11 +178,11 @@ namespace StarFruit2.Generate
         }
 
         private Class CommandSourceResultMethod(Class cls, CommandDescriptor cmd)
-            => cls.Method(new Method("GetCommandSourceResult")
+            => cls.Method(new Method("GetCommandSourceResult", modifiers: MemberModifiers.Override)
                           .ReturnType("CommandSourceResult")
                           .Parameter("parseResult", "ParseResult")
-                          .Parameter("exitCode","int")
-                          .Statements(Return(NewObject(cmd.CommandSourceClassName(),
+                          .Parameter("exitCode", "int")
+                          .Statements(Return(NewObject(cmd.CommandSourceResultClassName(),
                                               VariableReference("parseResult"),
                                               This(),
                                               VariableReference("exitCode"))))

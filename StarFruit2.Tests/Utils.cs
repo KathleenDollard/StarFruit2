@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using StarFruit.Common;
 using Starfruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
@@ -119,7 +120,7 @@ namespace StarFruit2.Tests
         {
             var clidDescriptor = new CliDescriptor()
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", null)
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class)
 
             };
             clidDescriptor.CommandDescriptor.Options.Add(optionDescriptor);
@@ -130,7 +131,7 @@ namespace StarFruit2.Tests
         {
             var clidDescriptor = new CliDescriptor()
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", null),
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class),
                 GeneratedComandSourceNamespace = "MyNamespace"
             };
             clidDescriptor.CommandDescriptor.Arguments.Add(argumentDescriptor);
@@ -144,8 +145,8 @@ namespace StarFruit2.Tests
 
         internal static OptionDescriptor CreateOptionDescriptor(string name, Type type)
         {
-            var option = new OptionDescriptor(null, name, null);
-            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(type), null, name, null));
+            var option = new OptionDescriptor(null, name, null, OriginalElementType.Property);
+            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(type), null, name, null, OriginalElementType.Property));
             return option;
         }
 

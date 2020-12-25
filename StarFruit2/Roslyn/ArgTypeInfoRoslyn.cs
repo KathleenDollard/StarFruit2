@@ -1,8 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using StarFruit2.Common;
 using System;
 
-namespace StarFruit2.Common
+namespace StarFruit2
 {
 
 

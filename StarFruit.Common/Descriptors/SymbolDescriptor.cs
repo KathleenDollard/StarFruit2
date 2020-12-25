@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+
 namespace StarFruit2.Common.Descriptors
 {
 
@@ -30,21 +31,21 @@ namespace StarFruit2.Common.Descriptors
 
     public abstract class SymbolDescriptor : ISymbolDescriptor
     {
-       // public static ISymbolDescriptor Empty = new EmptySymbolDescriptor();
+        // public static ISymbolDescriptor Empty = new EmptySymbolDescriptor();
 
-        public SymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
+        protected SymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                 string originalName,
                                 object? raw,
+                                string originalElementType,
                                 SymbolType symbolType)
         {
             ParentSymbolDescriptorBase = parentSymbolDescriptorBase;
             Raw = raw;
+            OriginalElementType = originalElementType;
             OriginalName = originalName;
             Name = originalName;
             SymbolType = symbolType;
         }
-
-
 
         /// <summary>
         /// This is the underlying thing rules were evaluated against. For
@@ -52,6 +53,7 @@ namespace StarFruit2.Common.Descriptors
         /// in the ReflectionAppModel. 
         /// </summary>
         public object? Raw { get; }
+        public string OriginalElementType { get; }
         public SymbolType SymbolType { get; }
         public string? Description { get; set; }
 
@@ -92,7 +94,6 @@ namespace StarFruit2.Common.Descriptors
         /// If sibling evaluation is needed, plan a post processing step.
         /// </summary>
         public ISymbolDescriptor? ParentSymbolDescriptorBase { get; }
-        public CodeElement CodeElement { get; set; }
         public int Position { get; set; }
         public CommandDescriptor Root
         {
@@ -109,8 +110,6 @@ namespace StarFruit2.Common.Descriptors
             }
         }
         public bool IsRoot => Root == this;
-
-
 
         public abstract string ReportInternal(int tabsCount, VerbosityLevel verbosity);
 
@@ -145,11 +144,12 @@ namespace StarFruit2.Common.Descriptors
 
     public abstract class IdentitySymbolDescriptor : SymbolDescriptor
     {
-        public IdentitySymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
-                                        string originalName,
-                                        object? raw,
-                                        SymbolType symbolType)
-            : base(parentSymbolDescriptorBase, originalName, raw, symbolType)
+        protected IdentitySymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
+                                           string originalName,
+                                           object? raw,
+                                           string originalElementType,
+                                           SymbolType symbolType)
+            : base(parentSymbolDescriptorBase, originalName, raw, originalElementType, symbolType)
         { }
         public List<string> Aliases { get; } = new List<string>();
 

@@ -19,7 +19,7 @@ namespace TwoLayerCli
 
         private static void RepeatMain(string[] args)
         {
-            var input = string.Join(" ", args);
+            var input = string.Join("", args);
             while (input is not null)
             {
                 CommandSource.Run<CliRoot>(input);

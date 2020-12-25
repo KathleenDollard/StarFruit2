@@ -42,7 +42,6 @@ namespace FluentDom.Generator
             return this;
         }
 
-
         protected internal override GeneratorBase OutputUsings(Code code)
         {
             return

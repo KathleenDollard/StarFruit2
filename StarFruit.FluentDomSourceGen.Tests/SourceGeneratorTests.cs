@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 using ApprovalTests;
 using ApprovalTests.Reporters;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using StarFruit2;
 using StarFruit2.Generate;
+using TwoLayerCli;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -50,18 +51,35 @@ namespace TwoLayerCli
         [Fact]
         public void CommandSource_generator_produces_correct_code()
         {
-             var actual = SourceGeneratorUtilities.GenerateCSharpOutput<Generator>(source1);
-
-            Approvals.Verify(actual.FirstOrDefault());
+            var generatedCodeName = "CliRootCommandSource";
+            var output = SourceGeneratorUtilities.GenerateAndTestSource(generatedCodeName, source1, null);
+            Approvals.Verify(output);
 
         }
 
         [Fact]
         public void CommandSourceResult_generator_produces_correct_code()
         {
-            var actual = SourceGeneratorUtilities.GenerateCSharpOutput<Generator>(source1);
-
-            Approvals.Verify(actual.Skip(1).FirstOrDefault());
+            var generatedCodeName = "CliRootCommandSourceResult";
+            var output = SourceGeneratorUtilities.GenerateAndTestSource(generatedCodeName, source1, null);
+            Approvals.Verify(output);
         }
+
+        [Fact]
+        public void CliRoot_creates_CommandSource_that_will_compile()
+        {
+            var generatedCodeName = "CliRootCommandSource";
+            SourceGeneratorUtilities.GenerateAndTest(generatedCodeName, "CliRoot.cs", $"../../../../StarFruit.FluentDomSourceGen.Tests.Output");
+        }
+
+        [Fact]
+        public void CliRoot_creates_CommandSourceResult_that_will_compile()
+        {
+            var generatedCodeName = "CliRootCommandSourceResult";
+            SourceGeneratorUtilities.GenerateAndTest(generatedCodeName, "CliRoot.cs", $"../../../../StarFruit.FluentDomSourceGen.Tests.Output");
+        }
+
+  
+
     }
 }

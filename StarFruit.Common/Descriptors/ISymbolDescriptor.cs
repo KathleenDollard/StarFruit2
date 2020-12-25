@@ -6,6 +6,7 @@ namespace StarFruit2.Common.Descriptors
     {
         SymbolType SymbolType { get; }
         object? Raw { get; }
+        public string OriginalElementType { get; }
         string? Description { get; }
         string? Name { get; }
         string? CliName { get; }

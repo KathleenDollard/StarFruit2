@@ -14,6 +14,16 @@ namespace FluentDom
             Name = name;
         }
 
+        public Parameter(string name, TypeRep type, IExpression defaultExpression)
+        {
+            Type = type;
+            Name = name;
+            HasDefault = true;
+            DefaultExpression = defaultExpression;
+        }
+
+        public bool HasDefault { get; }
+        public IExpression? DefaultExpression { get; }
         public TypeRep Type { get; }
         public string Name { get; }
     }

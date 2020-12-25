@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentDom", "FluentDom\Flue
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentDom.Tests", "FluentDom.Tests\FluentDom.Tests.csproj", "{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFruit.FluentDomSourceGen.Tests.Output", "StarFruit.FluentDomSourceGen.Tests.Output\StarFruit.FluentDomSourceGen.Tests.Output.csproj", "{5BDF7051-79EF-445E-91AE-A0A5AA65FA86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF731EBE-A1DD-41FF-9B2E-E3918EE1B09F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BDF7051-79EF-445E-91AE-A0A5AA65FA86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BDF7051-79EF-445E-91AE-A0A5AA65FA86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BDF7051-79EF-445E-91AE-A0A5AA65FA86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BDF7051-79EF-445E-91AE-A0A5AA65FA86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

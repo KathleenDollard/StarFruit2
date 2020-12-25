@@ -7,7 +7,7 @@ namespace StarFruit2.Generate
 {
     public static class Helpers
     {
-        public static string GetPropertyName(this ISymbolDescriptor symbol)
+        public static string PropertyName(this ISymbolDescriptor symbol)
          => symbol switch
          {
              OptionDescriptor option => $"{option.OriginalName}Option",
@@ -16,27 +16,20 @@ namespace StarFruit2.Generate
              _ => throw new InvalidOperationException("Unexpected symbol type")
          };
 
+        public static string ParameterName(this ISymbolDescriptor symbol)
+         => symbol.PropertyName().AsParameter();
 
-        public static string GetPropertyResultName(this ISymbolDescriptor symbol)
-         => symbol switch
-         {
-             OptionDescriptor option => $"{option.GetPropertyName()}_Result",
-             ArgumentDescriptor argument => $"{argument.GetPropertyName()}_Result",
-             CommandDescriptor command => $"{command.GetPropertyName()}_Result",
-             _ => throw new InvalidOperationException("Unexpected symbol type")
-         };
+        public static string PropertyResultName(this ISymbolDescriptor symbol)
+            => $"{symbol.PropertyName()}_Result";
+   
+        public static string ParameterResultName(this ISymbolDescriptor symbol)
+            => symbol.PropertyResultName().AsParameter();
 
-        public static string GetParameterResultName(this ISymbolDescriptor symbol)
-           => symbol switch
-           {
-               OptionDescriptor option => $"{option.GetPropertyName().CamelCase()}_result",
-               ArgumentDescriptor argument => $"{argument.GetPropertyName().CamelCase()}_result",
-               CommandDescriptor command => $"{command.GetPropertyName().CamelCase()}_result",
-               _ => throw new InvalidOperationException("Unexpected symbol type")
-           };
+        public static string AsParameter(this string name) 
+            => name.CamelCase();
 
         public static string CommandSourceClassName(this CommandDescriptor cmd) 
-            => $"{cmd.OriginalName}CommandSource";
+            => $"{cmd?.OriginalName}CommandSource";
         public static string CommandSourceResultClassName(this CommandDescriptor cmd)
             => $"{cmd.OriginalName}CommandSourceResult";
 

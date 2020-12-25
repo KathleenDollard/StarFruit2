@@ -34,7 +34,7 @@ namespace FluentDom
             return this;
         }
 
-        public Constructor BaseCall(params string[] arguments)
+        public Constructor BaseCall(params IExpression[] arguments)
         {
             baseOrThisCall = new BaseConstructorCall(arguments);
             return this;
@@ -43,18 +43,6 @@ namespace FluentDom
         public Constructor ThisCall()
         {
             baseOrThisCall = new ThisConstructorCall();
-            return this;
-        }
-
-        public Constructor ThisCall(params string[] arguments)
-        {
-            baseOrThisCall = new ThisConstructorCall(arguments);
-            return this;
-        }
-
-        public Constructor BaseCall(params IExpression[] arguments)
-        {
-            baseOrThisCall = new BaseConstructorCall(arguments);
             return this;
         }
 

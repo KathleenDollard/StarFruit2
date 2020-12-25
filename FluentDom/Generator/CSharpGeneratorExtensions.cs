@@ -12,7 +12,7 @@ namespace FluentDom.Generator
         => scope switch
         {
             Scope.None => "",
-            Scope.InternalProtected => "internal protected ",
+            Scope.ProtectedInternal => "protected internal ",
             Scope.PrivateProtected => "private protected ",
             _ => scope.ToString().ToLower() + " "
         };
@@ -60,13 +60,15 @@ namespace FluentDom.Generator
             LocalDeclaration x => $"{x.TypeRep.CSharpString()} {x.LocalName} = {x.RightHand.CSharpString()}",
             MethodCall x => $"{x.Name}({x.ArgumentStore.CSharpString()})",
             NewObject x => $"new {x.TypeRep.CSharpString()}({x.ArgumentStore.CSharpString()})",
-            This => $"this",
-            Base => $"base",
+            This => "this",
+            Base => "base",
             Value x => x.CSharpString(),
             Return x => x.CSharpString(),
             MultilineLambda x => x.CSharpString(),
-            VariableReference x => x.ValueStore,
-            Dot x=> $"{x.Left.CSharpString()}.{x.Right}",
+            Null => "null",
+            VariableReference x => x.ValueStore,                      // NOTE: This differs from Value because it does not have quotes for strings
+            Dot x=> $"{x.Left.CSharpString()}.{x.Right}",             // NOTE: Maybe we should drop this
+            As x=> $"({x.Expression.CSharpString()} as {x.TypeRep.CSharpString()})", // NOTE: This TryString in VB, although nullable value types are handled differently
             _ => throw new NotImplementedException(),
         };
 
@@ -133,6 +135,8 @@ namespace FluentDom.Generator
              }}";
 
         }
+
+
 
     }
 }

@@ -7,7 +7,11 @@ using System.CommandLine.Parsing;
 public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {
    public MyCommandCommandSource()
-   : base(new Command("my-command", null))
+   : this(null, null)
+   {
+   }
+   public MyCommandCommandSource(RootCommandSource root, CommandSource parent)
+   : base(new Command("my-command", null), parent)
    {
       Command.Handler = CommandHandler.Create((InvocationContext context) =>
              {  

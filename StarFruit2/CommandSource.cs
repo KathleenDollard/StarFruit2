@@ -108,14 +108,15 @@ namespace StarFruit2
             return Create<TCli>().Parse(args).Run();
         }
 
-        public Command Command { get; }
-
-        protected CommandSource(Command command)
+        protected CommandSource(Command command, CommandSource? parentCommandSource)
         {
             Command = command;
+            ParentCommandSource = parentCommandSource;
         }
+        public CommandSource? ParentCommandSource { get; }
+        public Command Command { get; }
 
-        protected internal virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult, int exitCode)
+        public virtual CommandSourceResult GetCommandSourceResult(ParseResult parseResult, int exitCode)
         {
             return new NotInvocableCommandSourceResult(parseResult, exitCode);
         }
@@ -123,7 +124,8 @@ namespace StarFruit2
 
     public abstract class RootCommandSource : CommandSource
     {
-        protected RootCommandSource(Command command) : base(command) { }
+        protected RootCommandSource(Command command, CommandSource parentCommandSource) 
+            : base(command, parentCommandSource) { }
 
         public CommandSource? CurrentCommandSource { get; set; }
         public ParseResult? CurrentParseResult { get; set; }
@@ -174,8 +176,8 @@ namespace StarFruit2
     public abstract class RootCommandSource<T> : RootCommandSource
     {
 
-        protected RootCommandSource(Command command)
-           : base(command) { }
+        protected RootCommandSource(Command command, CommandSource parentCommandSource)
+            : base(command, parentCommandSource) { }
 
         protected T NewInstance { get; set; } // exposed through CommandSourceResult
 

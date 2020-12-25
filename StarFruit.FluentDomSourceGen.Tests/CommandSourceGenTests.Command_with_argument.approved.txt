@@ -7,7 +7,11 @@ using System.CommandLine.Parsing;
 public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 {
    public MyCommandCommandSource()
-   : base(new Command(null, null))
+   : this(null, null)
+   {
+   }
+   public MyCommandCommandSource(RootCommandSource root, CommandSource parent)
+   : base(new Command(null, null), parent)
    {
       Argument1Argument = GetArgument1();
       Command.Add(Argument1Argument);
@@ -23,9 +27,8 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 
    public Argument<string> GetArgument1()
    {
-      Argument<string> argument = new Argument<string>();
+      Argument<string> argument = new Argument<string>(null);
       argument.Description = null;
-      argument.IsRequired = false;
       argument.IsHidden = false;
       return argument;
    }

@@ -11,7 +11,7 @@ namespace FluentDom
         Private,
         Internal,
         Protected,
-        InternalProtected,
+        ProtectedInternal,
         PrivateProtected
     }
 

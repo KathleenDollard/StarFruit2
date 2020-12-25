@@ -27,8 +27,15 @@
 
   <ItemGroup>
      <ProjectReference Include="..\FluentDom\FluentDom.csproj" />
-     <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
-     <ProjectReference Include="..\StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj" />
+    <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" />
+    <ProjectReference Include="..\StarFruit.FluentDomSourceGen\StarFruit.FluentDomSourceGen.csproj" />
+    <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="CliRoot.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>
