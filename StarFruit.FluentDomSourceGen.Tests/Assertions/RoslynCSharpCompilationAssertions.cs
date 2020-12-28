@@ -22,10 +22,14 @@ namespace StarFruit.FluentDomSourceGen.Tests
 
         public AndConstraint<RoslynCSharpCompilationAssertions> NotHaveErrors()
         {
-
-            var diagnostics = Subject.GetDiagnostics();
-            var filtered = diagnostics.Where(x => x.Id != "CS0246");
-            filtered.Should().NotHaveErrors();
+            Subject.Should().NotBeNull();
+            if (Subject is not null)
+            {
+                var diagnostics = Subject.GetDiagnostics();
+                // CS0246 occurs naturally as we test  a single file and its references are not available
+                var filtered = diagnostics.Where(x => x.Id != "CS0246");
+                filtered.Should().NotHaveErrors();
+            }
 
             return new AndConstraint<RoslynCSharpCompilationAssertions>(this);
 

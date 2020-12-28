@@ -14,23 +14,20 @@ namespace StarFruit2.Generate
     public class GenerateCommandSource
     {
 
-        public virtual Code CreateCode(CliDescriptor cli)
+        public virtual Code CreateCode(CliDescriptor cli, IEnumerable<Using>? sourceUsings = null)
         {
             var cmd = cli.CommandDescriptor;
-            var usings = new Using[]
-            {
-                        "StarFruit2",
-                        "System.CommandLine",
-                        "StarFruit2.Common",
-                        "System.CommandLine.Invocation",
-                        "System.CommandLine.Parsing"
-            };
-
-            return Code.Create(cli.GeneratedComandSourceNamespace)
-                    .Usings(usings)
-                    .Class(CommandSourceClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
-                    .Classes(new CommandDescriptor[] { cli.CommandDescriptor },
-                             c => SubCommandClasses(c));
+            var nspace = cli.GeneratedComandSourceNamespace ?? "";
+            return Code.Create(nspace)
+                .Usings("StarFruit2")
+                .Usings("System.CommandLine")
+                .Usings("StarFruit2.Common")
+                .Usings("System.CommandLine.Invocation")
+                .Usings("System.CommandLine.Parsing")
+                .Usings(sourceUsings)
+                .Class(CommandSourceClass(cmd, new TypeRep("RootCommandSource", cmd.CommandSourceClassName()), null))
+                .Classes(new CommandDescriptor[] { cmd },
+                            c => SubCommandClasses(c));
         }
 
         protected virtual Class CommandSourceClass(CommandDescriptor cmd,
@@ -51,7 +48,7 @@ namespace StarFruit2.Generate
             static IClassMember ParameterlessCtor(CommandDescriptor cmd)
                 => new Constructor(cmd.CommandSourceClassName())
                             .ThisCall(Null(), Null());
-       }
+        }
 
 
         protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, CommandDescriptor? parent)

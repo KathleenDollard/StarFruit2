@@ -12,18 +12,9 @@
     <Authors>Kathleen Dollard</Authors>
     <Company />
     <Product>StarFruit2</Product>   
-    
-    
-    
-    
-    <Version>0.0.1-beta0001U</Version>  
-    
-    
-    
-    
-    
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+    <Version>0.0.1-beta0001W</Version>  
   </PropertyGroup>
 
   <ItemGroup>

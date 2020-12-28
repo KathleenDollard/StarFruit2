@@ -11,14 +11,14 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20478.1" />
   </ItemGroup>
 
-  <PropertyGroup>
+  <!--<PropertyGroup>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
-  </PropertyGroup>
+  </PropertyGroup>-->
 
   <ItemGroup>
-    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001U"/>
     <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
+    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001W"/>
   </ItemGroup>
 
 </Project>

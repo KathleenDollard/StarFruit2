@@ -2,6 +2,7 @@
 using StarFruit.Common;
 using StarFruit2.Common.Descriptors;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using static FluentDom.Expression;
 
@@ -14,24 +15,19 @@ namespace StarFruit2.Generate
     public class GenerateCommandSourceResult
     {
 
-        public virtual Code CreateCode(CliDescriptor cli)
+        public virtual Code CreateCode(CliDescriptor cli, IEnumerable<Using>? sourceUsings = null)
         {
-            var cmd = cli.CommandDescriptor;
-            var usings = new Using[]
-            {
-                        "StarFruit2",
-                        "System.CommandLine",
-                        "StarFruit2.Common",
-                        "System.CommandLine.Invocation",
-                        "System.CommandLine.Parsing"
-            };
-
             _ = cli ?? throw new InvalidOperationException("CliDescriptor cannot be null");
-
+            var cmd = cli.CommandDescriptor;
             return Code.Create(cli.GeneratedComandSourceNamespace ?? "default namespace")
-                    .Usings(usings)
+                .Usings("StarFruit2")
+                .Usings("System.CommandLine")
+                .Usings("StarFruit2.Common")
+                .Usings("System.CommandLine.Invocation")
+                .Usings("System.CommandLine.Parsing")
+                .Usings(sourceUsings)
                     .Class(CommandResultClass(cmd, new TypeRep("CommandSourceResult", cmd.OriginalName)))
-                    .Classes(cli.CommandDescriptor.SubCommands,
+                    .Classes(cmd.SubCommands,
                              c => CommandResultClass(c, (c.ParentSymbolDescriptorBase as CommandDescriptor)?.CommandSourceResultClassName() ?? "<missing name>"));
         }
 
@@ -64,8 +60,8 @@ namespace StarFruit2.Generate
         private Property ChildProperty(SymbolDescriptor symbol)
             => symbol switch
             {
-                OptionDescriptor o => new Property(o.PropertyResultName(), new TypeRep("CommandSourceMemberResult", o.GetArgumentType())),
-                ArgumentDescriptor a => new Property(a.PropertyResultName(), new TypeRep("CommandSourceMemberResult", a.GetArgumentType())),
+                OptionDescriptor o => new Property(o.PropertyResultName(), new TypeRep("CommandSourceMemberResult", o.GetFluentArgumentType())),
+                ArgumentDescriptor a => new Property(a.PropertyResultName(), new TypeRep("CommandSourceMemberResult", a.GetFluentArgumentType())),
                 _ => throw new InvalidOperationException("Unexpected symbol type")
             };
 

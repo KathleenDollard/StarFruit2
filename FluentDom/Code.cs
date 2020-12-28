@@ -30,7 +30,16 @@ namespace FluentDom
 
         public Code Usings(params Using[] usings)
         {
-            this.usings.AddRange(usings.Where(x=>x is not null));
+            this.usings.AddRange(usings.Where(x => x is not null));
+            return this;
+        }
+
+        public Code Usings(IEnumerable<Using>? usings)
+        {
+            if (usings is not null)
+            {
+                this.usings.AddRange(usings.Where(x => x is not null));
+            }
             return this;
         }
 
@@ -40,10 +49,10 @@ namespace FluentDom
             return this;
         }
 
-        public Code Classes<T>( IEnumerable<T> items , params Func<T, Class>[] classMakers)
+        public Code Classes<T>(IEnumerable<T> items, params Func<T, Class>[] classMakers)
         {
             classes.AddRange(items.SelectMany(
-                            item => classMakers.Select(lambda => lambda(item))));        
+                            item => classMakers.Select(lambda => lambda(item))));
             return this;
         }
 

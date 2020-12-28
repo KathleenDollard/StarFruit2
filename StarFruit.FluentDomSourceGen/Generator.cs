@@ -17,7 +17,7 @@ namespace StarFruit2.Generate
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            context.RegisterForSyntaxNotifications(() => new CommandSourceSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
@@ -29,23 +29,18 @@ namespace StarFruit2.Generate
                     new DiagnosticDescriptor("KD0001", "Generator entered", "", "KDGenerator", DiagnosticSeverity.Info, true),
                     null));
 
-                if (context.SyntaxReceiver is not SyntaxReceiver receiver)
+                if (context.SyntaxReceiver is not CommandSourceSyntaxReceiver receiver)
                     return;
 
-                var source = "";
-                foreach (var declaration in receiver.CandidateCliTypes)
+                foreach (var (rootType, usings) in receiver.CandidateCliTypes)
                 {
-                    var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(declaration, context.Compilation as CSharpCompilation);
-                    //var tempSource += $"\npublic class Temp{cliDescriptor.CommandDescriptor.OriginalName}{{}}\n";
-                    //OutputCode(tempSource, context, $"Temp.generated.cs");
-                    OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}CommandSource.generated.cs");
-                    OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor), context, $"{cliDescriptor.CommandDescriptor.OriginalName}CommandSourceResult.generated.cs");
-                }
-
-                if (source != null)
-                {
-                    //Debugger.Launch();
-                    context.AddSource("generated.cs", source);
+                    var cliDescriptor = RoslyDescriptorMakerFactory.CreateCliDescriptor(rootType , context.Compilation as CSharpCompilation);
+                    OutputCode(new GenerateCommandSource().CreateCode(cliDescriptor, usings),
+                               context,
+                               $"{cliDescriptor.CommandDescriptor.OriginalName}CommandSource.generated.cs");
+                    OutputCode(new GenerateCommandSourceResult().CreateCode(cliDescriptor, usings),
+                               context,
+                               $"{cliDescriptor.CommandDescriptor.OriginalName}CommandSourceResult.generated.cs");
                 }
 
              }
@@ -65,14 +60,12 @@ namespace StarFruit2.Generate
                 }
             }
         }
-
-
     }
 
-    public class SyntaxReceiver : ISyntaxReceiver
+    public class CommandSourceSyntaxReceiver : ISyntaxReceiver
     {
-        public List<TypeSyntax> CandidateCliTypeferences { get; } = new();
-        public List<ClassDeclarationSyntax> CandidateCliTypes { get; } = new();
+        public List<TypeSyntax> CandidateCliTypReferences { get; } = new();
+        public List<(ClassDeclarationSyntax rootType, IEnumerable<Using> usings)> CandidateCliTypes { get; } = new();
 
         /// <summary>
         /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
@@ -81,6 +74,7 @@ namespace StarFruit2.Generate
         {
             try
             {
+                // If this worked, the CliRoot could be a normal POCO 
                 if (syntaxNode is InvocationExpressionSyntax invocation
                     && invocation.Expression is MemberAccessExpressionSyntax memberAccess
                     && memberAccess.Expression is IdentifierNameSyntax classIdentifier
@@ -91,21 +85,26 @@ namespace StarFruit2.Generate
                 {
                     var cliRootName = methodName.TypeArgumentList.Arguments.FirstOrDefault();
                     if (cliRootName is not null
-                        && !CandidateCliTypeferences.Contains(cliRootName))
+                        && !CandidateCliTypReferences.Contains(cliRootName))
                     {
-                        CandidateCliTypeferences.Add(cliRootName);
+                        CandidateCliTypReferences.Add(cliRootName);
                     }
                 }
 
+                // This approach has the benefit of actually working
                 if (syntaxNode is ClassDeclarationSyntax classDeclaration
                     && classDeclaration.BaseList is not null
                     && classDeclaration.BaseList.DescendantNodes()
                                                 .OfType<IdentifierNameSyntax>()
                                                 .Any(x => x.Identifier.ValueText == "ICliRoot"))
                 {
-                    if (!CandidateCliTypes.Contains(classDeclaration))
+                    if (!CandidateCliTypes.Any(x=>x.rootType == classDeclaration ))
                     {
-                        CandidateCliTypes.Add(classDeclaration);
+                        var compilationUnit  = classDeclaration.Ancestors()
+                                                               .OfType<CompilationUnitSyntax>()
+                                                               .FirstOrDefault();
+                        var usingDirectives = compilationUnit.Usings.Select(y=> new Using(y.Name.ToString(), y.Alias?.ToString()));
+                        CandidateCliTypes.Add((classDeclaration, usingDirectives));
                     }
                 }
             }

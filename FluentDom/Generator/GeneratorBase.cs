@@ -7,26 +7,13 @@ namespace FluentDom.Generator
     {
         protected StringBuilderWithTabs sb = new();
 
-        public virtual string Generate(Code code)
-        {
-
-            if (string.IsNullOrWhiteSpace(code.Namespace))
-            {
-                this
-                   .OutputUsings(code)
-                   .OutputSelect(code.ClassStore, (generator, x) => generator.OutputClass(x));
-            }
-            else
-            {
-                this
-                   .OutputUsings(code)
-                   .OpenNamespace(code)
-                   .OutputSelect(code.ClassStore, (generator, x) => generator.OutputClass(x))
-                   .CloseNamespace(code);
-            }
-
-            return sb.ToString();
-        }
+        public virtual string Generate(Code code) 
+            => this
+                .OutputUsings(code)
+                .Optional(!string.IsNullOrWhiteSpace(code.Namespace), () => OpenNamespace(code))
+                .OutputSelect(code.ClassStore, (generator, x) => generator.OutputClass(x))
+                .Optional(!string.IsNullOrWhiteSpace(code.Namespace), () => CloseNamespace(code))
+                .GetOutput();
 
         public string GetOutput()
         {
@@ -60,6 +47,16 @@ namespace FluentDom.Generator
             if (shouldOutput)
             {
                 sb.AppendLine(lineMaker());
+            }
+            return this;
+        }
+
+        // This will often force a closure. Consider if heavily used.
+        protected internal GeneratorBase Optional(bool shouldOutput, Func<GeneratorBase> lineMaker)
+        {
+            if (shouldOutput)
+            {
+                lineMaker();
             }
             return this;
         }

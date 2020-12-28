@@ -90,7 +90,7 @@ namespace StarFruit2
 
         public static async Task<int> RunAsync<TCli>(string[] args)
         {
-            return await RunAsync<TCli>(string.Join("",args));
+            return await RunAsync<TCli>(string.Join("", args));
         }
 
         public static async Task<int> RunAsync<TCli>(string args)
@@ -106,6 +106,35 @@ namespace StarFruit2
         public static int Run<TCli>(string args)
         {
             return Create<TCli>().Parse(args).Run();
+        }
+
+        public static int Repeat<TCli>(string[] args)
+        {
+            return Repeat<TCli>(string.Join(" ", args));
+        }
+
+        public static int Repeat<TCli>(string input)
+        {
+            try
+            {
+                var lastExitCode = 0;
+                var rootCommandSource = Create<TCli>();
+                while (input is not null)
+                {
+                    if (!string.IsNullOrWhiteSpace(input))
+                    {
+                        lastExitCode = rootCommandSource.Parse(input).Run();
+                    }
+                    Console.WriteLine("Enter something:");
+                    input = Console.ReadLine();
+                }
+                return lastExitCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return 1;
+            }
         }
 
         protected CommandSource(Command command, CommandSource? parentCommandSource)
@@ -124,7 +153,7 @@ namespace StarFruit2
 
     public abstract class RootCommandSource : CommandSource
     {
-        protected RootCommandSource(Command command, CommandSource parentCommandSource) 
+        protected RootCommandSource(Command command, CommandSource parentCommandSource)
             : base(command, parentCommandSource) { }
 
         public CommandSource? CurrentCommandSource { get; set; }

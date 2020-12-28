@@ -93,5 +93,6 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
 
             Approvals.Verify(actual);
         }
+
     }
 }

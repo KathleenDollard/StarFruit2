@@ -17,18 +17,23 @@ using Xunit.Abstractions;
 
 namespace StarFruit.FluentDomSourceGen.Tests
 {
-    public class WhereSingleLayerSource
+    public class SourceGeneratorTests
     {
         private readonly ITestOutputHelper _output;
 
-        public WhereSingleLayerSource(ITestOutputHelper output)
+        public SourceGeneratorTests(ITestOutputHelper output)
         {
             _output = output;
         }
 
+        // These using choices are deliberate.
+        // * StarFruit2.Common is redundant with default, 
+        // * System.Threading.Tasks may or may not be in the defualt generation,
+        // * System.IO is not in the generation
         private const string source1 = @"
 using StarFruit2.Common;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace TwoLayerCli
 {
@@ -79,7 +84,27 @@ namespace TwoLayerCli
             SourceGeneratorUtilities.GenerateAndTest(generatedCodeName, "CliRoot.cs", $"../../../../StarFruit.FluentDomSourceGen.Tests.Output");
         }
 
-  
+
+        [Fact]
+        public void Generate_CommandSource_for_debugging_when_needed()
+        {
+            SourceGeneratorUtilities.GenerateAndTest("CommandSource", @"..\..\..\Temp.cs", $"../../../../Temp");
+        }
+
+        [Fact]
+        public void Generate_CommandSourceResult_for_debugging_when_needed()
+        {
+            SourceGeneratorUtilities.GenerateAndTest("CommandSourceResult", @"..\..\..\Temp.cs", $"../../../../Temp");
+        }
+
+
+        [Fact]
+        public void Test_SyntaxReceiver_for_debugging_when_needed()
+        {
+            var receiver = SourceGeneratorUtilities.FindCandidatesWithSyntaxReceiver(@"..\..\..\Temp.cs");
+            receiver.CandidateCliTypes.Should().NotBeNullOrEmpty();
+            receiver.CandidateCliTypes.Should().HaveCount(1);
+        }
 
     }
 }

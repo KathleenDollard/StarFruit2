@@ -21,28 +21,30 @@ namespace StarFruit.FluentDomSourceGen.Tests
             GenerateAndTestSource(generatedCodeName, cliRootSource, outputPath);
         }
 
-        public static string? GenerateAndTestSource(string generatedCodeName, string inputSource, string? outputPath = null)
+        public static string GenerateAndTestSource(string generatedCodeName, string inputSource, string? outputPath = null)
         {
             using var _ = new AssertionScope();
             CSharpCompilation cliRootCompilation = GetCliRootCompilation(inputSource)
                                                    ?? throw new InvalidOperationException();
 
-            var outputCompilations = SourceGeneratorUtilities.Generate<Generator>(cliRootCompilation, out var outputCompilation, out var generationDiagnostics);
+            var syntaxTreePairs = SourceGeneratorUtilities.Generate<Generator>(cliRootCompilation, out var outputCompilation, out var generationDiagnostics);
             generationDiagnostics.Should().NotHaveErrors();
-            outputCompilation.Should().NotHaveErrors();
 
-            var (compilationName, sourceCode) = outputCompilations.Where(x => x.compilationName.Contains($"{generatedCodeName}.generated"))
-                                                                               .FirstOrDefault();
-            var commandSourceCompilation = SourceGeneratorUtilities.CompileSource(sourceCode, generatedCodeName);
-
+            var (compilationName, sourceCode) = syntaxTreePairs.Where(x => x.compilationName.Contains($"{generatedCodeName}.generated"))
+                                                               .FirstOrDefault();
             if (outputPath is not null)
             {
                 File.WriteAllText($"{outputPath}/{generatedCodeName}.generated.cs", sourceCode);
             }
+
+            outputCompilation.Should().NotHaveErrors();
+            var commandSourceCompilation = CompileSource(sourceCode, generatedCodeName);
             commandSourceCompilation!.Should().NotBeNull();
             commandSourceCompilation!.Should().NotHaveErrors();
 
-            return commandSourceCompilation?.SyntaxTrees.First().ToString();
+            return commandSourceCompilation is null
+                    ? "Compilation is null"
+                    : commandSourceCompilation.SyntaxTrees.First().ToString();
         }
 
         public static CSharpCompilation? GetCliRootCompilation(string cliRootSource)
@@ -54,13 +56,27 @@ namespace StarFruit.FluentDomSourceGen.Tests
             return cliRootCompilation;
         }
 
+        public static CommandSourceSyntaxReceiver FindCandidatesWithSyntaxReceiver(string inputFileName)
+            => FindCandidatesWithSyntaxReceiverSource(File.ReadAllText(inputFileName));
+
+        public static CommandSourceSyntaxReceiver FindCandidatesWithSyntaxReceiverSource(string source)
+        {
+            var _ = source ?? throw new ArgumentException("Source cannot be null", "source");
+            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var receiver = new CommandSourceSyntaxReceiver();
+            var walker = new GeneratorSyntaxWalker(receiver);
+            walker.Visit(syntaxTree.GetRoot());
+
+            return receiver;
+        }
+
         public static IEnumerable<(string compilationName, string sourceCode)> Generate<T>(CSharpCompilation compilation, out Compilation outputCompilation, out ImmutableArray<Diagnostic> generationDiagnostics)
             where T : ISourceGenerator, new()
         {
             ISourceGenerator generator = new T();
 
             var driver = CSharpGeneratorDriver.Create(generator);
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out outputCompilation, out  generationDiagnostics);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out outputCompilation, out generationDiagnostics);
 
             var output = outputCompilation.SyntaxTrees.Select(x => (x.FilePath, x.ToString()));
             return output;

@@ -14,39 +14,15 @@ namespace StarFruit2
         public static IDescriptionProvider Provider { get; private set; }
 
 
-        public static string? XmlComments(ITypeSymbol symbol)
+        public static string? XmlComments(ISymbol symbol)
         {
             var xml = symbol.GetDocumentationCommentXml();
-            if (string.IsNullOrWhiteSpace(xml))
+            if (string.IsNullOrWhiteSpace(xml) || xml!.StartsWith("<!-- Bad"))
             {
                 return null;
             }
             var xDoc = XElement.Parse(xml);
-            // for now, assume correct structure
-            return (xDoc.FirstNode as XElement)?.Value.Trim();
-        }
-
-        public static string? XmlComments(IPropertySymbol symbol)
-        {
-            var xml = symbol.GetDocumentationCommentXml();
-            if (string.IsNullOrWhiteSpace(xml))
-            {
-                return null;
-            }
-            var xDoc = XElement.Parse(xml);
-            // for now, assume correct structure
-            return (xDoc.FirstNode as XElement)?.Value.Trim();
-        }
-
-        public static string? XmlComments(IMethodSymbol symbol)
-        {
-            var xml = symbol.GetDocumentationCommentXml();
-            if (string.IsNullOrWhiteSpace(xml))
-            {
-                return null;
-            }
-            var xDoc = XElement.Parse(xml);
-            // for now, assume correct structure
+            // Assume correct structure or quit
             return (xDoc.FirstNode as XElement)?.Value.Trim();
         }
 
@@ -71,14 +47,12 @@ namespace StarFruit2
             return element.Value.Trim();
         }
 
-        public string? GetDescription<T>(T source, string route=null)
+        public string? GetDescription<T>(T source, string route = null)
         {
             return source switch
             {
-                ITypeSymbol t => XmlComments(t),
-                IPropertySymbol t => XmlComments(t),
-                IMethodSymbol t => XmlComments(t),
                 IParameterSymbol t => XmlComments(t),
+                ISymbol t => XmlComments(t),
                 _ => null
             };
         }

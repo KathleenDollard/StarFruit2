@@ -90,5 +90,16 @@ namespace StarFruit2
             arr[0] = char.ToLowerInvariant(arr[0]);
             return new string(arr);
         }
+
+        public static string RemoveLeadingTrailingQuotes(this string input)
+        {
+            var withoutLeading = input.StartsWith(@"""")
+                                    ? input.Substring(1)
+                                    : input;
+            return withoutLeading.EndsWith(@"""")
+                                    ? input.Substring(0, input.Length - 1)
+                                    : input;
+
+        }
     }
 }

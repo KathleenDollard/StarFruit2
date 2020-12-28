@@ -44,9 +44,8 @@ namespace FluentDom.Generator
 
         protected internal override GeneratorBase OutputUsings(Code code)
         {
-            return
-                OutputSelect(code.UsingStore, (g, x)
-                             => OutputLine($"using {IncludeUsingStatic(x)}{IncludeAlias(x)}{x.UsingNamespace};"))
+            return OutputSelect(code.UsingStore.Distinct(new Using.NameEqualComparer()),
+                                (g, x) => OutputLine($"using {IncludeUsingStatic(x)}{IncludeAlias(x)}{x.UsingNamespace};"))
                 .OutputLine();
 
             string IncludeAlias(Using usingNamespace)
