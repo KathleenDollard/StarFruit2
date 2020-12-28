@@ -284,7 +284,7 @@ public int MyMethod([AllowedValues(1,3,5,7,11,13)] int myParam=Int32.MinValue)
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
-            actual.OriginalElementType.Should().Be(OriginalElementType.MethodParameter);
+            actual.RawInfo.Should().BeOfType<RawInfoForMethodParameter>();
         }
     }
 }

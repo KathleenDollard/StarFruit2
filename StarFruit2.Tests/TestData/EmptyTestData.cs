@@ -21,7 +21,7 @@ namespace TestData
             {
                 GeneratedComandSourceNamespace = generatedNamespace,
                 GeneratedCommandSourceClassName = generatedClassName,
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class)
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null))
                 {
                     Name = "MyClass"
                 }

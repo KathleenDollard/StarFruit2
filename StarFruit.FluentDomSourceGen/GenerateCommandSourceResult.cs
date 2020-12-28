@@ -38,7 +38,7 @@ namespace StarFruit2.Generate
                 .Properties(cmd.GetOptionsAndArgs(),
                             s => ChildProperty(s))
                 .BlankLine()
-                .OptionalMembers(cmd.OriginalElementType == OriginalElementType.Class,
+                .OptionalMembers(cmd.RawInfo is RawInfoForType ,
                                  c => c.Method(CreateInstance(cmd)));
 
         private Constructor GetCtor(CommandDescriptor cmd)
@@ -69,14 +69,14 @@ namespace StarFruit2.Generate
         {
             const string newItem = "newItem";
             var arguments = cmd.GetOptionsAndArgs()
-                               .Where(x => x.OriginalElementType == OriginalElementType.CtorParameter)
+                               .Where(x => x.RawInfo is RawInfoForCtorParameter )
                                .Select(s => $"{s.ParameterResultName()}.Value")
                                .ToArray();
             return new Method("CreateInstance", modifiers: MemberModifiers.Override)
                            .ReturnType(cmd.OriginalName)
                            .Statements(AssignVar(newItem, "var", NewObject(cmd.OriginalName, arguments)))
                            .Statements(cmd.GetOptionsAndArgs()
-                                          .Where(x => x.OriginalElementType == OriginalElementType.Property),
+                                          .Where(x => x.RawInfo is RawInfoForProperty),
                                        x => Assign(VariableReference($"{newItem}.{x.OriginalName}"),
                                                    VariableReference($"{x.PropertyResultName()}.Value")))
                            .Statements(Return(VariableReference(newItem)));

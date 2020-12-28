@@ -7,18 +7,27 @@ using Xunit;
 
 namespace StarFruit2.Tests
 {
-    public class DescriptorMakerTestsForParameterArguments
+    public class MyClass
+    {
+        public MyClass(int myParamArg)
+        {}
+    }
+
+    public class DescriptorMakerTestsForParameterCtorArguments
     {
         [Fact]
         public void Argument_names_are_as_expected()
         {
             var code = @"
-public int MyMethod(int myParamArg)
-{ return 0; }"
-                      .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg)
+    {}
+}"
+                      .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.OriginalName.Should().Be("myParamArg");
             actual.Name.Should().Be("myParam");
@@ -29,12 +38,15 @@ public int MyMethod(int myParamArg)
         public void ArgumentType_is_int_when_int_on_argument()
         {
             var code = @"
-public int MyMethod(int myParamArg)
-{ return 0; }"
-                       .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg)
+    {}
+}"
+                       .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.ArgumentType.TypeAsString().Should().Be("Int32");
         }
@@ -43,12 +55,15 @@ public int MyMethod(int myParamArg)
         public void ArgumentType_is_bool_when_int_on_argument()
         {
             var code = @"
-public int MyMethod(bool myParamArg)
-{ return 0; }"
-                       .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(bool myParamArg)
+    {}
+}"
+                       .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.ArgumentType.TypeAsString().Should().Be("Boolean");
         }
@@ -57,12 +72,15 @@ public int MyMethod(bool myParamArg)
         public void Required_is_true_when_Required_attribute_used_on_argument()
         {
             var code = @"
-public int MyMethod([Required] int myParamArg)
-{ return 0; }"
-                       .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass([Required] int myParamArg)
+    {}
+}"
+                       .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(true);
         }
@@ -71,12 +89,15 @@ public int MyMethod([Required] int myParamArg)
         public void Required_is_true_when_Required_attribute_with_true_value_used_on_argument()
         {
             var code = @"
-public int MyMethod([Required(true)] int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass([Required(true)] int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(true);
         }
@@ -85,12 +106,15 @@ public int MyMethod([Required(true)] int myParamArg)
         public void Required_is_false_when_Required_attribute_not_on_argument()
         {
             var code = @"
-public int MyMethod(int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(false);
         }
@@ -99,12 +123,15 @@ public int MyMethod(int myParamArg)
         public void Required_is_false_when_Required_attribute_with_false_value_used_on_argument()
         {
             var code = @"
-public int MyMethod([Required(false)] int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass([Required(false)] int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(false);
         }
@@ -113,12 +140,15 @@ public int MyMethod([Required(false)] int myParamArg)
         public void Hidden_is_true_when_Hidden_attribute_used_on_argument()
         {
             var code = @"
-public int MyMethod([Hidden] int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass([Hidden] int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(true);
         }
@@ -127,12 +157,15 @@ public int MyMethod([Hidden] int myParamArg)
         public void Hidden_is_true_when_Hidden_attribute_with_true_value_used_on_argument()
         {
             var code = @"
-public int MyMethod([Hidden(true)] int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass([Hidden(true)] int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(true);
         }
@@ -141,12 +174,15 @@ public int MyMethod([Hidden(true)] int myParamArg)
         public void Hidden_is_false_when_Hidden_attribute_not_on_argument()
         {
             var code = @"
-public int MyMethod(int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(false);
         }
@@ -155,12 +191,15 @@ public int MyMethod(int myParamArg)
         public void Hidden_is_false_when_Hidden_attribute_with_false_value_used_on_argument()
         {
             var code = @"
-public int MyMethod([Hidden(false)] int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass([Hidden(false)] int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(false);
         }
@@ -170,15 +209,18 @@ public int MyMethod([Hidden(false)] int myParamArg)
         {
             var desc = "This is a nice param desc";
             var code = @$"
-                       /// <summary>
-                       /// 
-                       /// </summary>
-                       /// <param name=""myParamArg"">{desc}</param>
-                       public int MyMethod(int myParamArg)
-{{ return 0; }}"
-                .WrapInStandardClass();
+public class MyClass
+{{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name=""myParamArg"">{desc}</param> 
+    public MyClass([Hidden(false)] int myParamArg)
+    {{}}
+}}"
+                .WrapInStandardNamespace();
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Description.Should().Be(desc);
         }
@@ -187,12 +229,15 @@ public int MyMethod([Hidden(false)] int myParamArg)
         public void DefaultValue_from_parameter_initialize_on_argument()
         {
             var code = @"
-public int MyMethod(int myParamArg=42)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg=42)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("42");
         }
@@ -202,12 +247,15 @@ public int MyMethod(int myParamArg=42)
         public void DefaultValue_is_null_If_not_given_as_parameter_initialize_on_argument()
         {
             var code = @"
-                       public int MyMethod(int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.Should().BeNull();
         }
@@ -216,11 +264,15 @@ public int MyMethod(int myParamArg=42)
         public void DefaultValue_as_parameter_from_parameter_initialize_on_argument()
         {
             var code = @"
-public void MyMethod(int myParamArg=Int32.MinValue) {} "
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg=System.Int32.MinValue)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("-2147483648");
         }
@@ -229,12 +281,15 @@ public void MyMethod(int myParamArg=Int32.MinValue) {} "
         public void Allowed_values_from_attribute_on_argument()
         {
             var code = @"                       
-public int MyMethod([AllowedValues(1,3,5,7,11,13)] int myParamArg=Int32.MinValue)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass([AllowedValues(1,3,5,7,11,13)] int myParamArg=System.Int32.MinValue)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
         }
@@ -243,14 +298,17 @@ public int MyMethod([AllowedValues(1,3,5,7,11,13)] int myParamArg=Int32.MinValue
         public void Parameter_position_correct_for_arguments_and_options()
         {
             var code = @"                       
-public int MyMethod(int first, string secondArg, int third)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int first, string secondArg, int third)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual1 = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
-            var actual2 = actualCli.CommandDescriptor.SubCommands.First().Options.First();
-            var actual3 = actualCli.CommandDescriptor.SubCommands.First().Options.Skip(1).First();
+            var actual1 = actualCli.CommandDescriptor.Arguments.First();
+            var actual2 = actualCli.CommandDescriptor.Options.First();
+            var actual3 = actualCli.CommandDescriptor.Options.Skip(1).First();
 
             using var x = new AssertionScope();
             actual1.Position.Should().Be(1);
@@ -262,14 +320,17 @@ public int MyMethod(int first, string secondArg, int third)
         public void MemberSource_correct_for_argument()
         {
             var code = @"
-public int MyMethod(int myParamArg)
-{ return 0; }"
-                .WrapInStandardClass();
+public class MyClass
+{
+    public MyClass(int myParamArg)
+    {}
+}"
+                .WrapInStandardNamespace();
 
             CliDescriptor actualCli = Utils.GetCli(code);
-            var actual = actualCli.CommandDescriptor.SubCommands.First().Arguments.First();
+            var actual = actualCli.CommandDescriptor.Arguments.First();
 
-            actual.RawInfo.Should().BeOfType<RawInfoForMethodParameter>();
+            actual.RawInfo.Should().BeOfType<RawInfoForCtorParameter>();
         }
 
     }

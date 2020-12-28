@@ -1,5 +1,7 @@
 ﻿using System;
 
+Console.WriteLine($"Temp until code below works");
+
 
 //var myArgs = CommandSource.CreateInstance<MyArgs>();
 //Console.WriteLine($"Hello {myArgs.stringArg}! (magic number: {myArgs.intArg}");

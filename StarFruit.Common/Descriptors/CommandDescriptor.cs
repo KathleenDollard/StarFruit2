@@ -8,9 +8,8 @@ namespace StarFruit2.Common.Descriptors
     {
         public CommandDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                  string originalName,
-                                 object? raw,
-                                 string originalElementType)
-            : base(parentSymbolDescriptorBase, originalName, raw,originalElementType, SymbolType.Command) 
+                                 RawInfoBase rawInfo)
+            : base(parentSymbolDescriptorBase, originalName, rawInfo, SymbolType.Command) 
         {        }
 
         public bool TreatUnmatchedTokensAsErrors { get; set; } = true;
@@ -19,7 +18,7 @@ namespace StarFruit2.Common.Descriptors
         public InvokeMethodInfo? InvokeMethod { get; set; } // in Reflection models, this is a MethodInfo, in Roslyn it will be something else
         public List<CommandDescriptor> SubCommands { get; } = new List<CommandDescriptor>();
         public bool IsAsync { get; set; }
-        public object baseClass { get; set; }
+        public object? BaseClass { get; set; }
 
         public IEnumerable<SymbolDescriptor> GetChildren()
             => Arguments.OfType<SymbolDescriptor>().Union(Options).Union(SubCommands);

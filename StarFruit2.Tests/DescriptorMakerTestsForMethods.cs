@@ -37,7 +37,7 @@ namespace StarFruit2.Tests
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
-            actual.OriginalElementType.Should().Be(OriginalElementType.Method);
+            actual.RawInfo.Should().BeOfType<RawInfoForMethod>();
         }
 
         [Fact]

@@ -19,20 +19,20 @@ namespace TestData
         {
             string sourceCode = $@"NOT YET IMPLEMENTED: Read corresponding file";
 
-            var commandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class) { Name = "my-class" };
-
+            var commandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType (null)) { Name = "my-class" };
+            
             commandDescriptor.AddCommands(subCommands: new List<CommandDescriptor>(){
-                new CommandDescriptor( null, "MyMethod2", null, OriginalElementType.Property)
+                new CommandDescriptor( null, "MyMethod2", new RawInfoForMethod (null , false))
                 {
                     Name = "MyMethod2",
                     CliName = "my-mymethod2",
                 },
-                new CommandDescriptor( null, "MyMethod1", null, OriginalElementType.Property)
+                new CommandDescriptor( null, "MyMethod1", new RawInfoForMethod (null,false))
                 {
                     Name = "MyMethod1",
                     CliName = "my-mymethod1",
                 },
-                new CommandDescriptor( null, "MyMethod3", null, OriginalElementType.Property)
+                new CommandDescriptor( null, "MyMethod3", new RawInfoForMethod (null,false))
                 {
                     Name = "MyMethod3",
                     CliName = "my-mymethod3",
@@ -40,7 +40,7 @@ namespace TestData
             });
 
             commandDescriptor.SubCommands.First().AddArguments(arguments: new List<ArgumentDescriptor>(){
-                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(int)), null, "myParam", null, OriginalElementType.MethodParameter )
+                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(int)), null, "myParam", new RawInfoForMethodParameter (null)) 
                 {
                     Name = "myParam",
                     CliName = "my-param",

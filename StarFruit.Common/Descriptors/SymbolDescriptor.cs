@@ -35,13 +35,11 @@ namespace StarFruit2.Common.Descriptors
 
         protected SymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                 string originalName,
-                                object? raw,
-                                string originalElementType,
+                                RawInfoBase rawInfo,
                                 SymbolType symbolType)
         {
             ParentSymbolDescriptorBase = parentSymbolDescriptorBase;
-            Raw = raw;
-            OriginalElementType = originalElementType;
+            RawInfo = rawInfo;
             OriginalName = originalName;
             Name = originalName;
             SymbolType = symbolType;
@@ -52,8 +50,7 @@ namespace StarFruit2.Common.Descriptors
         /// example MethodInfo, Type, ParameterInfo and PropertyInfo appear
         /// in the ReflectionAppModel. 
         /// </summary>
-        public object? Raw { get; }
-        public string OriginalElementType { get; }
+        public RawInfoBase RawInfo { get; }
         public SymbolType SymbolType { get; }
         public string? Description { get; set; }
 
@@ -122,7 +119,7 @@ namespace StarFruit2.Common.Descriptors
                    $"{whitespace2}Description:{Description }" +
                    $"{whitespace2}IsHidden:{IsHidden  }" +
                    ReportInternal(tabsCount + 1, verbosity) +
-                   $"{whitespace2}Raw:{ReportRaw(Raw)}";
+                   $"{whitespace2}Raw:{ReportRaw(RawInfo.Raw)}";
             //$"{whitespace2}Symbol:{ReportBound(SymbolToBind)}";
 
             static string ReportRaw(object? raw)
@@ -146,10 +143,9 @@ namespace StarFruit2.Common.Descriptors
     {
         protected IdentitySymbolDescriptor(ISymbolDescriptor? parentSymbolDescriptorBase,
                                            string originalName,
-                                           object? raw,
-                                           string originalElementType,
+                                           RawInfoBase rawInfo,
                                            SymbolType symbolType)
-            : base(parentSymbolDescriptorBase, originalName, raw, originalElementType, symbolType)
+            : base(parentSymbolDescriptorBase, originalName, rawInfo, symbolType)
         { }
         public List<string> Aliases { get; } = new List<string>();
 

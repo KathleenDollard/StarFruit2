@@ -8,9 +8,8 @@ namespace StarFruit2.Common.Descriptors
         public ArgumentDescriptor(ArgTypeInfoBase argumentTypeInfo, 
                                   ISymbolDescriptor parentSymbolDescriptorBase,
                                   string originalName,
-                                  object? raw,
-                                  string originalElementType)
-            : base(parentSymbolDescriptorBase, originalName, raw,originalElementType, SymbolType.Argument)
+                                  RawInfoBase rawInfo)
+            : base(parentSymbolDescriptorBase, originalName, rawInfo, SymbolType.Argument)
         {
             ArgumentType = argumentTypeInfo;
         }

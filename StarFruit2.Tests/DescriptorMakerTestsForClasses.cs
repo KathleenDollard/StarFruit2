@@ -36,9 +36,8 @@ namespace StarFruit2.Tests
             CliDescriptor actualCli = Utils.GetCli(code);
             var actual = actualCli.CommandDescriptor;
 
-            actual.OriginalElementType .Should().Be(OriginalElementType.Class);
+            actual.RawInfo.Should().BeOfType<RawInfoForType>();
         }
-
 
         [Fact]
         public void Hidden_is_true_when_Hidden_attribute_used_on_command()
@@ -289,4 +288,4 @@ namespace StarFruit2.Tests
         }
 
     }
-    }
+}

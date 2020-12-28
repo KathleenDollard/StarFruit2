@@ -120,7 +120,7 @@ namespace StarFruit2.Tests
         {
             var clidDescriptor = new CliDescriptor()
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class)
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null))
 
             };
             clidDescriptor.CommandDescriptor.Options.Add(optionDescriptor);
@@ -131,7 +131,7 @@ namespace StarFruit2.Tests
         {
             var clidDescriptor = new CliDescriptor()
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class),
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null)),
                 GeneratedComandSourceNamespace = "MyNamespace"
             };
             clidDescriptor.CommandDescriptor.Arguments.Add(argumentDescriptor);
@@ -145,8 +145,8 @@ namespace StarFruit2.Tests
 
         internal static OptionDescriptor CreateOptionDescriptor(string name, Type type)
         {
-            var option = new OptionDescriptor(null, name, null, OriginalElementType.Property);
-            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(type), null, name, null, OriginalElementType.Property));
+            var option = new OptionDescriptor(null, name, new RawInfoForProperty(null));
+            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(type), null, name, new RawInfoForProperty(null)));
             return option;
         }
 

@@ -22,10 +22,10 @@ namespace TestData
         {
             string sourceCode = $@"NOT YET IMPLEMENTED: Read corresponding file";
 
-            var commandDescriptor = new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class) { Name = "my-class" };
+            var commandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null)) { Name = "my-class" };
 
             commandDescriptor.AddArguments(arguments: new List<ArgumentDescriptor>(){
-                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, "MyArgPropertyArg", null, OriginalElementType.Property)
+                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, "MyArgPropertyArg", new RawInfoForProperty (null))
                 {
                     Name = "MyArgPropertyArg",
                     CliName = "my-property-arg",
@@ -33,17 +33,17 @@ namespace TestData
             });
 
             commandDescriptor.AddOptions(options: new List<OptionDescriptor>(){
-                new OptionDescriptor(null, "MyProperty", null, OriginalElementType.Property)
+                new OptionDescriptor(null, "MyProperty", new RawInfoForProperty (null))
                 {
                     Name = "MyProperty",
                     CliName = "my-property",
                 },
-                new OptionDescriptor(null, "MyProperty2", null, OriginalElementType.Property)
+                new OptionDescriptor(null, "MyProperty2", new RawInfoForProperty (null))
                 {
                     Name = "MyProperty2",
                     CliName = "my-property2",
                 },
-                new OptionDescriptor( null, "MyProperty3", null, OriginalElementType.Property)
+                new OptionDescriptor( null, "MyProperty3",new RawInfoForProperty (null))
                 {
                     Name = "MyProperty3",
                     CliName = "my-property2",

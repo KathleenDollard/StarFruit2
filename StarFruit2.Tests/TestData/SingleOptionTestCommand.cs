@@ -10,7 +10,7 @@ namespace TestData
 {
     public class SingleOptionTestCommand<T> : BaseTestData
     {
-        public CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", null, OriginalElementType.Class) { Name = "my-class" };
+        public CommandDescriptor CommandDescriptor => new CommandDescriptor(null, "MyClass", new RawInfoForType(null)) { Name = "my-class" };
 
         public SingleOptionTestCommand(string testName,
                                        string originalName,
@@ -30,13 +30,13 @@ namespace TestData
 
             var commandDescriptor = CommandDescriptor;
 
-            var option = new OptionDescriptor(commandDescriptor, originalName, null, OriginalElementType.Property)
+            var option = new OptionDescriptor(commandDescriptor, originalName, new RawInfoForProperty(null))
             {
                 Name = originalName,
                 CliName = commandLineName,
                 Description = description,
             };
-            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(T)), null, originalName, null, OriginalElementType.Property)
+            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(T)), null, originalName, new RawInfoForProperty(null))
             {
                 Name = originalName,
                 CliName = commandLineName,

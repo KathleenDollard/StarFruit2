@@ -17,8 +17,10 @@ namespace StarFruit.FluentDomSourceGen.Tests
         [Fact]
         public void Simple_command()
         {
-            var descriptor = new CliDescriptor();
-            descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null, OriginalElementType.Class);
+            var descriptor = new CliDescriptor
+            {
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+            };
             descriptor.CommandDescriptor.CliName = "my-command";
             var expected = $@"using StarFruit2;
 using System.CommandLine;
@@ -57,11 +59,15 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         [Fact]
         public void Command_with_subcommand()
         {
-            var descriptor = new CliDescriptor();
-            descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null, OriginalElementType.Class);
-            descriptor.CommandDescriptor.CliName = "my-command";
-            descriptor.CommandDescriptor.Name = "MyCommand";
-            descriptor.CommandDescriptor.SubCommands.Add(new CommandDescriptor(descriptor.CommandDescriptor, "SubCommand", null, OriginalElementType.Class));
+            var descriptor = new CliDescriptor
+            {
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+                {
+                    CliName = "my-command",
+                    Name = "MyCommand"
+                }
+            };
+            descriptor.CommandDescriptor.SubCommands.Add(new CommandDescriptor(descriptor.CommandDescriptor, "SubCommand", new RawInfoForType(null)));
 
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
@@ -72,9 +78,11 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         [Fact]
         public void Command_with_option()
         {
-            var descriptor = new CliDescriptor();
-            descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null, OriginalElementType.Class);
-            descriptor.CommandDescriptor.Options.Add(new OptionDescriptor(descriptor.CommandDescriptor, "Option1", null, OriginalElementType.Property ));
+            var descriptor = new CliDescriptor
+            {
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+            };
+            descriptor.CommandDescriptor.Options.Add(new OptionDescriptor(descriptor.CommandDescriptor, "Option1", new RawInfoForProperty(null)));
 
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
@@ -85,9 +93,11 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         [Fact]
         public void Command_with_argument()
         {
-            var descriptor = new CliDescriptor();
-            descriptor.CommandDescriptor = new CommandDescriptor(null, "MyCommand", null, OriginalElementType.Class);
-            descriptor.CommandDescriptor.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), descriptor.CommandDescriptor, "Argument1", null, OriginalElementType.Property));
+            var descriptor = new CliDescriptor
+            {
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+            };
+            descriptor.CommandDescriptor.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), descriptor.CommandDescriptor, "Argument1", new RawInfoForProperty(null)));
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
 

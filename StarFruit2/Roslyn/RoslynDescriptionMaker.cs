@@ -50,19 +50,19 @@ namespace Starfruit2
 
     // Unique fieldname in descripriptor    Probably to do
 
-    public class DescriptorMakerBase
+    public class RoslynDescriptionMaker
     {
         protected readonly MakerConfiguration config;
         protected readonly SemanticModel semanticModel;
 
-        public DescriptorMakerBase(MakerConfiguration config, SemanticModel semanticModel)
+        public RoslynDescriptionMaker(MakerConfiguration config, SemanticModel semanticModel)
         {
             this.config = config ?? new MakerConfiguration(new CSharpLanguageHelper());
             this.semanticModel = semanticModel;
         }
     }
 
-    public abstract class DescriptorMaker : DescriptorMakerBase
+    public abstract class DescriptorMaker : RoslynDescriptionMaker
     //where TCommandSymbol : class, ISymbol
     //where TMemberSymbol : class, ISymbol
     {
@@ -87,7 +87,7 @@ namespace Starfruit2
             where TCommandSymbol : class, ISymbol
         {
             Assert.NotNull(symbol);
-            var command = new CommandDescriptor(parent, symbol.Name, symbol, symbol.OriginalElementTypeFromSymbol(parent))
+            var command = new CommandDescriptor(parent, symbol.Name, symbol.RawInfoTypeFromSymbol(parent))
             {
                 Name = config.CommandNameToName(symbol.Name),
                 CliName = config.CommandNameToCliName(symbol.Name),
@@ -110,7 +110,7 @@ namespace Starfruit2
 
         protected virtual ArgumentDescriptor CreateArgumentDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
                                                                                      TMemberSymbol symbol,
-                                           string originalElementType,
+                                                                                     RawInfoBase rawInfo,
                                                                                      int position)
         where TMemberSymbol : class, ISymbol
             // ** How to find syntax: var propertyDeclaration = propertySymbol.DeclaringSyntaxReferences.Single().GetSyntax() as PropertyDeclarationSyntax;
@@ -120,8 +120,7 @@ namespace Starfruit2
             var arg = new ArgumentDescriptor(argType,
                                              parent,
                                              symbol.Name,
-                                             symbol,
-                                             symbol.OriginalElementTypeFromSymbol(parent))
+                                             symbol.RawInfoTypeFromSymbol(parent))
             {
                 Name = config.ArgumentNameToName(symbol.Name),
                 CliName = config.ArgumentNameToCliName(symbol.Name),
@@ -138,14 +137,13 @@ namespace Starfruit2
 
         protected virtual OptionDescriptor CreateOptionDescriptor<TMemberSymbol>(ISymbolDescriptor parent,
                                                                                  TMemberSymbol symbol,
-                                                                                 string originalElementType,
+                                                                                 RawInfoBase rawInfo,
                                                                                  int position)
             where TMemberSymbol : class, ISymbol
         {
             var option = new OptionDescriptor(parent,
                                               symbol.Name,
-                                              symbol,
-                                              originalElementType)
+                                              rawInfo)
             {
                 Name = config.OptionNameToName(symbol.Name),
                 CliName = config.OptionNameToCliName(symbol.Name),
@@ -169,8 +167,7 @@ namespace Starfruit2
             var arg = new ArgumentDescriptor(argType,
                                              parent,
                                              symbol.Name,
-                                             symbol,
-                                             parent.OriginalElementType)
+                                             parent.RawInfo)
             {
                 Name = symbol.Name,
                 CliName = config.OptionArgumentNameToCliName(symbol.Name),
@@ -195,48 +192,48 @@ namespace Starfruit2
             return cliDesriptor;
         }
 
-        private IEnumerable<(ISymbol Symbol, int Position, string OriginalElementType)> GetItemCandidates
+        private IEnumerable<(ISymbol Symbol, int Position, RawInfoBase RawInfo)> GetItemCandidates
                 <TCommandSymbol>(TCommandSymbol parentSymbol)
             where TCommandSymbol : class, ISymbol
         {
             return parentSymbol switch
             {
-                INamedTypeSymbol s => GetPropertyCaandidates(s).Concat(GetCtorParameterCandidates(s)),
+                INamedTypeSymbol s => GetPropertyCandidates(s).Concat(GetCtorParameterCandidates(s)),
                 IMethodSymbol s => s.Parameters.Select((symbol, position)
-                                         => GetTuple((ISymbol)symbol, position, OriginalElementType.MethodParameter)),
+                                         => GetTuple((ISymbol)symbol, position, symbol.RawInfoTypeFromSymbol(s))),
                 _ => throw new NotImplementedException()
             };
 
-            static IEnumerable<(ISymbol Symbol, int Position, string OriginalElementType)> GetPropertyCaandidates(INamedTypeSymbol parentSymbol)
+            static IEnumerable<(ISymbol Symbol, int Position, RawInfoBase rawInfo)> GetPropertyCandidates(INamedTypeSymbol parentSymbol)
                 => parentSymbol.GetMembers()
                         .Where(s => s.Kind == SymbolKind.Property)
-                        .Select((Symbol, Position) => GetTuple((ISymbol)Symbol, Position, OriginalElementType.Property));
+                        .Select((Symbol, Position) => GetTuple((ISymbol)Symbol, Position, Symbol.RawInfoTypeFromSymbol(parentSymbol)));
 
-            static IEnumerable<(ISymbol Symbol, int Position, string OriginalElementType)> GetCtorParameterCandidates(INamedTypeSymbol parent)
+            static IEnumerable<(ISymbol Symbol, int Position, RawInfoBase RawInfo)> GetCtorParameterCandidates(INamedTypeSymbol parent)
                 // KAD: Options need to be duplicated so the raw values are correct later. This is intended
                 // and creation of System.CommandLine options may need to remove dupes and result handling
                 // can use Raw to recreate constructors. Yes, this is messy.
                 => parent.Constructors.SelectMany(c => c.Parameters)
-                                      .Select((symbol, position) => ((ISymbol)symbol, position, OriginalElementType.CtorParameter));
+                                      .Select((symbol, position) => ((ISymbol)symbol, position, symbol.RawInfoTypeFromSymbol(parent)));
 
-            static (ISymbol Symbol, int Position, string OriginalElementType) GetTuple(ISymbol symbol, int position, string originalElementType)
-                  => (symbol, position, originalElementType);
+            static (ISymbol Symbol, int Position, RawInfoBase RawInfo) GetTuple(ISymbol symbol, int position, RawInfoBase rawInfo)
+                  => (symbol, position, rawInfo);
         }
 
         protected IEnumerable<OptionDescriptor> GetOptions(ISymbolDescriptor parent,
-                                                           IEnumerable<(ISymbol Symbol, int Position, string OriginalElementType)> candidates)
+                                                           IEnumerable<(ISymbol Symbol, int Position, RawInfoBase RawInfo)> candidates)
             => candidates.Where(t => config.IsOption(t.Symbol.Name, t.Symbol))
                          .Select(t => CreateOptionDescriptor(parent,
                                                              t.Symbol,
-                                                             t.OriginalElementType,
+                                                             t.RawInfo,
                                                              t.Position));
 
         protected IEnumerable<ArgumentDescriptor> GetArguments(ISymbolDescriptor parent,
-                                                               IEnumerable<(ISymbol Symbol, int Position, string OriginalElementType)> candidates)
+                                                               IEnumerable<(ISymbol Symbol, int Position, RawInfoBase RawInfo)> candidates)
             => candidates.Where(t => config.IsArgument(t.Symbol.Name, t.Symbol))
                          .Select(t => CreateArgumentDescriptor(parent,
                                                                t.Symbol,
-                                                               t.OriginalElementType,
+                                                               t.RawInfo,
                                                                t.Position));
 
     }

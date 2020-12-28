@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using StarFruit.Common;
+using System.Collections.Generic;
 
 namespace StarFruit2.Common.Descriptors
 {
     public interface ISymbolDescriptor
     {
         SymbolType SymbolType { get; }
-        object? Raw { get; }
-        public string OriginalElementType { get; }
+        public RawInfoBase RawInfo { get; }
         string? Description { get; }
         string? Name { get; }
         string? CliName { get; }
