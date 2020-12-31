@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Remove="C:\Users\kdollard\source\repos\cla-starfruit2\StarFruit2\/System.Diagnostics.CodeAnalysis.cs" />
+    <Compile Remove="C:\Users\kdollard\source\repos\cla-starfruit2\StarFruit2\src\/System.Diagnostics.CodeAnalysis.cs" />
   </ItemGroup>
 
   <ItemGroup>

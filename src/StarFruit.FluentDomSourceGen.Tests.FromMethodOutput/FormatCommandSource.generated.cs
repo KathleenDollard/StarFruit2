@@ -48,7 +48,7 @@ namespace MethodEntryPoint
       public Option<DirectoryInfo> Getfolder()
       {
          Option<DirectoryInfo> option = new Option<DirectoryInfo>("--folder");
-         option.Description = "Folder Whether to treat the `project` path as a folder of files.";
+         option.Description = "Folder to treat the `project` path as a folder of files.";
          option.IsRequired = false;
          option.IsHidden = false;
          option.AddAlias("-f");

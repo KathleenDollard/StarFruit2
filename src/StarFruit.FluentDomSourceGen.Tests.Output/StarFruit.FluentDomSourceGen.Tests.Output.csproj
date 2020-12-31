@@ -16,4 +16,9 @@
     <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.9.0-2.final" PrivateAssets="all" />
+  </ItemGroup>
+
+
 </Project>
