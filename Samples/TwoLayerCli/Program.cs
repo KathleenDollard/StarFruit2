@@ -28,6 +28,12 @@ namespace TwoLayerCli
             }
         }
 
+        private static int MethodInMain(string[] args)
+        {
+            // ??
+            return 0;
+        }
+
         static int Main_Simplest(string[] args)
             => CommandSource.Run<CliRoot>(args);
 

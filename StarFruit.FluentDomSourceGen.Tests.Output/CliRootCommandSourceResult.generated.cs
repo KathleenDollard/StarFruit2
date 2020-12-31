@@ -11,7 +11,7 @@ namespace TwoLayerCli
    public class CliRootCommandSourceResult : CommandSourceResult<CliRoot>
    {
       public CliRootCommandSourceResult(ParseResult parseResult, CliRootCommandSource commandSource, int exitCode)
-      : base(parseResult, (commandSource.ParentCommandSource as CommandSource), exitCode)
+      : base(parseResult, (commandSource.ParentCommandSource as CommandSourceBase), exitCode)
       {
          StringPropertyOption_Result = CommandSourceMemberResult.Create(commandSource.StringPropertyOption, parseResult);
          ctorParamOption_Result = CommandSourceMemberResult.Create(commandSource.ctorParamOption, parseResult);

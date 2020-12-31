@@ -17,7 +17,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.OriginalName.Should().Be("MyPropertyArg");
@@ -32,7 +32,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.ArgumentType.TypeAsString().Should().Be("Int32");
@@ -45,7 +45,7 @@ namespace StarFruit2.Tests
                 public bool MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.ArgumentType.TypeAsString().Should().Be("Boolean");
@@ -59,7 +59,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(true);
@@ -73,7 +73,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(true);
@@ -86,7 +86,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(false);
@@ -100,7 +100,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(false);
@@ -114,7 +114,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(true);
@@ -128,7 +128,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(true);
@@ -141,7 +141,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(false);
@@ -155,7 +155,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(false);
@@ -172,7 +172,7 @@ namespace StarFruit2.Tests
                 [Aliases()]
                 public int MyPropertyArg {{ get; set; }}"
                 .WrapInStandardClass();
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Description.Should().Be(desc);
@@ -185,7 +185,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; } = 42;"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("42");
@@ -198,7 +198,7 @@ namespace StarFruit2.Tests
                 public DateTime MyPropertyArg { get; set; } = new DateTime(2020, 12, 31); "
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("new DateTime(2020, 12, 31)");
@@ -211,7 +211,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; } = Int32.MinValue;"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("Int32.MinValue");
@@ -225,7 +225,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; } "
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
@@ -238,7 +238,7 @@ namespace StarFruit2.Tests
                 public int MyPropertyArg { get; set; } "
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.RawInfo.Should().BeOfType<RawInfoForProperty>();
@@ -253,7 +253,7 @@ namespace StarFruit2.Tests
                        public int Third{get;set;}"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual1 = actualCli.CommandDescriptor.Arguments.First();
             var actual2 = actualCli.CommandDescriptor.Options.First();
             var actual3 = actualCli.CommandDescriptor.Options.Skip(1).First();

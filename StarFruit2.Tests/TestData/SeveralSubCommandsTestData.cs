@@ -2,6 +2,7 @@
 using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Tests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,20 +20,20 @@ namespace TestData
         {
             string sourceCode = $@"NOT YET IMPLEMENTED: Read corresponding file";
 
-            var commandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType (null)) { Name = "my-class" };
+            var commandDescriptor = new CommandDescriptor(null, "MyClass", RawInfo.DummyClass) { Name = "my-class" };
             
             commandDescriptor.AddCommands(subCommands: new List<CommandDescriptor>(){
-                new CommandDescriptor( null, "MyMethod2", new RawInfoForMethod (null , false))
+                new CommandDescriptor( null, "MyMethod2", RawInfo.DummyClass )
                 {
                     Name = "MyMethod2",
                     CliName = "my-mymethod2",
                 },
-                new CommandDescriptor( null, "MyMethod1", new RawInfoForMethod (null,false))
+                new CommandDescriptor( null, "MyMethod1",  RawInfo.DummyClass)
                 {
                     Name = "MyMethod1",
                     CliName = "my-mymethod1",
                 },
-                new CommandDescriptor( null, "MyMethod3", new RawInfoForMethod (null,false))
+                new CommandDescriptor( null, "MyMethod3",  RawInfo.DummyClass)
                 {
                     Name = "MyMethod3",
                     CliName = "my-mymethod3",
@@ -40,7 +41,7 @@ namespace TestData
             });
 
             commandDescriptor.SubCommands.First().AddArguments(arguments: new List<ArgumentDescriptor>(){
-                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(int)), null, "myParam", new RawInfoForMethodParameter (null)) 
+                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(int)), null, "myParam", RawInfo.DummyMethod) 
                 {
                     Name = "myParam",
                     CliName = "my-param",

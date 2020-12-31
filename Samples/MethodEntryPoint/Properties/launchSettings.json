@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MethodEntryPoint": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}

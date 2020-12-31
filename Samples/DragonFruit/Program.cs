@@ -4,9 +4,15 @@ namespace DragonFruit
 {
     class Program
     {
+        /// <summary>
+        /// Illustrating DragonFruit!!!
+        /// </summary>
+        /// <param name="intArg">Supply a magic number</param>
+        /// <param name="stringArg">Who you want to say Hello to</param>
+        /// <returns></returns>
         static int Main(int intArg, string stringArg)
         {
-            Console.WriteLine($"Hello {stringArg}! (magic number: {intArg}");
+            Console.WriteLine($"Hello {stringArg}! (magic number: {intArg})");
             return 0;
         }
 

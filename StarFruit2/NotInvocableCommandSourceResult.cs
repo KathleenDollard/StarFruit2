@@ -7,10 +7,8 @@ namespace StarFruit2
     {
         private InvocationContext context;
 
-        public NotInvocableCommandSourceResult(ParseResult parseResult, int exitCode)
-            : base(parseResult, exitCode)
-        {
-            this.context = context;
-        }
+        public NotInvocableCommandSourceResult(ParseResult parseResult, CommandSourceBase commandSourceBase, int exitCode)
+            : base(parseResult, commandSourceBase, exitCode)
+        {  }
     }
 }

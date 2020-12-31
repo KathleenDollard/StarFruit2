@@ -10,7 +10,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
    : this(null, null)
    {
    }
-   public MyCommandCommandSource(RootCommandSource root, CommandSource parent)
+   public MyCommandCommandSource(RootCommandSource root, CommandSourceBase parent)
    : base(new Command(null, null), parent)
    {
       Argument1Argument = GetArgument1();

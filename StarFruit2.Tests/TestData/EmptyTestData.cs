@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using StarFruit.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Tests;
 using System.CommandLine;
 
 namespace TestData
@@ -21,7 +22,7 @@ namespace TestData
             {
                 GeneratedComandSourceNamespace = generatedNamespace,
                 GeneratedCommandSourceClassName = generatedClassName,
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null))
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", RawInfo.DummyClass)
                 {
                     Name = "MyClass"
                 }

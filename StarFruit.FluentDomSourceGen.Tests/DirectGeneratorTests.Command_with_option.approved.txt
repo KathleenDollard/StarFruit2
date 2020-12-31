@@ -10,9 +10,11 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
    : this(null, null)
    {
    }
-   public MyCommandCommandSource(RootCommandSource root, CommandSource parent)
-   : base(new Command("my-command", null), parent)
+   public MyCommandCommandSource(RootCommandSource root, CommandSourceBase parent)
+   : base(new Command(null, null), parent)
    {
+      Option1Option = GetOption1();
+      Command.Add(Option1Option);
       Command.Handler = CommandHandler.Create((InvocationContext context) =>
              {  
                 CurrentCommandSource = this;
@@ -21,5 +23,14 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
              });
    }
 
+   public Option<bool> Option1Option { get; set; }
 
+   public Option<bool> GetOption1()
+   {
+      Option<bool> option = new Option<bool>(null);
+      option.Description = null;
+      option.IsRequired = false;
+      option.IsHidden = false;
+      return option;
+   }
 }

@@ -13,7 +13,7 @@ namespace StarFruit2.Tests
     {
         private CliDescriptor GetCliDescriptor()
         {
-            var commandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null))
+            var commandDescriptor = new CommandDescriptor(null, "MyClass", RawInfo.DummyClass)
             {
                 Name = "my-class",
                // Parent = null,
@@ -27,13 +27,13 @@ namespace StarFruit2.Tests
             string description = "desc";
             var defaultValue = new DefaultValueDescriptor("abc");
 
-            var option = new OptionDescriptor(commandDescriptor, originalName, new RawInfoForProperty (null))
+            var option = new OptionDescriptor(commandDescriptor, originalName, RawInfo.DummyProperty)
             {
                 Name = originalName,
                 CliName = commandLineName,
                 Description = description,
             };
-            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, originalName, new RawInfoForProperty(null))
+            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, originalName, RawInfo.DummyProperty)
             {
                 Name = originalName,
                 CliName = commandLineName,

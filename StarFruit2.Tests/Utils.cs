@@ -6,6 +6,7 @@ using StarFruit.Common;
 using Starfruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Generate;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -53,23 +54,33 @@ namespace StarFruit2.Tests
         }
 
         internal static CliDescriptor GetCliFromFile(string fileName)
-            => GetCli(File.ReadAllText($"TestData/{fileName}"));
+            => GetClassBasedCli(File.ReadAllText($"TestData/{fileName}"));
 
-        internal static CliDescriptor GetCli(string code)
+        internal static CliDescriptor GetClassBasedCli(string code) 
+            => GetCli<ClassDeclarationSyntax>(code);
+
+        internal static CliDescriptor GetMethodBasedCli(string code)
+            => GetCli<MethodDeclarationSyntax>(code);
+
+        private static CliDescriptor? GetCli<T>(string code)
+            where T : SyntaxNode
         {
             var tree = CSharpSyntaxTree.ParseText(code);
             var compilation = GetCompilation(tree);
-            var warningsAndErrors=compilation.GetDiagnostics().Where(x=>x.Severity.HasFlag(DiagnosticSeverity.Error)|| x.Severity.HasFlag(DiagnosticSeverity.Warning)) ;
+            var warningsAndErrors = compilation.GetDiagnostics().Where(x => x.Severity.HasFlag(DiagnosticSeverity.Error) || x.Severity.HasFlag(DiagnosticSeverity.Warning));
             warningsAndErrors.Should().NotHaveWarningsOrErrors();
             var rootCommand = tree.GetRoot().DescendantNodes()
-                               .OfType<ClassDeclarationSyntax>()
+                               .OfType<T>()
                                .FirstOrDefault();
             if (rootCommand is null)
             {
                 return null;
             }
-            var cli = RoslyDescriptorMakerFactory.CreateCliDescriptor(rootCommand, compilation);
-            return cli;
+            var semanticModels = new Dictionary<ISymbol, SemanticModel>();
+            var symbol = RoslynCSharpDescriptorFactory.GetSymbol(rootCommand, compilation, semanticModels);
+            return symbol is null
+                   ? null
+                   : RoslynCSharpDescriptorFactory.GetCliDescriptor (symbol, semanticModels[symbol]);
         }
 
         internal static CSharpCompilation GetCompilation(SyntaxTree syntaxTree)
@@ -120,7 +131,7 @@ namespace StarFruit2.Tests
         {
             var clidDescriptor = new CliDescriptor()
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null))
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", RawInfo.DummyClass)
 
             };
             clidDescriptor.CommandDescriptor.Options.Add(optionDescriptor);
@@ -131,7 +142,7 @@ namespace StarFruit2.Tests
         {
             var clidDescriptor = new CliDescriptor()
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null)),
+                CommandDescriptor = new CommandDescriptor(null, "MyClass", RawInfo.DummyClass),
                 GeneratedComandSourceNamespace = "MyNamespace"
             };
             clidDescriptor.CommandDescriptor.Arguments.Add(argumentDescriptor);
@@ -145,8 +156,8 @@ namespace StarFruit2.Tests
 
         internal static OptionDescriptor CreateOptionDescriptor(string name, Type type)
         {
-            var option = new OptionDescriptor(null, name, new RawInfoForProperty(null));
-            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(type), null, name, new RawInfoForProperty(null)));
+            var option = new OptionDescriptor(null, name, RawInfo.DummyProperty );
+            option.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(type), null, name, RawInfo.DummyProperty));
             return option;
         }
 

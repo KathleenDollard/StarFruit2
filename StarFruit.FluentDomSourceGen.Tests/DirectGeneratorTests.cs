@@ -11,15 +11,19 @@ using Xunit;
 
 namespace StarFruit.FluentDomSourceGen.Tests
 {
-    public class CommandSourceGenTests
+    public class DirectGeneratorTests
     {
+
+        private const string namespaceName = "";
+        private const string className = "MyCommand";
+
         [UseReporter(typeof(VisualStudioReporter))]
         [Fact]
         public void Simple_command()
         {
             var descriptor = new CliDescriptor
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null,namespaceName, className ))
             };
             descriptor.CommandDescriptor.CliName = "my-command";
             var expected = $@"using StarFruit2;
@@ -34,7 +38,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
    : this(null, null)
    {{
    }}
-   public MyCommandCommandSource(RootCommandSource root, CommandSource parent)
+   public MyCommandCommandSource(RootCommandSource root, CommandSourceBase parent)
    : base(new Command(""my-command"", null), parent)
    {{
       Command.Handler = CommandHandler.Create((InvocationContext context) =>
@@ -61,13 +65,13 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         {
             var descriptor = new CliDescriptor
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null, namespaceName, className))
                 {
                     CliName = "my-command",
                     Name = "MyCommand"
                 }
             };
-            descriptor.CommandDescriptor.SubCommands.Add(new CommandDescriptor(descriptor.CommandDescriptor, "SubCommand", new RawInfoForType(null)));
+            descriptor.CommandDescriptor.SubCommands.Add(new CommandDescriptor(descriptor.CommandDescriptor, "SubCommand", new RawInfoForType(null, namespaceName, "SubCommand")));
 
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
@@ -80,9 +84,9 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         {
             var descriptor = new CliDescriptor
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null, namespaceName, className))
             };
-            descriptor.CommandDescriptor.Options.Add(new OptionDescriptor(descriptor.CommandDescriptor, "Option1", new RawInfoForProperty(null)));
+            descriptor.CommandDescriptor.Options.Add(new OptionDescriptor(descriptor.CommandDescriptor, "Option1", new RawInfoForProperty(null,namespaceName, className )));
 
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
@@ -95,9 +99,9 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
         {
             var descriptor = new CliDescriptor
             {
-                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null))
+                CommandDescriptor = new CommandDescriptor(null, "MyCommand", new RawInfoForType(null, namespaceName, className))
             };
-            descriptor.CommandDescriptor.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), descriptor.CommandDescriptor, "Argument1", new RawInfoForProperty(null)));
+            descriptor.CommandDescriptor.Arguments.Add(new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), descriptor.CommandDescriptor, "Argument1", new RawInfoForProperty(null, namespaceName, className)));
             var dom = new GenerateCommandSource().CreateCode(descriptor);
             var actual = new CSharpGenerator().Generate(dom);
 

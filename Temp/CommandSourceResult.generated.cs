@@ -12,7 +12,7 @@ namespace SingleLayerCli
    public class DotnetFormatCommandSourceResult : CommandSourceResult<DotnetFormat>
    {
       public DotnetFormatCommandSourceResult(ParseResult parseResult, DotnetFormatCommandSource commandSource, int exitCode)
-      : base(parseResult, (commandSource.ParentCommandSource as CommandSource), exitCode)
+      : base(parseResult, (commandSource.ParentCommandSource as CommandSourceBase), exitCode)
       {
          FolderOption_Result = CommandSourceMemberResult.Create(commandSource.FolderOption, parseResult);
          FilesOption_Result = CommandSourceMemberResult.Create(commandSource.FilesOption, parseResult);

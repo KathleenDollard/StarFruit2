@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>VBSample</RootNamespace>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="C:\Users\kdollard\source\repos\cla-starfruit2\StarFruit2\/System.Diagnostics.CodeAnalysis.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.9.0-2.final" />
+  </ItemGroup>
+
+</Project>

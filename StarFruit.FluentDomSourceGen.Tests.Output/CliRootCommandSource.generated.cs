@@ -14,7 +14,7 @@ namespace TwoLayerCli
       : this(null, null)
       {
       }
-      public CliRootCommandSource(RootCommandSource root, CommandSource parent)
+      public CliRootCommandSource(RootCommandSource root, CommandSourceBase parent)
       : base(new Command("cli-root", "This is the entry point, the end user types the executable name"), parent)
       {
          StringPropertyOption = GetStringProperty();
@@ -58,9 +58,9 @@ namespace TwoLayerCli
          return option;
       }
    }
-   public class FindCommandSource : CommandSource
+   public class FindCommandSource : CommandSourceBase
    {
-      public FindCommandSource(RootCommandSource root, CommandSource parent)
+      public FindCommandSource(RootCommandSource root, CommandSourceBase parent)
       : base(new Command("find", "Use this to find things"), parent)
       {
          intArgArgument = GetintArg();
@@ -105,9 +105,9 @@ namespace TwoLayerCli
          return option;
       }
    }
-   public class ListCommandSource : CommandSource
+   public class ListCommandSource : CommandSourceBase
    {
-      public ListCommandSource(RootCommandSource root, CommandSource parent)
+      public ListCommandSource(RootCommandSource root, CommandSourceBase parent)
       : base(new Command("list", "List the elements you are interested in"), parent)
       {
          verbosityOption = Getverbosity();

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.30404.54
+VisualStudioVersion = 16.0.30830.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit2", "StarFruit2\StarFruit2.csproj", "{CD93E299-475F-4B9A-A4C3-A4E4B6CA4873}"
 EndProject
@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit.Common", "StarFruit.Common\StarFruit.Common.csproj", "{6AAF9A66-9D3C-4807-B442-DA2B0858F2E0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{792A9084-37CC-40A8-B3C3-8A2EFA5BA796}"
+	ProjectSection(SolutionItems) = preProject
+		Samples\Directory.Build.props = Samples\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarAuth", "Samples\StarAuth\StarAuth.csproj", "{788F5496-5296-4ED7-B6BC-11EA5A3D5749}"
 EndProject
@@ -39,9 +42,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentDom.Tests", "FluentDo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarFruit.FluentDomSourceGen.Tests.Output", "StarFruit.FluentDomSourceGen.Tests.Output\StarFruit.FluentDomSourceGen.Tests.Output.csproj", "{5BDF7051-79EF-445E-91AE-A0A5AA65FA86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruit", "Samples\DragonFruit\DragonFruit.csproj", "{40EC3C6E-76ED-462F-B192-15EB5D317C7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DragonFruit", "Samples\DragonFruit\DragonFruit.csproj", "{40EC3C6E-76ED-462F-B192-15EB5D317C7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonFruitInstance", "DragonFruitInstance\DragonFruitInstance.csproj", "{1ABA39EF-0110-4C19-82D6-FA378BA06981}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopLevelProgram", "Samples\TopLevelProgram\TopLevelProgram.csproj", "{C3BB8283-EBAF-4B85-86FE-E326A48ADDF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MethodEntryPoint", "Samples\MethodEntryPoint\MethodEntryPoint.csproj", "{037561D1-3E24-4314-9916-6A087BF5EBF8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DragonFruitInstance", "Samples\DragonFruitInstance\DragonFruitInstance.csproj", "{EA96BC68-0BE4-42C7-A2B2-6091D124B6F4}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VBSample", "VBSample\VBSample.vbproj", "{B8A7A06A-2320-4377-96D3-9D0479580A2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFruit.FluentDomSourceGen.Tests.FromMethodOutput", "StarFruit.FluentDomSourceGen.Tests.FromMethodOutput\StarFruit.FluentDomSourceGen.Tests.FromMethodOutput.csproj", "{CEE62726-E0B0-4AFC-BBCB-86E5E84ECB2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,10 +116,26 @@ Global
 		{40EC3C6E-76ED-462F-B192-15EB5D317C7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40EC3C6E-76ED-462F-B192-15EB5D317C7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40EC3C6E-76ED-462F-B192-15EB5D317C7F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1ABA39EF-0110-4C19-82D6-FA378BA06981}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1ABA39EF-0110-4C19-82D6-FA378BA06981}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1ABA39EF-0110-4C19-82D6-FA378BA06981}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1ABA39EF-0110-4C19-82D6-FA378BA06981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3BB8283-EBAF-4B85-86FE-E326A48ADDF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3BB8283-EBAF-4B85-86FE-E326A48ADDF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3BB8283-EBAF-4B85-86FE-E326A48ADDF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3BB8283-EBAF-4B85-86FE-E326A48ADDF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{037561D1-3E24-4314-9916-6A087BF5EBF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{037561D1-3E24-4314-9916-6A087BF5EBF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{037561D1-3E24-4314-9916-6A087BF5EBF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{037561D1-3E24-4314-9916-6A087BF5EBF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA96BC68-0BE4-42C7-A2B2-6091D124B6F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA96BC68-0BE4-42C7-A2B2-6091D124B6F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA96BC68-0BE4-42C7-A2B2-6091D124B6F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA96BC68-0BE4-42C7-A2B2-6091D124B6F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8A7A06A-2320-4377-96D3-9D0479580A2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A7A06A-2320-4377-96D3-9D0479580A2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A7A06A-2320-4377-96D3-9D0479580A2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A7A06A-2320-4377-96D3-9D0479580A2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEE62726-E0B0-4AFC-BBCB-86E5E84ECB2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEE62726-E0B0-4AFC-BBCB-86E5E84ECB2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEE62726-E0B0-4AFC-BBCB-86E5E84ECB2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEE62726-E0B0-4AFC-BBCB-86E5E84ECB2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,7 +147,10 @@ Global
 		{AEFFEE23-B095-4FE2-AD45-B430C64FA386} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
 		{B7CBFA55-151D-4F2D-8D81-76BA1C9BB0CD} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
 		{40EC3C6E-76ED-462F-B192-15EB5D317C7F} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
-		{1ABA39EF-0110-4C19-82D6-FA378BA06981} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
+		{C3BB8283-EBAF-4B85-86FE-E326A48ADDF7} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
+		{037561D1-3E24-4314-9916-6A087BF5EBF8} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
+		{EA96BC68-0BE4-42C7-A2B2-6091D124B6F4} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
+		{B8A7A06A-2320-4377-96D3-9D0479580A2E} = {792A9084-37CC-40A8-B3C3-8A2EFA5BA796}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B016F2BA-2F89-45F3-86A1-E4FA9D992C1F}

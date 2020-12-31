@@ -61,7 +61,7 @@ namespace StarFruit.FluentDomSourceGen.Tests
             MetadataReference starFruit2Common =
                        MetadataReference.CreateFromFile(typeof(RequiredAttribute).Assembly.Location);
             MetadataReference starFruit2 =
-                      MetadataReference.CreateFromFile(typeof(CommandSource).Assembly.Location);
+                      MetadataReference.CreateFromFile(typeof(CommandSourceBase).Assembly.Location);
             MetadataReference systemCommandLine =
                       MetadataReference.CreateFromFile(typeof(Command).Assembly.Location);
             MetadataReference systemRuntime =

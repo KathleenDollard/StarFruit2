@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- also see Directory.Build.Props in Samples and solution -->
 
   <PropertyGroup>
-	  <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <LangVersion>9.0</LangVersion>
+    <OutputType>Library</OutputType>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
-
 </Project>

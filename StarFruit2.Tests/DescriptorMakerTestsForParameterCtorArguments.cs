@@ -26,7 +26,7 @@ public class MyClass
 }"
                       .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.OriginalName.Should().Be("myParamArg");
@@ -45,7 +45,7 @@ public class MyClass
 }"
                        .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.ArgumentType.TypeAsString().Should().Be("Int32");
@@ -62,7 +62,7 @@ public class MyClass
 }"
                        .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.ArgumentType.TypeAsString().Should().Be("Boolean");
@@ -79,7 +79,7 @@ public class MyClass
 }"
                        .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(true);
@@ -96,7 +96,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(true);
@@ -113,7 +113,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(false);
@@ -130,7 +130,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Required.Should().Be(false);
@@ -147,7 +147,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(true);
@@ -164,7 +164,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(true);
@@ -181,7 +181,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(false);
@@ -198,7 +198,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.IsHidden.Should().Be(false);
@@ -219,7 +219,7 @@ public class MyClass
     {{}}
 }}"
                 .WrapInStandardNamespace();
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.Description.Should().Be(desc);
@@ -236,7 +236,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("42");
@@ -254,7 +254,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.Should().BeNull();
@@ -271,7 +271,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.DefaultValue.CodeRepresentation.Should().Be("-2147483648");
@@ -288,7 +288,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
@@ -305,7 +305,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual1 = actualCli.CommandDescriptor.Arguments.First();
             var actual2 = actualCli.CommandDescriptor.Options.First();
             var actual3 = actualCli.CommandDescriptor.Options.Skip(1).First();
@@ -327,7 +327,7 @@ public class MyClass
 }"
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.Arguments.First();
 
             actual.RawInfo.Should().BeOfType<RawInfoForCtorParameter>();

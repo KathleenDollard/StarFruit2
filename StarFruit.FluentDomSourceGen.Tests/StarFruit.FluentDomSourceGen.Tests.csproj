@@ -10,7 +10,6 @@
   <ItemGroup>
     <PackageReference Include="ApprovalTests" Version="5.4.4" />
     <PackageReference Include="FluentAssertions" Version="5.10.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0-1.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.9.0-1.final" />
     <!--<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />-->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
@@ -33,9 +32,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="C:\Users\kdollard\source\repos\cla-starfruit2\StarFruit2\/System.Diagnostics.CodeAnalysis.cs" Link="Utillities and support\System.Diagnostics.CodeAnalysis.cs" />
     <Compile Update="CliRoot.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DirectGeneratorTests.Simple_command.approved.txt">
+      <DependentUpon>DirectGeneratorTests.cs</DependentUpon>
+    </None>
+    <None Update="DirectGeneratorTests.Command_with_subcommand.approved.txt">
+      <DependentUpon>DirectGeneratorTests.cs</DependentUpon>
+    </None>
+    <None Update="DirectGeneratorTests.Command_with_option.approved.txt">
+      <DependentUpon>DirectGeneratorTests.cs</DependentUpon>
+    </None>
+    <None Update="DirectGeneratorTests.Command_with_argument.approved.txt">
+      <DependentUpon>DirectGeneratorTests.cs</DependentUpon>
+    </None>
   </ItemGroup>
 
 </Project>

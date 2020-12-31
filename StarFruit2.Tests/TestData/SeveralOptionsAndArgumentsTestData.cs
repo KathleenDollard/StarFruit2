@@ -2,6 +2,7 @@
 using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Tests;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,10 +23,10 @@ namespace TestData
         {
             string sourceCode = $@"NOT YET IMPLEMENTED: Read corresponding file";
 
-            var commandDescriptor = new CommandDescriptor(null, "MyClass", new RawInfoForType(null)) { Name = "my-class" };
+            var commandDescriptor = new CommandDescriptor(null, "MyClass", RawInfo.DummyClass) { Name = "my-class" };
 
             commandDescriptor.AddArguments(arguments: new List<ArgumentDescriptor>(){
-                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, "MyArgPropertyArg", new RawInfoForProperty (null))
+                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(string)), null, "MyArgPropertyArg", RawInfo.DummyProperty)
                 {
                     Name = "MyArgPropertyArg",
                     CliName = "my-property-arg",
@@ -33,17 +34,17 @@ namespace TestData
             });
 
             commandDescriptor.AddOptions(options: new List<OptionDescriptor>(){
-                new OptionDescriptor(null, "MyProperty", new RawInfoForProperty (null))
+                new OptionDescriptor(null, "MyProperty", RawInfo.DummyProperty)
                 {
                     Name = "MyProperty",
                     CliName = "my-property",
                 },
-                new OptionDescriptor(null, "MyProperty2", new RawInfoForProperty (null))
+                new OptionDescriptor(null, "MyProperty2", RawInfo.DummyProperty)
                 {
                     Name = "MyProperty2",
                     CliName = "my-property2",
                 },
-                new OptionDescriptor( null, "MyProperty3",new RawInfoForProperty (null))
+                new OptionDescriptor( null, "MyProperty3",RawInfo.DummyProperty)
                 {
                     Name = "MyProperty3",
                     CliName = "my-property2",

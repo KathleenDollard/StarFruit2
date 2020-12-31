@@ -5,12 +5,16 @@ namespace StarFruit2
 {
     public abstract class CommandSourceResult
     {
-        public CommandSourceResult(ParseResult parseResult,int exitCode, bool earlyReturn =false)
+
+        protected CommandSourceResult(ParseResult parseResult, CommandSourceBase commandSource, int exitCode)
+
         {
+            CommandSource = commandSource;
             ParseResult = parseResult;
             ExitCode = exitCode;
         }
 
+        public CommandSourceBase CommandSource { get; }
         public bool EarlyReturn
             => this is EmptyCommandSourceResult;
         public ParseResult ParseResult { get; }
@@ -23,8 +27,8 @@ namespace StarFruit2
 
     public class EmptyCommandSourceResult : CommandSourceResult
     {
-        public EmptyCommandSourceResult(ParseResult parseResult, int exitCode)
-            : base(parseResult, exitCode, earlyReturn:true )
+        public EmptyCommandSourceResult(ParseResult parseResult, CommandSourceBase commandSource, int exitCode)
+            : base(parseResult, commandSource, exitCode)
         { }
     }
 
@@ -39,13 +43,10 @@ namespace StarFruit2
     /// </remarks>
     public abstract class CommandSourceResult<T> : CommandSourceResult
     {
-        protected CommandSourceResult(ParseResult parseResult, CommandSource commandSource, int exitCode)
-            : base(parseResult, exitCode)
-        {
-            CommandSource = commandSource;
-        }
+        protected CommandSourceResult(ParseResult parseResult, CommandSourceBase commandSource, int exitCode)
+            : base(parseResult, commandSource, exitCode)
+        { }
 
         public abstract T CreateInstance();
-        public CommandSource CommandSource { get; }
     }
 }

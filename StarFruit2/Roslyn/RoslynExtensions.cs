@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using StarFruit.Common;
 using StarFruit2.Common.Descriptors;
-using System;
 
 namespace StarFruit2
 {
@@ -14,14 +13,15 @@ namespace StarFruit2
             {
 
                 null => (RawInfoBase)new RawInfoForNull(),
-                ITypeSymbol x => new RawInfoForType(x),
-                IMethodSymbol x => new RawInfoForMethod(x, x.IsStatic),
-                IPropertySymbol x => new RawInfoForProperty(x),
+                ITypeSymbol x => new RawInfoForType(x, x.ContainingNamespace.Name, x.ContainingType?.Name),
+                IMethodSymbol x => new RawInfoForMethod(x, x.IsStatic, x.ContainingNamespace.Name, x.ContainingType.Name),
+                IPropertySymbol x => new RawInfoForProperty(x, x.ContainingNamespace.Name, x.ContainingType.Name),
                 IParameterSymbol x => isParentAMethod 
-                                            ? new RawInfoForMethodParameter(x)
-                                            : new RawInfoForCtorParameter(x),
+                                            ? new RawInfoForMethodParameter(x, x.ContainingNamespace.Name, x.ContainingType.Name, x.ContainingSymbol.Name)
+                                            : new RawInfoForCtorParameter(x, x.ContainingNamespace.Name, x.ContainingType.Name),
                 _ => new RawInfoForUnknown(),
             };
+
         }
 
         public static RawInfoBase RawInfoTypeFromSymbol(this ISymbol symbol, ISymbol parent)

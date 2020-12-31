@@ -4,9 +4,9 @@ using StarFruit2;
 namespace Starfruit2
 {
 
-    public class MethodSyntaxCommandMaker : DescriptorMaker
+    public class MethodBasedDescriptorMaker : DescriptorMaker
     {
-        public MethodSyntaxCommandMaker(MakerConfiguration config, SemanticModel semanticModel)
+        public MethodBasedDescriptorMaker(MakerConfiguration config, SemanticModel semanticModel)
           : base(config, semanticModel)
         { }
 

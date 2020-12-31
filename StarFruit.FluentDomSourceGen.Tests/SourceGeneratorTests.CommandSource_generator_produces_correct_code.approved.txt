@@ -6,7 +6,7 @@ using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace TwoLayerCli
+namespace Tests
 {
    public class CliRootCommandSource : RootCommandSource<CliRootCommandSource>
    {
@@ -14,7 +14,7 @@ namespace TwoLayerCli
       : this(null, null)
       {
       }
-      public CliRootCommandSource(RootCommandSource root, CommandSource parent)
+      public CliRootCommandSource(RootCommandSource root, CommandSourceBase parent)
       : base(new Command("cli-root", ""), parent)
       {
          StringPropertyOption = GetStringProperty();
@@ -52,9 +52,9 @@ namespace TwoLayerCli
          return option;
       }
    }
-   public class InvokeAsyncCommandSource : CommandSource
+   public class InvokeAsyncCommandSource : CommandSourceBase
    {
-      public InvokeAsyncCommandSource(RootCommandSource root, CommandSource parent)
+      public InvokeAsyncCommandSource(RootCommandSource root, CommandSourceBase parent)
       : base(new Command("invoke-async", ""), parent)
       {
          intArgArgument = GetintArg();

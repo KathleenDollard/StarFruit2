@@ -10,7 +10,7 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
    : this(null, null)
    {
    }
-   public MyCommandCommandSource(RootCommandSource root, CommandSource parent)
+   public MyCommandCommandSource(RootCommandSource root, CommandSourceBase parent)
    : base(new Command("my-command", null), parent)
    {
       SubCommandCommand = new SubCommandCommandSource(this, this);
@@ -26,9 +26,9 @@ public class MyCommandCommandSource : RootCommandSource<MyCommandCommandSource>
    public SubCommandCommandSource SubCommandCommand { get; set; }
 
 }
-public class SubCommandCommandSource : CommandSource
+public class SubCommandCommandSource : CommandSourceBase
 {
-   public SubCommandCommandSource(RootCommandSource root, CommandSource parent)
+   public SubCommandCommandSource(RootCommandSource root, CommandSourceBase parent)
    : base(new Command(null, null), parent)
    {
       Command.Handler = CommandHandler.Create(() =>

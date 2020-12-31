@@ -15,7 +15,7 @@ namespace SingleLayerCli
       : this(null, null)
       {
       }
-      public DotnetFormatCommandSource(RootCommandSource root, CommandSource parent)
+      public DotnetFormatCommandSource(RootCommandSource root, CommandSourceBase parent)
       : base(new Command("dotnet-format", ""), parent)
       {
          FolderOption = GetFolder();
@@ -101,9 +101,9 @@ namespace SingleLayerCli
          return option;
       }
    }
-   public class InvokeCommandSource : CommandSource
+   public class InvokeCommandSource : CommandSourceBase
    {
-      public InvokeCommandSource(RootCommandSource root, CommandSource parent)
+      public InvokeCommandSource(RootCommandSource root, CommandSourceBase parent)
       : base(new Command("invoke", ""), parent)
       {
          Command.Handler = CommandHandler.Create(() =>

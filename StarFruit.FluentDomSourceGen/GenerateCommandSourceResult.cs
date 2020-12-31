@@ -26,10 +26,20 @@ namespace StarFruit2.Generate
                 .Usings("System.CommandLine.Invocation")
                 .Usings("System.CommandLine.Parsing")
                 .Usings(sourceUsings)
-                    .Class(CommandResultClass(cmd, new TypeRep("CommandSourceResult", cmd.OriginalName)))
+                    .Class(CommandResultClass(cmd, BaseType(cmd)))
                     .Classes(cmd.SubCommands,
                              c => CommandResultClass(c, (c.ParentSymbolDescriptorBase as CommandDescriptor)?.CommandSourceResultClassName() ?? "<missing name>"));
+
+            static TypeRep BaseType(CommandDescriptor cmd)
+                => cmd.RawInfo switch
+                {
+                    RawInfoForType => new TypeRep("CommandSourceResult", cmd.OriginalName),
+                    RawInfoForMethod => "CommandSourceResult",
+                    _ => throw new InvalidOperationException("Source of command not of an expected type")
+                };
         }
+
+
 
         private Class CommandResultClass(CommandDescriptor cmd, TypeRep baseTypeRep)
             => new Class(cmd.CommandSourceResultClassName())
@@ -38,8 +48,11 @@ namespace StarFruit2.Generate
                 .Properties(cmd.GetOptionsAndArgs(),
                             s => ChildProperty(s))
                 .BlankLine()
-                .OptionalMembers(cmd.RawInfo is RawInfoForType ,
-                                 c => c.Method(CreateInstance(cmd)));
+                .OptionalMembers(cmd.RawInfo is RawInfoForType,
+                                 c => c.Method(CreateInstance(cmd)))
+                .OptionalMembers(cmd.RawInfo is RawInfoForMethod r && r.IsStatic,
+                                 c => c.Method(RunStatic(cmd)));
+
 
         private Constructor GetCtor(CommandDescriptor cmd)
             => new Constructor(cmd.CommandSourceResultClassName())
@@ -51,7 +64,9 @@ namespace StarFruit2.Generate
 
         private IExpression CommandSourceParent(CommandDescriptor cmd)
             => As(VariableReference("commandSource.ParentCommandSource"),
-                     (cmd.ParentSymbolDescriptorBase as CommandDescriptor).CommandSourceClassName());
+                     cmd.ParentSymbolDescriptorBase is CommandDescriptor parentCmd
+                     ? parentCmd.CommandSourceClassName()
+                     : "CommandSourceBase");
 
         private IExpression CtorAssigns(CommandDescriptor cmd, SymbolDescriptor symbol)
             => Assign(symbol.PropertyResultName(),
@@ -69,7 +84,7 @@ namespace StarFruit2.Generate
         {
             const string newItem = "newItem";
             var arguments = cmd.GetOptionsAndArgs()
-                               .Where(x => x.RawInfo is RawInfoForCtorParameter )
+                               .Where(x => x.RawInfo is RawInfoForCtorParameter)
                                .Select(s => $"{s.ParameterResultName()}.Value")
                                .ToArray();
             return new Method("CreateInstance", modifiers: MemberModifiers.Override)
@@ -82,19 +97,22 @@ namespace StarFruit2.Generate
                            .Statements(Return(VariableReference(newItem)));
         }
 
-        private Method Run(CommandDescriptor cmd)
+        private Method RunStatic(CommandDescriptor cmd)
         {
             return new Method("Run", modifiers: MemberModifiers.Override)
                        .ReturnType("int")
-                       .Statements(Return(MethodCall($"CreateInstance().{cmd.OriginalName}", GetArgs(cmd))));
+                       .Statements(Return(MethodCall(MethodName(cmd), GetArgs(cmd))));
+
+            static string MethodName(CommandDescriptor cmd)
+                => cmd.RawInfo is not RawInfoForMethod rawInfo
+                   ? throw new InvalidOperationException("Invalid raw info type")
+                   : $"{rawInfo.ContainingTypeName}.{cmd.Name}";
 
             static IExpression[] GetArgs(CommandDescriptor cmd)
                 => cmd.GetOptionsAndArgs()
                       .Select(x => Dot(x.PropertyResultName(), "Value"))
                       .ToArray();
         }
-
-
     }
 }
 

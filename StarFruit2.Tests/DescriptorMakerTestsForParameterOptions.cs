@@ -17,7 +17,7 @@ public int MyMethod(int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.OriginalName.Should().Be("myParam");
@@ -33,7 +33,7 @@ public int MyMethod(int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Arguments.First().ArgumentType.TypeAsString().Should().Be("Int32");
@@ -47,7 +47,7 @@ public int MyMethod(bool myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Arguments.First().ArgumentType.TypeAsString().Should().Be("Boolean");
@@ -61,7 +61,7 @@ public int MyMethod([Required] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Required.Should().Be(true);
@@ -75,7 +75,7 @@ public int MyMethod([Required(true)] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Required.Should().Be(true);
@@ -89,7 +89,7 @@ public int MyMethod(int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Required.Should().Be(false);
@@ -103,7 +103,7 @@ public int MyMethod([Required(false)] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Required.Should().Be(false);
@@ -117,7 +117,7 @@ public int MyMethod([Hidden] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.IsHidden.Should().Be(true);
@@ -131,7 +131,7 @@ public int MyMethod([Hidden(true)] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.IsHidden.Should().Be(true);
@@ -145,7 +145,7 @@ public int MyMethod(int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.IsHidden.Should().Be(false);
@@ -159,7 +159,7 @@ public int MyMethod([Hidden(false)] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.IsHidden.Should().Be(false);
@@ -173,7 +173,7 @@ public int MyMethod([Aliases(""x"")] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Aliases.Count().Should().Be(1);
@@ -188,7 +188,7 @@ public int MyMethod([Aliases(""x"",""y"")] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Aliases.Count().Should().Be(2);
@@ -204,7 +204,7 @@ public int MyMethod([Aliases()] int myParam)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Aliases.Count().Should().Be(0);
@@ -224,7 +224,7 @@ public int MyMethod([Aliases()] int myParam)
             "
 
 .WrapInStandardClass();
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Description.Should().Be(desc);
@@ -238,7 +238,7 @@ public int MyMethod(int myParam=42)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Arguments.First().DefaultValue.CodeRepresentation.Should().Be("42");
@@ -253,7 +253,7 @@ public int MyMethod(int myParam=Int32.MinValue)
 
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Arguments.First().DefaultValue.CodeRepresentation.Should().Be("-2147483648");
@@ -267,7 +267,7 @@ public int MyMethod([AllowedValues(1,3,5,7,11,13)] int myParam=Int32.MinValue)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.Arguments.First().AllowedValues.Should().BeEquivalentTo(new int[] { 1, 3, 5, 7, 11, 13 });
@@ -281,7 +281,7 @@ public int MyMethod([AllowedValues(1,3,5,7,11,13)] int myParam=Int32.MinValue)
 { return 0; }"
                 .WrapInStandardClass();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First().Options.First();
 
             actual.RawInfo.Should().BeOfType<RawInfoForMethodParameter>();

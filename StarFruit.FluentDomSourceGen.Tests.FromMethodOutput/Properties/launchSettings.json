@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "StarFruit.FluentDomSourceGen.Tests.FromMethodOutput": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}

@@ -1,4 +1,5 @@
-﻿using StarFruit2.Common.Descriptors;
+﻿using StarFruit.Common;
+using StarFruit2.Common.Descriptors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,18 @@ namespace StarFruit2.Tests
 
         public static string WrapInMethod(this string code, string methodName)
            =>   $"\npublic Command {methodName}()\n{{\n{code}\n}}";
+    }
+
+    internal static class RawInfo
+    {
+        internal static RawInfoForType DummyClass
+           => new RawInfoForType(null, "", "");
+
+        internal static RawInfoForMethod DummyMethod
+           => new RawInfoForMethod(null, false,  "","");
+
+        internal static RawInfoForProperty DummyProperty
+            => new RawInfoForProperty(null,  "", "");
     }
 
     public static class CodeGenerator

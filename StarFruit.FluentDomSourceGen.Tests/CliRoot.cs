@@ -1,4 +1,8 @@
-﻿using StarFruit2;
+﻿// These using choices are deliberate.
+// * StarFruit2.Common is redundant with default, 
+// * System.Threading.Tasks may or may not be in the defualt generation,
+// * System.IO is not in the generation
+using StarFruit2;
 using StarFruit2.Common;
 using System;
 using System.IO;

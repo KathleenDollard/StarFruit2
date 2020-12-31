@@ -16,7 +16,7 @@ namespace StarFruit.FluentDomSourceGen.Tests
 
         protected override string Identifier => "roslyndiagnostics";
 
-        public AndConstraint<RoslynGenerationDiagnosticAssertions> NotHaveErrors()
+        public AndConstraint<RoslynGenerationDiagnosticAssertions> NotHaveErrors(string compilationId)
         {
 
             using var _ = new AssertionScope();
@@ -26,7 +26,9 @@ namespace StarFruit.FluentDomSourceGen.Tests
             {
                 Execute.Assertion
                      .ForCondition(!diagnostic.Severity.HasFlag(DiagnosticSeverity.Warning))
-                     .FailWith($"Compilation issue: {diagnostic}");
+                     .FailWith(@$"
+Compilation issue ({compilationId}): 
+   {diagnostic}");
 
             }
             return new AndConstraint<RoslynGenerationDiagnosticAssertions>(this);

@@ -2,6 +2,7 @@
 using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
+using StarFruit2.Tests;
 using System.Collections.Generic;
 
 namespace TestData
@@ -9,7 +10,7 @@ namespace TestData
     public class SingleArgTestData<T> : BaseTestData
     {
         public CommandDescriptor CommandDescriptor
-            => new CommandDescriptor(null, "MyClass", new RawInfoForType(null)) { Name = "MyClass" };
+            => new CommandDescriptor(null, "MyClass", new RawInfoForType(null,"","")) { Name = "MyClass" };
 
         public SingleArgTestData(string testName,
                                          string originalName,
@@ -31,7 +32,7 @@ namespace TestData
             var commandDescriptor = CommandDescriptor;
 
             commandDescriptor.AddArguments(arguments: new List<ArgumentDescriptor>(){
-                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(T)), null, originalName, new RawInfoForProperty (null))
+                new ArgumentDescriptor(new ArgTypeInfoRoslyn(typeof(T)), null, originalName, RawInfo.DummyProperty)
                 {
                     Name = name,
                     CliName = commandLineName,

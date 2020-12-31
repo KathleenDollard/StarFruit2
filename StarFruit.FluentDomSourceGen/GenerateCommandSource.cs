@@ -55,7 +55,7 @@ namespace StarFruit2.Generate
         {
             return new Constructor(cmd.CommandSourceClassName())
                            .Parameter("root", "RootCommandSource")
-                           .Parameter("parent", "CommandSource")
+                           .Parameter("parent", "CommandSourceBase")
                            .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)), VariableReference("parent"))
                            .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
                            .Statements(cmd.SubCommands, CtorSubCommands())
@@ -81,7 +81,7 @@ namespace StarFruit2.Generate
         //protected virtual Constructor GetCtor(CommandDescriptor cmd, CommandDescriptor root, CommandDescriptor parent)
         //    => new Constructor(cmd.CommandSourceClassName())
         //        .Parameter("root", "RootCommandSource")
-        //        .Parameter("parent", "CommandSource")
+        //        .Parameter("parent", "CommandSourceBase")
         //        .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)), VariableReference("parent"))
         //        .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
         //        .Statements(cmd.SubCommands, CtorSubCommands())
@@ -165,7 +165,7 @@ namespace StarFruit2.Generate
             //CommandClass(c, new TypeRep(cmd.Root.CommandSourceClassName());
             foreach (var subCommand in cmd.SubCommands)
             {
-                list.Add(CommandSourceClass(subCommand, "CommandSource", subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
+                list.Add(CommandSourceClass(subCommand, "CommandSourceBase", subCommand.ParentSymbolDescriptorBase as CommandDescriptor));
                 if (subCommand.SubCommands.Any())
                 {
                     list.AddRange(SubCommandClasses(subCommand));

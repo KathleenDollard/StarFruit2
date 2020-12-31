@@ -18,7 +18,7 @@ namespace StarFruit2.Tests
                 .WrapInClass("MyClass")
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.OriginalName.Should().Be("MyMethod");
@@ -34,7 +34,7 @@ namespace StarFruit2.Tests
                 .WrapInClass("MyClass")
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.RawInfo.Should().BeOfType<RawInfoForMethod>();
@@ -49,7 +49,7 @@ namespace StarFruit2.Tests
                  .WrapInClass("MyClass")
                  .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.IsHidden.Should().Be(true);
@@ -64,7 +64,7 @@ namespace StarFruit2.Tests
                   .WrapInClass("MyClass")
                   .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.IsHidden.Should().Be(true);
@@ -78,7 +78,7 @@ namespace StarFruit2.Tests
                 .WrapInClass("MyClass")
                 .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.IsHidden.Should().Be(false);
@@ -93,7 +93,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.IsHidden.Should().Be(false);
@@ -108,7 +108,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.Aliases.Count().Should().Be(1);
@@ -124,7 +124,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.Aliases.Count().Should().Be(2);
@@ -140,7 +140,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.Aliases.Count().Should().Be(0);
@@ -158,7 +158,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.Description.Should().Be(desc);
@@ -173,7 +173,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.TreatUnmatchedTokensAsErrors.Should().BeTrue();
@@ -187,7 +187,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.TreatUnmatchedTokensAsErrors.Should().BeTrue();
@@ -202,7 +202,7 @@ namespace StarFruit2.Tests
                    .WrapInClass("MyClass")
                    .WrapInStandardNamespace();
 
-            CliDescriptor actualCli = Utils.GetCli(code);
+            CliDescriptor actualCli = Utils.GetClassBasedCli(code);
             var actual = actualCli.CommandDescriptor.SubCommands.First();
 
             actual.TreatUnmatchedTokensAsErrors.Should().BeFalse();

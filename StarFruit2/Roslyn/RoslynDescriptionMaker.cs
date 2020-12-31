@@ -70,6 +70,18 @@ namespace Starfruit2
            : base(config, semanticModel)
         { }
 
+        public virtual CliDescriptor CreateCliDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
+                                                                         TCommandSymbol symbol)
+                where TCommandSymbol : class, ISymbol
+        {
+            var cliDesriptor = new CliDescriptor
+            {
+                GeneratedComandSourceNamespace = symbol.ContainingNamespace.ToString(),
+                CommandDescriptor = CreateCommandDescriptor(parent, symbol)
+            };
+            return cliDesriptor;
+        }
+
         protected virtual IEnumerable<CommandDescriptor> GetSubCommands(CommandDescriptor parent,
                                                                         INamedTypeSymbol parentSymbol)
         {
@@ -180,18 +192,7 @@ namespace Starfruit2
             return arg;
         }
 
-        protected internal virtual CliDescriptor CreateCliDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
-                                                                     TCommandSymbol symbol)
-        where TCommandSymbol : class, ISymbol
-        {
-            var cliDesriptor = new CliDescriptor
-            {
-                GeneratedComandSourceNamespace = symbol.ContainingNamespace.ToString(),
-                CommandDescriptor = CreateCommandDescriptor(parent, symbol)
-            };
-            return cliDesriptor;
-        }
-
+   
         private IEnumerable<(ISymbol Symbol, int Position, RawInfoBase RawInfo)> GetItemCandidates
                 <TCommandSymbol>(TCommandSymbol parentSymbol)
             where TCommandSymbol : class, ISymbol
