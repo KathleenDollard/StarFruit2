@@ -1,39 +1,37 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Linq;
+using System;
 
 namespace StarFruit2
 {
     public abstract class LanguageHelper
     {
-        public abstract string GetDefaultValue(IPropertySymbol propertySymbol);
-    }
+        public abstract string? GetDefaultValue(IPropertySymbol propertySymbol);
+        protected abstract string ArgTypeInfoAsStringInternal(object? typeRepresentation);
 
-    public class CSharpLanguageHelper : LanguageHelper
-    {
-        public override string? GetDefaultValue(IPropertySymbol propertySymbol)
-        {
-            var declaration = propertySymbol.DeclaringSyntaxReferences.First();
-            var propertyDeclaration = declaration.GetSyntax() as PropertyDeclarationSyntax;
-            if( propertyDeclaration?.Initializer is null)
+        protected LanguageHelper()
+            => HelperInUse = this;
+
+        private static LanguageHelper? HelperInUse { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="languageName">A member of Microsoft.CodeAnalysis.LanguageNames</param>
+        /// <returns></returns>
+        public static LanguageHelper GetLanguageHelper(string languageName)
+            => languageName switch
             {
-                return null;
-            }
-            return propertyDeclaration.Initializer.Value switch
-            {
-                LiteralExpressionSyntax s => s.Token.ValueText,
-                ObjectCreationExpressionSyntax s => s.ToString(),
-                MemberAccessExpressionSyntax s => s.ToString(),
-                _ => $"Type not handled: {propertyDeclaration.Initializer.Value.GetType()}"
+                LanguageNames.CSharp => new CSharpLanguageHelper(),
+                LanguageNames.VisualBasic => new VBLanguageHelper(),
+                LanguageNames.FSharp => throw new ArgumentException("F# is not supported by Roslyn generators because it doesn't use Rolsyn.", "languageName"),
+                _ => throw new ArgumentException("Unexpected language type", "languageName")
             };
-        }
+
+        internal static string ArgTypeInfoAsString(object? typeRepresentation)
+            => HelperInUse is null
+               ? throw new InvalidOperationException("You cannot use a helper until it is initialized")
+               : HelperInUse.ArgTypeInfoAsStringInternal(typeRepresentation);
+
     }
 
-    public class VBLanguageHelper : LanguageHelper
-    {
-        public override string GetDefaultValue(IPropertySymbol propertySymbol)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
 }

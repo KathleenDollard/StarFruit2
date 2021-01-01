@@ -103,7 +103,7 @@ namespace FluentDom.Generator
                 Method m => OutputMethod(m),
                 BlankLine => OutputLine(),
                 Field f => OutputField(f),
-                _ => throw new NotImplementedException()
+                _ => throw new NotImplementedException($"Not implemented {nameof(IClassMember)} in {nameof(GeneratorBase)}.{nameof(OutputMember)}")
             };
         }
 

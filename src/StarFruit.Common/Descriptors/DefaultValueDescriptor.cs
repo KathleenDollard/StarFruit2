@@ -17,7 +17,7 @@ namespace StarFruit2.Common.Descriptors
             long i => i.ToString(),
             bool b => b.ToString(),
             string s => $@"""{s}""",
-            _ => throw new NotImplementedException()
+            _ => throw new NotImplementedException($"Not implementd DefaultValue type in {nameof(DefaultValueDescriptor)}.{nameof(CodeRepresentation)}")
         };
 
         public object? DefaultValue { get; set; }

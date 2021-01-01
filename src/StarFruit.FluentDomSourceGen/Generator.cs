@@ -31,11 +31,11 @@ namespace StarFruit2.Generate
                 Dictionary<ISymbol, SemanticModel> semanticModels = new();
                 // semanticModels updated in GetSymbol
                 var symbols = receiver.Candidates
-                                      .Select(x => RoslynCSharpDescriptorFactory.GetSymbol(x, context.Compilation, semanticModels))
+                                      .Select(x => RoslynHelpers.GetSymbol(x, context.Compilation, semanticModels))
                                       .Where(symbol => symbol is not null)
                                       .Distinct();
 
-                var cliDescriptors = symbols.Select(symbol => RoslynCSharpDescriptorFactory.GetCliDescriptor(symbol!, semanticModels[symbol!]))
+                var cliDescriptors = symbols.Select(symbol => RoslynCSharpDescriptorFactory.GetCliDescriptor(LanguageNames.CSharp, symbol!, semanticModels[symbol!]))
                                             .ToList();
 
                 foreach (var cliDescriptor in cliDescriptors)

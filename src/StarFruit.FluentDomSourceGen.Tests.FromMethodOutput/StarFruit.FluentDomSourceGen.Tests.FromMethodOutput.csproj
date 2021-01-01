@@ -9,4 +9,8 @@
     <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="System.CommandLine" Version="2.0.0-beta1.20574.7" />
+  </ItemGroup>
+
 </Project>

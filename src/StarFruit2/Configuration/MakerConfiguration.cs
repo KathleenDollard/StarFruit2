@@ -113,7 +113,7 @@ namespace StarFruit2
             {
                 INamedTypeSymbol _ => false,
                 IMethodSymbol s => s.IsAsync,
-                _ => throw new NotImplementedException()
+                _ => throw new NotImplementedException($"Not implemented {nameof(symbol)} in {nameof(MakerConfiguration)}.{nameof(GetAsync)}")
             };
         }
 

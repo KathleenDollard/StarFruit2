@@ -1,12 +1,8 @@
-﻿using StarFruit.Common;
-using StarFruit2;
+﻿using StarFruit2;
 using StarFruit2.Common;
 using StarFruit2.Common.Descriptors;
 using StarFruit2.Tests;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using TestData;
 
 namespace TestData
 {

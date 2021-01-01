@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StarFruit2.Tests.TestSampleData.SeveralSubCommandsTestModel
+﻿namespace StarFruit2.Tests.TestSampleData.SeveralSubCommandsTestModel
 {
     public class MyClass
     {

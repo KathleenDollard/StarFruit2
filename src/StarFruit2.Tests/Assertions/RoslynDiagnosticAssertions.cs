@@ -29,11 +29,15 @@ namespace StarFruit2.Tests
             {
                 Execute.Assertion
                      .ForCondition(!diagnostic.Severity.HasFlag(DiagnosticSeverity.Warning))
-                     .FailWith($"Compilation issue: {diagnostic}");
+                     .FailWith($"Compilation issue: {Escape(diagnostic.ToString())}");
 
             }
             return new AndConstraint<RoslynDiagnosticAssertions>(this);
 
+            static string Escape(string input)
+            {
+                return input.Replace("{", "{{");
+            }
         }
 
     }

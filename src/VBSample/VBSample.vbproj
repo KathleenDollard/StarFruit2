@@ -16,4 +16,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.9.0-2.final" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="System.CommandLine" Version="2.0.0-beta1.20574.7" />
+  </ItemGroup>
+
 </Project>

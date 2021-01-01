@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
-using FluentAssertions;
+﻿using System.Collections.Generic;
 using StarFruit2.Common.Descriptors;
 using StarFruit2.Common;
-using StarFruit.Common;
 
 namespace StarFruit2.Tests
 {

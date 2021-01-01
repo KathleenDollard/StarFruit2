@@ -2,8 +2,6 @@
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using StarFruit2.Common.Descriptors;
-using StarFruit2.Tests.SampleData;
-using System.Linq;
 
 namespace StarFruit2.Tests
 {

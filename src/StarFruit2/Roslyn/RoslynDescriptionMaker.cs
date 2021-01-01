@@ -55,20 +55,11 @@ namespace Starfruit2
         protected readonly MakerConfiguration config;
         protected readonly SemanticModel semanticModel;
 
-        public RoslynDescriptionMaker(MakerConfiguration config, SemanticModel semanticModel)
+        public RoslynDescriptionMaker(SemanticModel semanticModel, MakerConfiguration? config = null)
         {
-            this.config = config ?? new MakerConfiguration(new CSharpLanguageHelper());
+            this.config = config ?? new MakerConfiguration(LanguageHelper.GetLanguageHelper(semanticModel.Language));
             this.semanticModel = semanticModel;
         }
-    }
-
-    public abstract class DescriptorMaker : RoslynDescriptionMaker
-    //where TCommandSymbol : class, ISymbol
-    //where TMemberSymbol : class, ISymbol
-    {
-        public DescriptorMaker(MakerConfiguration config, SemanticModel semanticModel)
-           : base(config, semanticModel)
-        { }
 
         public virtual CliDescriptor CreateCliDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,
                                                                          TCommandSymbol symbol)
@@ -90,7 +81,7 @@ namespace Starfruit2
                 {
                     IMethodSymbol x => CreateCommandDescriptor(parent, x),
                     INamedTypeSymbol x => CreateCommandDescriptor(parent, x),
-                    _ => throw new NotImplementedException()
+                    _ => throw new NotImplementedException($"Not implemented for member in {nameof(RoslynDescriptionMaker)}.{nameof(GetSubCommands)}")
                 });
         }
 
@@ -192,7 +183,7 @@ namespace Starfruit2
             return arg;
         }
 
-   
+
         private IEnumerable<(ISymbol Symbol, int Position, RawInfoBase RawInfo)> GetItemCandidates
                 <TCommandSymbol>(TCommandSymbol parentSymbol)
             where TCommandSymbol : class, ISymbol
@@ -202,7 +193,7 @@ namespace Starfruit2
                 INamedTypeSymbol s => GetPropertyCandidates(s).Concat(GetCtorParameterCandidates(s)),
                 IMethodSymbol s => s.Parameters.Select((symbol, position)
                                          => GetTuple((ISymbol)symbol, position, symbol.RawInfoTypeFromSymbol(s))),
-                _ => throw new NotImplementedException()
+                _ => throw new NotImplementedException($"Not implemented {nameof(parentSymbol)} in {nameof(RoslynDescriptionMaker)}.{nameof(GetItemCandidates)}")
             };
 
             static IEnumerable<(ISymbol Symbol, int Position, RawInfoBase rawInfo)> GetPropertyCandidates(INamedTypeSymbol parentSymbol)

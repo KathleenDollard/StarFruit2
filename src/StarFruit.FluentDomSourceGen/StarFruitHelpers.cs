@@ -67,7 +67,7 @@ namespace StarFruit2.Generate
                 {
                     INamedTypeSymbol t => TypeRepFromNamedType(t),
                     Type t => new TypeRep(t.Name), // currently just used for tests, so generics ignored
-                    _ => throw new NotImplementedException("Type not recognized")
+                    _ => throw new NotImplementedException($"Not implemented { nameof(typeAsObject) } in { nameof(Helpers)}.{ nameof(TypeRepFromNonNullObject)}")
                 };
             }
         }
@@ -80,7 +80,7 @@ namespace StarFruit2.Generate
             {
                 ArgumentDescriptor a => ArgumentType(a),
                 OptionDescriptor o => OptionType(o),
-                _ => throw new InvalidOperationException("Unknown symbol type")
+                _ => throw new InvalidOperationException($"Not implemented { nameof(symbolDescriptor) } in { nameof(Helpers)}.{ nameof(SymbolType)}")
             };
         }
 

@@ -69,7 +69,7 @@ namespace FluentDom.Generator
             VariableReference x => x.ValueStore,                      // NOTE: This differs from Value because it does not have quotes for strings
             Dot x=> $"{x.Left.CSharpString()}.{x.Right}",             // NOTE: Maybe we should drop this
             As x=> $"({x.Expression.CSharpString()} as {x.TypeRep.CSharpString()})", // NOTE: This TryString in VB, although nullable value types are handled differently
-            _ => throw new NotImplementedException(),
+            _ => throw new NotImplementedException($"Not implemented expression type in {nameof(CSharpString)}(IExpression) in {nameof(CSharpGeneratorExtensions)}"),
         };
 
         public static string CSharpString(this Return expression)

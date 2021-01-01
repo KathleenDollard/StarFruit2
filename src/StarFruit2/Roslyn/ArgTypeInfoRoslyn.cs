@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using StarFruit2.Common;
-using System;
+﻿using StarFruit2.Common;
 
 namespace StarFruit2
 {
@@ -21,16 +18,7 @@ namespace StarFruit2
         { }
 
         public override string TypeAsString()
-        => TypeRepresentation switch
-        {
-            Type t => t.Name,
-            INamedTypeSymbol t => t.Name,
-            PredefinedTypeSyntax p => p.ToString(),
-            IdentifierNameSyntax i => i.Identifier.ToString(),
-            _ => TypeRepresentation?.ToString() ?? ""
-        };
-
-
+        => LanguageHelper.ArgTypeInfoAsString(TypeRepresentation );
     }
 
 }
