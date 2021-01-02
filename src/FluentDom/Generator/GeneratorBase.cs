@@ -7,7 +7,7 @@ namespace FluentDom.Generator
     {
         protected StringBuilderWithTabs sb = new();
 
-        public virtual string Generate(Code code) 
+        public virtual string Generate(Code code)
             => this
                 .OutputUsings(code)
                 .Optional(!string.IsNullOrWhiteSpace(code.Namespace), () => OpenNamespace(code))
@@ -22,23 +22,49 @@ namespace FluentDom.Generator
 
         protected internal abstract GeneratorBase OutputUsings(Code code);
         protected internal abstract GeneratorBase OpenNamespace(Code code);
-        protected internal abstract GeneratorBase CloseNamespace(Code code);
         protected internal abstract GeneratorBase OpenClass(Class cls);
-        protected internal abstract GeneratorBase CloseClass(Class cls);
         protected internal abstract GeneratorBase OutputField(Field field);
         protected internal abstract GeneratorBase OpenConstructor(Constructor ctor);
-        protected internal abstract GeneratorBase CloseConstructor(Constructor ctor);
         protected internal abstract GeneratorBase OpenMethod(Method method);
-        protected internal abstract GeneratorBase CloseMethod(Method method);
         protected internal abstract GeneratorBase OpenProperty(Property property);
-        protected internal abstract GeneratorBase CloseProperty(Property property);
         protected internal abstract GeneratorBase OpenPropertyGetter(Property property);
-        protected internal abstract GeneratorBase ClosePropertyGetter(Property property);
         protected internal abstract GeneratorBase OpenPropertySetter(Property property);
-        protected internal abstract GeneratorBase ClosePropertySetter(Property property);
-
         protected internal abstract GeneratorBase OutputStatement(IExpression expression);
-        protected internal abstract GeneratorBase OutputStatements(IEnumerable<IExpression> expressions);
+        protected internal abstract string BlockClose(BlockType blockType);
+
+       protected internal virtual GeneratorBase CloseNamespace(Code code)
+            => Close(BlockType.Namespace);
+        protected internal virtual GeneratorBase CloseClass(Class cls)
+             => Close(BlockType.Class);
+        protected internal virtual GeneratorBase CloseConstructor(Constructor ctor)
+              => Close(BlockType.Constructor);
+        protected internal virtual GeneratorBase CloseMethod(Method method)
+              => Close(method.ReturnTypeStore is null
+                ? BlockType.Sub
+                : BlockType.Function);
+        protected internal virtual GeneratorBase CloseProperty(Property property)
+              => Close(BlockType.Property);
+        protected internal virtual GeneratorBase ClosePropertyGetter(Property property)
+              => Close(BlockType.Getter);
+        protected internal virtual GeneratorBase ClosePropertySetter(Property property)
+              => Close(BlockType.Setter);
+
+        protected internal virtual GeneratorBase Close(BlockType blockType)
+        {
+            sb.DecreaseTabs();
+            OutputLine(BlockClose(blockType));
+            return this;
+        }
+
+
+        protected internal virtual GeneratorBase OutputStatements(IEnumerable<IExpression> expressions)
+        {
+            foreach (var expression in expressions)
+            {
+                OutputStatement(expression);
+            }
+            return this;
+        }
 
 
         // This will often force a closure. Consider if heavily used.
@@ -106,7 +132,6 @@ namespace FluentDom.Generator
                 _ => throw new NotImplementedException($"Not implemented {nameof(IClassMember)} in {nameof(GeneratorBase)}.{nameof(OutputMember)}")
             };
         }
-
         protected internal virtual GeneratorBase OutputConstructor(Constructor ctor)
         {
             return OpenConstructor(ctor)
@@ -119,7 +144,6 @@ namespace FluentDom.Generator
                    .OutputStatements(method.StatementStore)
                    .CloseMethod(method);
         }
-
         protected internal virtual GeneratorBase OutputProperty(Property property)
         {
             // C# needs to override this for auto properties
@@ -134,7 +158,7 @@ namespace FluentDom.Generator
             {
                 OpenPropertySetter(property);
                 OutputStatements(property.SetterStatementStore.StatementStore);
-                ClosePropertyGetter(property);
+                ClosePropertySetter(property);
             }
             CloseProperty(property);
             return this;

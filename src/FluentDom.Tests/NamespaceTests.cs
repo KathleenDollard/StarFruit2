@@ -2,6 +2,7 @@
 using Xunit;
 using FluentAssertions;
 using FluentDom.Generator;
+using System;
 
 namespace FluentDom.Tests
 {
@@ -81,25 +82,36 @@ namespace FluentDom.Tests
             CheckUsing(code.UsingStore.Skip(1).First(), BadNamespace);
         }
 
-        [Fact]
-        public void Generated_namespace_with_usings_is_correct()
+        [Theory]
+        [InlineData(typeof(CSharpGenerator))]
+        [InlineData(typeof(VBGenerator))]
+        public void Generated_namespace_with_usings_is_correct(Type generatorType)
         {
+            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var expected = generator switch
+            {
+                CSharpGenerator => @"using static First = FirstNamespace;
+                                     using Second.Namespace;
+                                     using Third.Yes.No.Namespace;
+                           
+                                     namespace CodeNamespace
+                                     {
+                                     }",
+                VBGenerator => @"Imports First = FirstNamespace
+                                 Imports Second.Namespace
+                                 Imports Third.Yes.No.Namespace
+                    
+                                 Namespace CodeNamespace
+                                 End Namespace",
+            };   
             var code = Code.Create(CodeNamespace)
                            .Usings(
                                 new Using(FirstNamespace, FirstNamespaceAlias, true),
                                 SecondNamespace,
                                 ThirdNamespace);
-            var actual = new CSharpGenerator().Generate(code);
+            var actual = generator.Generate(code);
 
-            var expected = 
-@"using static First = FirstNamespace;
-using Second.Namespace;
-using Third.Yes.No.Namespace;
 
-namespace CodeNamespace
-{
-}
-";
             actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 

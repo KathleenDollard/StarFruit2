@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FluentDom.Generator
 {
@@ -84,7 +82,6 @@ namespace FluentDom.Generator
                 _ => expression.ValueStore.ToString()!
             };
 
-
         public static string CSharpString(this TypeRep typeRep)
         {
             return typeRep is null
@@ -135,8 +132,5 @@ namespace FluentDom.Generator
              }}";
 
         }
-
-
-
     }
 }

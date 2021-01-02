@@ -11,10 +11,14 @@ namespace FluentDom.Tests
         {
             var expression = Expression.Assign("left", Expression.MethodCall("M"));
 
-            var expected = @"left = M()";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"left = M()";
+            var vbExpected = cSharpExpected;
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
@@ -22,21 +26,29 @@ namespace FluentDom.Tests
         {
             var expression = Expression.Assign("left", "right");
 
-            var expected = @"left = right";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"left = right";
+            var vbExpected = cSharpExpected;
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
         public void Generated_AssignVar_correct()
         {
-            var expression = Expression.AssignVar("left", "type", Expression.MethodCall("M"));
+            var expression = Expression.AssignVar("left", "myType", Expression.MethodCall("M"));
 
-            var expected = @"type left = M()";
-            var actual = expression.CSharpString();
+            var cSharpExpected = "myType left = M()";
+            var vbExpected = "Dim left As myType = M()";
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
@@ -44,10 +56,10 @@ namespace FluentDom.Tests
         {
             var expression = Expression.MethodCall("M");
 
-            var expected = @"M()";
+            var cSharpExpected = @"M()";
             var actual = expression.CSharpString();
 
-            actual.Should().Be(expected);
+            actual.Should().Be(cSharpExpected);
         }
 
         [Fact]
@@ -55,10 +67,14 @@ namespace FluentDom.Tests
         {
             var expression = Expression.MethodCall("M", Expression.MethodCall("X"), Expression.MethodCall("Y"));
 
-            var expected = @"M(X(), Y())";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"M(X(), Y())";
+            var vbExpected = cSharpExpected;
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
@@ -66,10 +82,14 @@ namespace FluentDom.Tests
         {
             var expression = Expression.MethodCall("M", "x", "y", "z");
 
-            var expected = @"M(x, y, z)";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"M(x, y, z)";
+            var vbExpected = cSharpExpected;
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact(Skip = "TBD")]
@@ -77,54 +97,74 @@ namespace FluentDom.Tests
         {
             var expression = Expression.Assign("left", "right");
 
-            var expected = @"";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"";
+            var vbExpected = cSharpExpected;
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
         public void Generated_NewObject_correct()
         {
-            var expression = Expression.NewObject(new TypeRep("type"));
+            var expression = Expression.NewObject(new TypeRep("myType"));
 
-            var expected = @"new type()";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"new myType()";
+            var vbExpected = @"New myType()";
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
         public void Generated_NewObject_with_type_as_string_correct()
         {
-            var expression = Expression.NewObject("type");
+            var expression = Expression.NewObject("myType");
 
-            var expected = @"new type()";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"new myType()";
+            var vbExpected = @"New myType()";
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
         public void Generated_NewObject_with_args_as_expressions_correct()
         {
-            var expression = Expression.NewObject("type", Expression.MethodCall("X"), Expression.MethodCall("Y"));
+            var expression = Expression.NewObject("myType", Expression.MethodCall("X"), Expression.MethodCall("Y"));
 
-            var expected = @"new type(X(), Y())";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"new myType(X(), Y())";
+            var vbExpected = @"New myType(X(), Y())";
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
         public void Generated_NewObject_with_args_as_strings_correct()
         {
-            var expression = Expression.NewObject("type", "x", "y", "z");
+            var expression = Expression.NewObject("myType", "x", "y", "z");
 
-            var expected = @"new type(x, y, z)";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"new myType(x, y, z)";
+            var vbExpected = @"New myType(x, y, z)";
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
@@ -132,10 +172,14 @@ namespace FluentDom.Tests
         {
             var expression = Expression.This();
 
-            var expected = @"this";
-            var actual = expression.CSharpString();
+            var cSharpExpected = "this";
+            var vbExpected = "Me";
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
@@ -143,10 +187,14 @@ namespace FluentDom.Tests
         {
             var expression = Expression.Base();
 
-            var expected = @"base";
-            var actual = expression.CSharpString();
+            var cSharpExpected = "base";
+            var vbExpected = "MyBase";
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
         [Fact]
@@ -155,10 +203,14 @@ namespace FluentDom.Tests
         {
             var expression = Expression.Value("value");
 
-            var expected = @"""value""";
-            var actual = expression.CSharpString();
+            var cSharpExpected = @"""value""";
+            var vbExpected = cSharpExpected;
 
-            actual.Should().Be(expected);
+            var actualCSharp = expression.CSharpString();
+            var actualVB = expression.VBString();
+
+            actualCSharp.Should().Be(cSharpExpected);
+            actualVB.Should().Be(vbExpected);
         }
 
 

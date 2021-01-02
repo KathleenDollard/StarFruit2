@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FluentDom
+﻿namespace FluentDom
 {
     public enum Scope
     {

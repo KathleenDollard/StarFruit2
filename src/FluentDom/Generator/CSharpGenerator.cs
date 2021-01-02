@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,29 +15,9 @@ namespace FluentDom.Generator
 {
     public class CSharpGenerator : GeneratorBase
     {
-
-        internal void OutputProperty(LocalDeclaration expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void OutputProperty(MethodCallBase expression)
-        {
-            throw new NotImplementedException();
-        }
-
         protected internal override GeneratorBase OutputStatement(IExpression expression)
         {
             sb.AppendLine($"{expression.CSharpString()};");
-            return this;
-        }
-
-        protected internal override GeneratorBase OutputStatements(IEnumerable<IExpression> expressions)
-        {
-            foreach (var expression in expressions)
-            {
-                OutputStatement(expression);
-            }
             return this;
         }
 
@@ -63,9 +42,6 @@ namespace FluentDom.Generator
             return this;
         }
 
-        protected internal override GeneratorBase CloseNamespace(Code code)
-                => CloseCurly();
-
         protected internal override GeneratorBase OpenClass(Class cls)
         {
             OutputLine(ClassDeclaration(cls));
@@ -85,8 +61,6 @@ namespace FluentDom.Generator
                 return $"{cls.Scope.CSharpString()}{cls.Modifiers.CSharpString()}class {cls.Name}" + baseString;
             }
         }
-        protected internal override GeneratorBase CloseClass(Class cls)
-            => CloseCurly();
 
         protected internal override GeneratorBase OpenConstructor(Constructor ctor)
         {
@@ -103,8 +77,6 @@ namespace FluentDom.Generator
             => $"{ctor.Scope.CSharpString()}{ctor.Modifiers.CSharpString()}{ctor.ContainingType.Name}" +
                $"({ctor.ParameterStore.CSharpString()})";
         }
-        protected internal override GeneratorBase CloseConstructor(Constructor ctor)
-            => CloseCurly();
 
         protected internal override GeneratorBase OpenMethod(Method method)
         {
@@ -121,8 +93,6 @@ namespace FluentDom.Generator
                    ? "void"
                    : method.ReturnTypeStore.CSharpString();
         }
-        protected internal override GeneratorBase CloseMethod(Method method)
-           => CloseCurly();
 
         protected internal override GeneratorBase OutputProperty(Property property)
         {
@@ -173,24 +143,9 @@ namespace FluentDom.Generator
                               .OutputLine();
         }
 
-        protected internal override GeneratorBase CloseProperty(Property property)
-        => CloseCurly();
-
-        protected internal override GeneratorBase ClosePropertyGetter(Property property)
-        => CloseCurly();
-
-        protected internal override GeneratorBase ClosePropertySetter(Property property)
-        => CloseCurly();
-
         protected internal GeneratorBase OpenCurly()
         {
             sb.AppendLine("{").IncreaseTabs();
-            return this;
-        }
-
-        protected internal GeneratorBase CloseCurly()
-        {
-            sb.DecreaseTabs().AppendLine("}");
             return this;
         }
 
@@ -199,5 +154,8 @@ namespace FluentDom.Generator
             OutputLine($"{field.Scope.CSharpString()}{(field.ReadOnly ? "readonly " : "")}{field.TypeRep.CSharpString()} {field.Name};");
             return this;
         }
+
+        protected internal override string BlockClose(BlockType blockType)
+            => "}";
     }
 }
