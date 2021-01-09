@@ -15,7 +15,7 @@ namespace StarFruit2.Generate
     public class GenerateCommandSourceResult
     {
 
-        public virtual Code CreateCode(CliDescriptor cli, IEnumerable<Using>? sourceUsings = null)
+        public virtual Code CreateCode(CliDescriptor cli, IEnumerable<string>? sourceUsings = null)
         {
             _ = cli ?? throw new InvalidOperationException("CliDescriptor cannot be null");
             var cmd = cli.CommandDescriptor;

@@ -41,6 +41,15 @@ namespace FluentDom
             return this;
         }
 
+        public Code Usings(IEnumerable<string>? usings)
+        {
+            if (usings is not null)
+            {
+                this.usings.AddRange(usings.Where(x => x is not null).Select(x=>(Using)x));
+            }
+            return this;
+        }
+
         public Code Class(Class cls)
         {
             classes.Add(cls);

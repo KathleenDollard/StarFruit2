@@ -165,7 +165,8 @@ End Namespace";
             }
             else
             {
-                var methodType = receiver.Candidates.First() as CSharp.MemberAccessExpressionSyntax;
+                var syntax = receiver.Candidates.First();
+                var methodType = syntax as CSharp.MemberAccessExpressionSyntax;
                 methodType.Should().NotBeNull();
                 var classIdentifier = methodType!.Expression as CSharp.IdentifierNameSyntax;
                 var methodIdentifier = methodType.Name as CSharp.IdentifierNameSyntax;

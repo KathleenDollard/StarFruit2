@@ -14,7 +14,7 @@ namespace StarFruit2.Generate
     public class GenerateCommandSource
     {
 
-        public virtual Code CreateCode(CliDescriptor cli, IEnumerable<Using>? sourceUsings = null)
+        public virtual Code CreateCode(CliDescriptor cli, IEnumerable<string>? sourceUsings = null)
         {
             var cmd = cli.CommandDescriptor;
             return Code.Create(cli.GeneratedComandSourceNamespace)

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FluentDom\FluentDom.csproj" GeneratePathProperty="true" />
+    <ProjectReference Include="..\RoslynSourceGenSupport\RoslynSourceGenSupport.csproj" />
     <ProjectReference Include="..\StarFruit.Common\StarFruit.Common.csproj" GeneratePathProperty="true" />
     <ProjectReference Include="..\StarFruit2\StarFruit2.csproj" GeneratePathProperty="true" />
   </ItemGroup>
