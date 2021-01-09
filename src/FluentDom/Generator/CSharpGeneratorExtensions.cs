@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -65,8 +66,8 @@ namespace FluentDom.Generator
             MultilineLambda x => x.CSharpString(),
             Null => "null",
             VariableReference x => x.ValueStore,                      // NOTE: This differs from Value because it does not have quotes for strings
-            Dot x=> $"{x.Left.CSharpString()}.{x.Right}",             // NOTE: Maybe we should drop this
-            As x=> $"({x.Expression.CSharpString()} as {x.TypeRep.CSharpString()})", // NOTE: This TryString in VB, although nullable value types are handled differently
+            Dot x => $"{x.Left.CSharpString()}.{x.Right}",             // NOTE: Maybe we should drop this
+            As x => $"({x.Expression.CSharpString()} as {x.TypeRep.CSharpString()})", // NOTE: This TryString in VB, although nullable value types are handled differently
             _ => throw new NotImplementedException($"Not implemented expression type in {nameof(CSharpString)}(IExpression) in {nameof(CSharpGeneratorExtensions)}"),
         };
 
@@ -85,7 +86,7 @@ namespace FluentDom.Generator
         public static string CSharpString(this TypeRep typeRep)
         {
             return typeRep is null
-                       ? ""
+                       ? "var"
                        : typeRep.GenericTypeArguments.Any()
                            ? $"{typeRep.Name}<{string.Join(", ", typeRep.GenericTypeArguments.Select(x => x.CSharpString()))}>"
                            : typeRep.Name.StartsWith("@")
@@ -107,7 +108,7 @@ namespace FluentDom.Generator
                                    "System.UInt16" => "ushort",
                                    "System.Object" => "object",
                                    "System.String" => "string",
-                                   _ => typeRep.Name
+                                   _ => IsKeyword(typeRep.Name) ? $"[{typeRep.Name}]" : typeRep.Name
                                };
         }
 
@@ -132,5 +133,8 @@ namespace FluentDom.Generator
              }}";
 
         }
+
+        private static bool IsKeyword(string id)
+         => SyntaxFacts.GetKeywordKind(id) != SyntaxKind.None;
     }
 }

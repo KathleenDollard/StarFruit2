@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+
 namespace StarFruit2.Tests
 {
     internal static class Utils
@@ -109,7 +110,7 @@ namespace StarFruit2.Tests
             var symbol = RoslynHelpers.GetSymbol(rootCommand, compilation, semanticModels);
             return symbol is null
                    ? null
-                   : RoslynCSharpDescriptorFactory.GetCliDescriptor(LanguageNames.CSharp, symbol, semanticModels[symbol]);
+                   : RoslynDescriptorFactory.GetCliDescriptor( symbol, semanticModels[symbol]);
         }
 
         internal static OptionDescriptor CreateOptionDescriptor(string name, Type type)

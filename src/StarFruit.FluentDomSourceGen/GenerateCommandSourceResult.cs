@@ -19,7 +19,7 @@ namespace StarFruit2.Generate
         {
             _ = cli ?? throw new InvalidOperationException("CliDescriptor cannot be null");
             var cmd = cli.CommandDescriptor;
-            return Code.Create(cli.GeneratedComandSourceNamespace ?? "default namespace")
+            return Code.Create(cli.GeneratedComandSourceNamespace)
                 .Usings("StarFruit2")
                 .Usings("System.CommandLine")
                 .Usings("StarFruit2.Common")
@@ -52,7 +52,6 @@ namespace StarFruit2.Generate
                                  c => c.Method(CreateInstance(cmd)))
                 .OptionalMembers(cmd.RawInfo is RawInfoForMethod r && r.IsStatic,
                                  c => c.Method(RunStatic(cmd)));
-
 
         private Constructor GetCtor(CommandDescriptor cmd)
             => new Constructor(cmd.CommandSourceResultClassName())
@@ -89,7 +88,7 @@ namespace StarFruit2.Generate
                                .ToArray();
             return new Method("CreateInstance", modifiers: MemberModifiers.Override)
                            .ReturnType(cmd.OriginalName)
-                           .Statements(AssignVar(newItem, "var", NewObject(cmd.OriginalName, arguments)))
+                           .Statements(AssignVar(newItem, null, NewObject(cmd.OriginalName, arguments)))
                            .Statements(cmd.GetOptionsAndArgs()
                                           .Where(x => x.RawInfo is RawInfoForProperty),
                                        x => Assign(VariableReference($"{newItem}.{x.OriginalName}"),

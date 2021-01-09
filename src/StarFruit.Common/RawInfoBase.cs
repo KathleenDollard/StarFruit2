@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace StarFruit.Common
+﻿namespace StarFruit.Common
 {
     public enum CodeElementType
     {

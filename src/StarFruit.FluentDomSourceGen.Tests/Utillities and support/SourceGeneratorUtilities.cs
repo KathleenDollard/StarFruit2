@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
+using FluentDom.Generator;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using StarFruit2.Generate;
 using System;
 using System.Collections.Generic;
@@ -9,94 +9,141 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace StarFruit.FluentDomSourceGen.Tests
 {
-    public class SourceGeneratorUtilities
+    public abstract class SourceGeneratorUtilities
     {
-        public static string GenerateAndTest(string generatedCodeName, string inputFileName, string outputPath)
+        public static SourceGeneratorUtilities LanguageUtils(bool useVB)
+             => useVB
+                 ? new VBGeneratorUtilities()
+                 : new CSharpGeneratorUtilities();
+
+        public static SyntaxReceiverBase Receiver(bool useVB)
+            => useVB
+                ? new VBSyntaxReceiver()
+                : new CSharpSyntaxReceiver();
+
+        public static string LanguageName(bool useVB)
+             => useVB
+                 ? "VB"
+                 : "CSharp";
+
+        public static string Extension(bool useVB)
+             => useVB
+                 ? "vb"
+                 : "cs";
+
+        public static string ShortenedGeneratedCodeName(string generatedCodeName)
+            => generatedCodeName.EndsWith("CommandSource")
+                 ? "CmdSrc"
+                 : "CmdSrcResult";
+
+        public static IEnumerable<SyntaxNode> ClassDeclarations(bool useVB, string source)
+            => LanguageUtils(useVB).ClassDeclarations(source);
+
+        public static IEnumerable<SyntaxNode>? StatementsForMethod(bool useVB, string source, string methodName)
+            => LanguageUtils(useVB).StatementsForMethod(source, methodName);
+
+        public bool IsVB
+            => this is VBGeneratorUtilities;
+
+        public abstract IEnumerable<SyntaxNode>? StatementsForMethod(string source, string methodName);
+        public abstract IEnumerable<SyntaxNode> ClassDeclarations(string source);
+        public abstract SyntaxTree ParseToSyntaxTree(string source);
+        public abstract Compilation CreatCompilation(string compilationName, SyntaxTree syntaxTree, IEnumerable<MetadataReference> references, OutputKind outputKind);
+        public abstract GeneratorDriver CreateGeneratorDriver(ISourceGenerator generator);
+        public abstract ISourceGenerator CreateGenerator();
+
+        public virtual string GenerateAndTest(string generatedCodeName, string inputFileName, string outputPath, bool isExe = false)
         {
             var cliRootSource = File.ReadAllText(inputFileName);
-            return GenerateAndTestSource(generatedCodeName, cliRootSource, outputPath);
+            return GenerateAndTestSource(generatedCodeName, cliRootSource, outputPath, isExe);
         }
 
-        public static string GenerateAndTestSource(string generatedCodeName, string inputSource, string? outputPath = null)
+        public virtual string GenerateAndTestSource(string generatedCodeName, string inputSource, string? outputPath = null, bool isExe = false)
         {
-            using var _ = new AssertionScope();
+            var outputFileName = GetOutputFileName(outputPath, generatedCodeName, IsVB);
+            using var assertionScope = new AssertionScope(outputFileName);
+            assertionScope.AddReportable("OutputFileName", outputFileName);
 
-            CSharpCompilation cliRootCompilation = GetCliRootCompilation(inputSource)
-               ?? throw new InvalidOperationException();
+            Compilation cliRootCompilation = GetCliRootCompilation(inputSource, isExe)
+                ?? throw new InvalidOperationException();
 
-            var outputPairs = SourceGeneratorUtilities.Generate<Generator>(cliRootCompilation, out var outputCompilation, out var generationDiagnostics);
-   
-            generationDiagnostics.Should().NotHaveErrors($"{generatedCodeName} - Generation diagnostics");
-            outputCompilation.Should().NotHaveErrors($"{generatedCodeName} - Generation compilation");
+            var requestedSyntaxTree = Generate(cliRootCompilation, out var outputCompilation, out var generationDiagnostics)
+                                        .Where(x => x.compilationName.Contains($"{generatedCodeName}.generated"))
+                                        .Select(x => x.syntaxTree)
+                                        .FirstOrDefault();
 
-            var (compilationName, generatedSyntaxTree) = outputPairs.Where(x => x.compilationName.Contains($"{generatedCodeName}.generated"))
-                                                               .FirstOrDefault();
-            if (outputPath is not null)
-            {
-                File.WriteAllText($"{outputPath}/{generatedCodeName}.generated.cs", generatedSyntaxTree.ToString());
-            }
+            ReportDiagnostics(generatedCodeName, generationDiagnostics, outputCompilation);
+            OutputIfRequested(outputFileName, requestedSyntaxTree);
 
-            return generatedSyntaxTree is null
+            return requestedSyntaxTree is null
                     ? "Compilation is null"
-                    : generatedSyntaxTree.ToString();
+                    : requestedSyntaxTree.ToString();
 
-            // *** I am removing this code because of false failures when this compilation does not have
-            // *** the full context of the source. What correct errors would be reported here and not earlier?
-            //var commandSourceCompilation = CompileSource(sourceCode, generatedCodeName);
-            //commandSourceCompilation!.Should().NotBeNull();
-            //commandSourceCompilation!.Should().NotHaveErrors($"{generatedCodeName} - Compiler issues");
-
-            //return commandSourceCompilation is null
-            //        ? "Compilation is null"
-            //        : commandSourceCompilation.SyntaxTrees.First().ToString();
+            static string? GetOutputFileName(string? outputPath, string generatedCodeName, bool isVB) => outputPath is null
+                ? null
+                : $"{outputPath}/{generatedCodeName}.generated."
+                  + (isVB ? "vb" : "cs");
+            static void OutputIfRequested(string? fileName, SyntaxTree requestedSyntaxTree)
+            {
+                if (fileName is not null)
+                {
+                    File.WriteAllText(fileName, requestedSyntaxTree.ToString());
+                }
+            }
+            static void ReportDiagnostics(string generatedCodeName, ImmutableArray<Diagnostic> generationDiagnostics, Compilation outputCompilation)
+            {
+                generationDiagnostics.Should().NotHaveErrors($"{generatedCodeName} - Generation diagnostics");
+                outputCompilation.Should().NotHaveErrors($"{generatedCodeName} - Generation compilation");
+            }
         }
 
-        public static CSharpCompilation? GetCliRootCompilation(string cliRootSource)
+        internal static GeneratorBase Generator(bool useVB)
+            => GeneratorBase.Generator(useVB ? LanguageNames.VisualBasic : LanguageNames.CSharp);
+
+        public virtual Compilation? GetCliRootCompilation(string cliRootSource, bool isExe = false)
         {
             cliRootSource.Should().NotBeNull();
-            var cliRootCompilation = SourceGeneratorUtilities.CompileSource(cliRootSource, "cliRoot");
+            var cliRootCompilation = CompileSource(cliRootSource, "cliRoot", isExe);
             cliRootCompilation!.Should().NotBeNull();
             cliRootCompilation!.Should().NotHaveErrors($"CliRoot compilation");
             return cliRootCompilation;
         }
 
-        public static CommandSourceSyntaxReceiver FindCandidatesWithSyntaxReceiver(string inputFileName)
+        public virtual SyntaxReceiverBase FindCandidatesWithSyntaxReceiver(string inputFileName)
             => FindCandidatesWithSyntaxReceiverSource(File.ReadAllText(inputFileName));
 
-        public static CommandSourceSyntaxReceiver FindCandidatesWithSyntaxReceiverSource(string source)
+        public virtual SyntaxReceiverBase FindCandidatesWithSyntaxReceiverSource(string source)
         {
             var _ = source ?? throw new ArgumentException("Source cannot be null", "source");
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
-            var receiver = new CommandSourceSyntaxReceiver();
+            var syntaxTree = ParseToSyntaxTree(source);
+            var receiver = Receiver(this is VBGeneratorUtilities);
             var walker = new GeneratorSyntaxWalker(receiver);
             walker.Visit(syntaxTree.GetRoot());
 
             return receiver;
         }
 
-        public static IEnumerable<(string compilationName, SyntaxTree syntaxTree)> Generate<T>(CSharpCompilation compilation, out Compilation outputCompilation, out ImmutableArray<Diagnostic> generationDiagnostics)
-            where T : ISourceGenerator, new()
+        public virtual IEnumerable<(string compilationName, SyntaxTree syntaxTree)> Generate(Compilation compilation, out Compilation outputCompilation, out ImmutableArray<Diagnostic> generationDiagnostics)
         {
-            ISourceGenerator generator = new T();
+            ISourceGenerator generator = CreateGenerator();
 
-            var driver = CSharpGeneratorDriver.Create(generator);
+            var driver = CreateGeneratorDriver(generator);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out outputCompilation, out generationDiagnostics);
 
             var output = outputCompilation.SyntaxTrees.Select(x => (x.FilePath, x));
             return output;
         }
 
-        public static CSharpCompilation? CompileSource(string source, string? compilationName = null)
+        public virtual Compilation? CompileSource(string source, string? compilationName = null, bool isExe = false)
         {
             if (source is null)
             {
                 return null;
             }
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var syntaxTree = ParseToSyntaxTree(source);
             compilationName ??= "defaultCompilation";
 
             var references = new List<MetadataReference>();
@@ -109,8 +156,8 @@ namespace StarFruit.FluentDomSourceGen.Tests
                 }
             }
 
-            var compilation = CSharpCompilation.Create(compilationName, new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            return compilation;
+            var kind = isExe ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary;
+            return CreatCompilation(compilationName, syntaxTree, references, kind);
         }
     }
 }

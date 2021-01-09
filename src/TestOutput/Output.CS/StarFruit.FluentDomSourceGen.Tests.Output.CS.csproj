@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\StarFruit.FluentDomSourceGen.Tests\CliRoot.cs" Link="CliRoot.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\StarFruit.FluentDomSourceGen.Tests\StarFruit.FluentDomSourceGen.Tests.csproj" />
+    <ProjectReference Include="..\..\StarFruit2\StarFruit2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.9.0-2.final" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="System.CommandLine" Version="2.0.0-beta1.20574.7" />
+  </ItemGroup>
+
+
+</Project>

@@ -1,10 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using StarFruit2;
-using System;
-using System.CommandLine;
+﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace StarFruit.FluentDomSourceGen.Tests
@@ -46,45 +41,45 @@ namespace StarFruit.FluentDomSourceGen.Tests
             return value;
         }
 
-        public static Compilation GetStarFruitCompilation(this SyntaxTree sytanxTree)
-        {
+        //public static Compilation GetStarFruitCompilation(this SyntaxTree sytanxTree)
+        //{
 
-            const string longName = "System.Runtime, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-            var systemCollectionsAssembly = Assembly.Load(longName);
+        //    const string longName = "System.Runtime, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+        //    var systemCollectionsAssembly = Assembly.Load(longName);
 
-            MetadataReference fixcCS0012 =
-                       MetadataReference.CreateFromFile(systemCollectionsAssembly.Location);
-            MetadataReference mscorlib =
-                       MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-            MetadataReference netStandard =
-                      MetadataReference.CreateFromFile(typeof(MethodInfo).Assembly.Location);
-            MetadataReference starFruit2Common =
-                       MetadataReference.CreateFromFile(typeof(RequiredAttribute).Assembly.Location);
-            MetadataReference starFruit2 =
-                      MetadataReference.CreateFromFile(typeof(CommandSourceBase).Assembly.Location);
-            MetadataReference systemCommandLine =
-                      MetadataReference.CreateFromFile(typeof(Command).Assembly.Location);
-            MetadataReference systemRuntime =
-                        MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
+        //    MetadataReference fixcCS0012 =
+        //               MetadataReference.CreateFromFile(systemCollectionsAssembly.Location);
+        //    MetadataReference mscorlib =
+        //               MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+        //    MetadataReference netStandard =
+        //              MetadataReference.CreateFromFile(typeof(MethodInfo).Assembly.Location);
+        //    MetadataReference starFruit2Common =
+        //               MetadataReference.CreateFromFile(typeof(RequiredAttribute).Assembly.Location);
+        //    MetadataReference starFruit2 =
+        //              MetadataReference.CreateFromFile(typeof(CommandSourceBase).Assembly.Location);
+        //    MetadataReference systemCommandLine =
+        //              MetadataReference.CreateFromFile(typeof(Command).Assembly.Location);
+        //    MetadataReference systemRuntime =
+        //                MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
 
-            MetadataReference[] references =
-                {
-                    mscorlib,
-                    netStandard,
-                    starFruit2,
-                    starFruit2Common,
-                    systemCommandLine,
-                    systemRuntime,
-                    fixcCS0012
-                };
+        //    MetadataReference[] references =
+        //        {
+        //            mscorlib,
+        //            netStandard,
+        //            starFruit2,
+        //            starFruit2Common,
+        //            systemCommandLine,
+        //            systemRuntime,
+        //            fixcCS0012
+        //        };
 
-            var compilation = CSharpCompilation.Create("TransformationCS",
-                                            new SyntaxTree[] { sytanxTree },
-                                            references,
-                                            new CSharpCompilationOptions(
-                                                    OutputKind.DynamicallyLinkedLibrary));
-            return compilation;
-        }
+        //    var compilation = CSharpCompilation.Create("TransformationCS",
+        //                                    new SyntaxTree[] { sytanxTree },
+        //                                    references,
+        //                                    new CSharpCompilationOptions(
+        //                                            OutputKind.DynamicallyLinkedLibrary));
+        //    return compilation;
+        //}
     }
 
 }

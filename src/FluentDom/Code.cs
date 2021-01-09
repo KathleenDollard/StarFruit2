@@ -10,17 +10,17 @@ namespace FluentDom
         internal List<Using> usings = new List<Using>();
         internal List<Class> classes = new List<Class>();
 
-        public static Code Create(string @namespace)
+        public static Code Create(string? @namespace)
         {
             return new Code(@namespace);
         }
 
-        public Code(string @namespace)
+        public Code(string? @namespace)
         {
             Namespace = @namespace;
         }
 
-        public string Namespace { get; }
+        public string? Namespace { get; }
         public IEnumerable<Using> UsingStore
             => usings;
         public IEnumerable<Class> ClassStore

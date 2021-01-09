@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace MultiLayerCli
+﻿namespace MultiLayerCli
 {
     public class CliRoot
     { }

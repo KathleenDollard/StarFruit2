@@ -11,12 +11,12 @@ namespace FluentDom.Tests
         private const string MethodName = "MethodName";
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_auto_property_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_auto_property_is_correct(bool useVB)
         {
             var property = new Property(PropertyName, "string");
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");
             var expected = generator switch
             {
                 CSharpGenerator => @"public string PropertyName { get; set; }",
@@ -30,12 +30,12 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_readonly_auto_property_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_readonly_auto_property_is_correct(bool useVB)
         {
             var property = new Property(PropertyName, "string", readOnly: true);
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");
             var expected = generator switch
             {
                 CSharpGenerator => @"public string PropertyName { get; }",
@@ -49,12 +49,12 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        public void Generated_expression_body_property_is_correct(Type generatorType)
+        [InlineData(false)]
+        public void Generated_expression_body_property_is_correct(bool useVB)
         {
             var property = new Property(PropertyName, "string", readOnly: true)
                                 .GetterReturn(Expression.Value(42));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @"public string PropertyName
@@ -68,15 +68,15 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_full_property_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_full_property_is_correct(bool useVB)
         {
             var property = new Property(PropertyName, "string")
                                 .GetterStatements(Expression.AssignVar("y", "int", Expression.Value(11)))
                                 .GetterReturn(Expression.Value(5))
                                 .SetterStatements(Expression.AssignVar("x", "int", Expression.Value(7)));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @"public string PropertyName
@@ -110,12 +110,12 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_constructor_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_constructor_is_correct(bool useVB)
         {
             var ctor = new Constructor(new TypeRep("ClassName"));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @"public ClassName()
@@ -132,13 +132,13 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_constructor_with_base_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_constructor_with_base_is_correct(bool useVB)
         {
             var ctor = new Constructor(new TypeRep("Abc"))
                        .BaseCall();
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @"public Abc()
@@ -157,13 +157,13 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_constructor_with_this_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_constructor_with_this_is_correct(bool useVB)
         {
             var ctor = new Constructor(new TypeRep("Abc"))
                        .ThisCall();
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @"public Abc()
@@ -182,13 +182,13 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_constructor_with_base_and_argument_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_constructor_with_base_and_argument_is_correct(bool useVB)
         {
             var ctor = new Constructor(new TypeRep("Abc"))
                        .BaseCall(Expression.Value(42));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @"public Abc()
@@ -207,13 +207,13 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_constructor_with_this_and_argument_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_constructor_with_this_and_argument_is_correct(bool useVB)
         {
             var ctor = new Constructor(new TypeRep("Abc"))
                        .ThisCall(Expression.Value(42));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @"public Abc()
@@ -232,12 +232,12 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_method_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_method_is_correct(bool useVB)
         {
             var method = new Method(MethodName);
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"public void {MethodName}()
@@ -254,13 +254,13 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_method_is_correct_with_returnType(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_method_is_correct_with_returnType(bool useVB)
         {
             var method = new Method(MethodName)
                             .ReturnType("string");
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"public string {MethodName}()
@@ -277,14 +277,14 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_method_with_parameters_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_method_with_parameters_is_correct(bool useVB)
         {
             var method = new Method(MethodName)
                             .Parameter("value", typeof(int))
                             .Parameter("s", typeof(string));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"public void {MethodName}(int value, string s)
@@ -302,15 +302,15 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_method_with_returnType_and_parameters_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_method_with_returnType_and_parameters_is_correct(bool useVB)
         {
             var method = new Method(MethodName)
                             .ReturnType("string")
                             .Parameter("value", typeof(int))
                             .Parameter("s", typeof(string));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"public string {MethodName}(int value, string s)
@@ -327,15 +327,15 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_method_with_scope_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_method_with_scope_is_correct(bool useVB)
         {
             var method = new Method(MethodName, scope: Scope.Protected)
                             .ReturnType("string")
                             .Parameter("value", typeof(int))
                             .Parameter("s", typeof(string));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"protected string {MethodName}(int value, string s)
@@ -352,15 +352,15 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_method_with_modifiers_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_method_with_modifiers_is_correct(bool useVB)
         {
             var method = new Method(MethodName, modifiers: MemberModifiers.Partial | MemberModifiers.Override)
                             .ReturnType("string")
                             .Parameter("value", typeof(int))
                             .Parameter("s", typeof(string));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"public partial override string {MethodName}(int value, string s)
@@ -378,14 +378,14 @@ namespace FluentDom.Tests
 
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_constructor_with_parameters_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_constructor_with_parameters_is_correct(bool useVB)
         {
             var ctor = new Constructor(new TypeRep("ClassName"))
                          .Parameter("abc", typeof(string))
                          .Parameter("def", typeof(int));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"public ClassName(string abc, int def)
@@ -402,11 +402,11 @@ namespace FluentDom.Tests
         }
 
         [Theory(Skip = "TBD")]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_field_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_field_is_correct(bool useVB)
         {
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"",
@@ -420,11 +420,11 @@ namespace FluentDom.Tests
         }
 
         [Theory(Skip = "TBD")]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_field_with_initializer_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_field_with_initializer_is_correct(bool useVB)
         {
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");;
             var expected = generator switch
             {
                 CSharpGenerator => @$"",

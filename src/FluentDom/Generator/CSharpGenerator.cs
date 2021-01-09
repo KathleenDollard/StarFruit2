@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Collections.Generic;
 using System.Linq;
 
 [assembly: InternalsVisibleTo("FluentDom.Tests")]
@@ -15,6 +14,8 @@ namespace FluentDom.Generator
 {
     public class CSharpGenerator : GeneratorBase
     {
+        internal CSharpGenerator() { }
+
         protected internal override GeneratorBase OutputStatement(IExpression expression)
         {
             sb.AppendLine($"{expression.CSharpString()};");
@@ -34,7 +35,7 @@ namespace FluentDom.Generator
                 => usingNamespace.UsingStatic ? "static " : "";
         }
 
-        protected internal override GeneratorBase OpenNamespace(Code code)
+        protected internal override GeneratorBase OpenNamespaceInternal(Code code)
         {
             sb.AppendLine($"namespace {code.Namespace}");
             OpenCurly();

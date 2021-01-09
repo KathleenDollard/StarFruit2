@@ -1,0 +1,32 @@
+Imports StarFruit2
+Imports System.CommandLine
+Imports StarFruit2.Common
+Imports System.CommandLine.Invocation
+Imports System.CommandLine.Parsing
+
+Public Class MyCommandCommandSource
+   Inherits RootCommandSource(Of MyCommandCommandSource)
+   Public Sub New()
+      Me.New(Nothing, Nothing)
+   End Sub
+   Public Sub New(root As RootCommandSource, parent As CommandSourceBase)
+      MyBase.New(New Command(Nothing, Nothing), parent)
+         Option1Option = GetOption1()
+         Command.Add(Option1Option)
+         Command.Handler = CommandHandler.Create(Function (context As InvocationContext) As Integer
+                CurrentCommandSource = Me
+                CurrentParseResult = context.ParseResult
+                Return 0
+                   End Function)
+   End Sub
+
+   Public Property Option1Option As [Option](Of Boolean)
+
+   Public  Function GetOption1() As [Option](Of Boolean)
+      Dim opt As [Option](Of Boolean) = New [Option](Of Boolean)(Nothing)
+      opt.Description = Nothing
+      opt.IsRequired = False
+      opt.IsHidden = False
+      Return opt
+End Function
+End Class

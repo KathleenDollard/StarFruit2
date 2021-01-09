@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace FluentDom.Generator
 {
     public class VBGenerator : GeneratorBase
     {
+        internal VBGenerator() { }
+
         protected internal override GeneratorBase OutputStatement(IExpression expression)
         {
             sb.AppendLine($"{expression.VBString()}");
@@ -22,7 +22,7 @@ namespace FluentDom.Generator
                 => string.IsNullOrWhiteSpace(usingNamespace.Alias) ? "" : $"{usingNamespace.Alias} = ";
         }
 
-        protected internal override GeneratorBase OpenNamespace(Code code)
+        protected internal override GeneratorBase OpenNamespaceInternal(Code code)
         {
             sb.AppendLine($"Namespace {code.Namespace}");
             sb.IncreaseTabs();
@@ -39,7 +39,7 @@ namespace FluentDom.Generator
             }
             foreach (var item in cls.InterfaceStore)
             {
-                sb.AppendLine(item.VBString());
+                sb.AppendLine($"Implements {item.VBString()}");
             }
             return this;
 
@@ -136,20 +136,21 @@ namespace FluentDom.Generator
                 expr = returnExpression.ReturnExpression;
             }
             return OutputLine(PropertyDeclaration(property))
-                              .OutputLine($"=> {expr.VBString()};")
+                              .OutputLine($"=> {expr.VBString()}")
                               .OutputLine();
         }
 
 
         protected internal override GeneratorBase OutputField(Field field)
         {
-            OutputLine($"{field.Scope.VBString()}{(field.ReadOnly ? "readonly " : "")}{field.TypeRep.VBString()} {field.Name};");
+            OutputLine($"{field.Scope.VBString()}{(field.ReadOnly ? "readonly " : "")}{field.TypeRep.VBString()} {field.Name}");
             return this;
         }
 
         protected internal override string BlockClose(BlockType blockType)
-            => "End " + blockType.VBString();
-
-
+        {
+            sb.DecreaseTabs();
+            return "End " + blockType.VBString();
+        }
     }
 }

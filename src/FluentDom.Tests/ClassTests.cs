@@ -10,12 +10,12 @@ namespace FluentDom.Tests
         private const string ClassName = "George";
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_class_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_class_is_correct(bool useVB)
         {
             var cls = new Class(ClassName);
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");
             var expected = generator switch
             {
                 CSharpGenerator => @$"public class {ClassName}
@@ -32,13 +32,13 @@ namespace FluentDom.Tests
         }
 
         [Theory]
-        [InlineData(typeof(CSharpGenerator))]
-        [InlineData(typeof(VBGenerator))]
-        public void Generated_class_with_base_is_correct(Type generatorType)
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_class_with_base_is_correct(bool useVB)
         {
             var cls = new Class(ClassName)
                         .Base("Fred");
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");
             var expected = generator switch
             {
                 CSharpGenerator => @$"public class {ClassName} : Fred
@@ -50,18 +50,20 @@ namespace FluentDom.Tests
                 _ => throw new NotImplementedException()
             };
 
-               var actual = generator.OutputClass(cls).GetOutput();
+            var actual = generator.OutputClass(cls).GetOutput();
 
             actual.NormalizeWhitespace().Should().Be(expected.NormalizeWhitespace());
         }
 
-        [Theory] [InlineData(typeof(CSharpGenerator))] [InlineData(typeof(VBGenerator))]
-        public void Generated_code_with_member_is_correct(Type generatorType)
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Generated_code_with_member_is_correct(bool useVB)
         {
             var memberName = "AMember";
             var cls = new Class(ClassName)
                         .Member(new Property(memberName, "string"));
-            var generator = Activator.CreateInstance(generatorType) as GeneratorBase;
+            var generator = GeneratorBase.Generator(useVB ? "VisualBasic" : "C#");
             var expected = generator switch
             {
                 CSharpGenerator => @$"public class {ClassName}

@@ -74,7 +74,7 @@ namespace StarFruit2.Tests
             var symbol = RoslynHelpers.GetSymbol(cliSyntax, compilation, semanticModels);
             _ = symbol ?? throw new InvalidOperationException("No matching symbol found");
 
-            return RoslynCSharpDescriptorFactory.GetCliDescriptor(LanguageNames.CSharp, symbol, semanticModels[symbol]);
+            return RoslynDescriptorFactory.GetCliDescriptor( symbol, semanticModels[symbol]);
 
             static string DiagnosticList(IEnumerable<Diagnostic> diagnostics)
             {

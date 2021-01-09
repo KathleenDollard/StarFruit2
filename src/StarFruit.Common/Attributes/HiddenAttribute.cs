@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StarFruit2
+﻿namespace StarFruit2
 {
     public class HiddenAttribute : BoolAttribute 
     {

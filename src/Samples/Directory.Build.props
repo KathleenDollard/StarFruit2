@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001AA"/>
+    <PackageReference  Include="CodeRapid.StarFruit.Generation" Version="0.0.1-beta0001AB"/>
   </ItemGroup>
 
   <ItemGroup>

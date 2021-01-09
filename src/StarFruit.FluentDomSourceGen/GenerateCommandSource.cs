@@ -17,8 +17,7 @@ namespace StarFruit2.Generate
         public virtual Code CreateCode(CliDescriptor cli, IEnumerable<Using>? sourceUsings = null)
         {
             var cmd = cli.CommandDescriptor;
-            var nspace = cli.GeneratedComandSourceNamespace ?? "";
-            return Code.Create(nspace)
+            return Code.Create(cli.GeneratedComandSourceNamespace)
                 .Usings("StarFruit2")
                 .Usings("System.CommandLine")
                 .Usings("StarFruit2.Common")
@@ -34,11 +33,14 @@ namespace StarFruit2.Generate
                                               TypeRep baseClass,
                                               CommandDescriptor? parent)
         {
+            //  .Optional(parent is null, (cls) => cls.Member(parent is null, ParameterlessCtor(cmd))
+
             return new Class(cmd.CommandSourceClassName())
                                .Base(baseClass)
                                .OptionalMember(parent is null, ParameterlessCtor(cmd))
                                .Constructor(GetCtor(cmd, cmd.Root, parent))
                                .BlankLine()
+                               .Properties(cmd.GetChildren().Select(s => ChildProperty(s)))
                                .Properties(cmd.GetChildren(),
                                            s => ChildProperty(s))
                                .BlankLine()
@@ -66,12 +68,14 @@ namespace StarFruit2.Generate
             {
                 return isRoot
                         ? MultilineLambda()
+                              .ReturnType("int")
                               .Parameter("context", "InvocationContext")
                               .Statements(
                                    Assign("CurrentCommandSource", This()),
                                    Assign("CurrentParseResult", "context.ParseResult"),
                                    Return(Value(0)))
-                          : MultilineLambda()
+                         : MultilineLambda()
+                              .ReturnType("int")
                               .Statements(
                                    Assign("root.CurrentCommandSource", This()),
                                    Return(Value(0)));
@@ -143,18 +147,18 @@ namespace StarFruit2.Generate
             var method = new Method(GetOptArgMethodName(o))
                 .ReturnType(o.OptionType())
                 .Statements(
-                      AssignVar("option", o.OptionType(), NewObject(o.OptionType(), Value(o.CliName))),
-                      Assign("option.Description", Value(o.Description)),
-                      Assign("option.IsRequired", Value(o.Required)),
-                      Assign("option.IsHidden", Value(o.IsHidden)))
+                      AssignVar("opt", o.OptionType(), NewObject(o.OptionType(), Value(o.CliName))),
+                      Assign("opt.Description", Value(o.Description)),
+                      Assign("opt.IsRequired", Value(o.Required)),
+                      Assign("opt.IsHidden", Value(o.IsHidden)))
                  .OptionalStatements(
                       o.Arguments?.FirstOrDefault()?.DefaultValue is not null,
-                      () => AssignVar("optionArg", "var", Dot(VariableReference("option"), "Argument")),
+                      () => AssignVar("optionArg", null, Dot(VariableReference("opt"), "Argument")),
                       () => MethodCall("optionArg.SetDefaultValue", Value(o.Arguments.First().DefaultValue.DefaultValue)))
                  .Statements(
                       o.Aliases,
-                      alias => MethodCall("option.AddAlias", Value($"-{alias}")))
-                 .Statements(Return(VariableReference("option")));
+                      alias => MethodCall("opt.AddAlias", Value($"-{alias}")))
+                 .Statements(Return(VariableReference("opt")));
 
             return method;
         }

@@ -5,6 +5,13 @@ namespace FluentDom.Generator
 {
     public abstract class GeneratorBase
     {
+
+        public static GeneratorBase Generator(string languageName)
+             => languageName == "C#" // hardcoded because FluentDom does not know about Roslyn, by design
+                 ? new CSharpGenerator()
+                 : new VBGenerator();
+
+
         protected StringBuilderWithTabs sb = new();
 
         public virtual string Generate(Code code)
@@ -21,8 +28,8 @@ namespace FluentDom.Generator
         }
 
         protected internal abstract GeneratorBase OutputUsings(Code code);
-        protected internal abstract GeneratorBase OpenNamespace(Code code);
         protected internal abstract GeneratorBase OpenClass(Class cls);
+        protected internal abstract GeneratorBase OpenNamespaceInternal(Code code);
         protected internal abstract GeneratorBase OutputField(Field field);
         protected internal abstract GeneratorBase OpenConstructor(Constructor ctor);
         protected internal abstract GeneratorBase OpenMethod(Method method);
@@ -32,8 +39,15 @@ namespace FluentDom.Generator
         protected internal abstract GeneratorBase OutputStatement(IExpression expression);
         protected internal abstract string BlockClose(BlockType blockType);
 
-       protected internal virtual GeneratorBase CloseNamespace(Code code)
-            => Close(BlockType.Namespace);
+        protected internal virtual GeneratorBase OpenNamespace(Code code)
+             => string.IsNullOrWhiteSpace(code.Namespace)
+                   ? this
+                   : OpenNamespaceInternal(code);
+
+        protected internal virtual GeneratorBase CloseNamespace(Code code)
+             => string.IsNullOrWhiteSpace(code.Namespace)
+                   ? this
+                   : Close(BlockType.Namespace);
         protected internal virtual GeneratorBase CloseClass(Class cls)
              => Close(BlockType.Class);
         protected internal virtual GeneratorBase CloseConstructor(Constructor ctor)
@@ -115,7 +129,8 @@ namespace FluentDom.Generator
 
         protected internal virtual GeneratorBase OutputClass(Class cls)
         {
-            return OpenClass(cls)
+               //     .Output(cls.MemberStore.Select x => OutputMember(x))
+           return OpenClass(cls)
                    .OutputSelect(cls.MemberStore, (g, x) => g.OutputMember(x))
                    .CloseClass(cls);
         }

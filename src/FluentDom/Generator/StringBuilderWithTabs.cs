@@ -23,6 +23,7 @@ namespace FluentDom
 
         public StringBuilderWithTabs AppendLine(string line)
         {
+            tabs = tabs < 0 ? 0 : tabs;
             sb.Append(new string(' ', tabs * tabWidth));
             sb.Append(line + newLine);
             return this;

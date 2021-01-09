@@ -1,0 +1,37 @@
+Imports StarFruit2
+Imports System.CommandLine
+Imports StarFruit2.Common
+Imports System.CommandLine.Invocation
+Imports System.CommandLine.Parsing
+
+Public Class MyCommandCommandSource
+   Inherits RootCommandSource(Of MyCommandCommandSource)
+   Public Sub New()
+      Me.New(Nothing, Nothing)
+   End Sub
+   Public Sub New(root As RootCommandSource, parent As CommandSourceBase)
+      MyBase.New(New Command("my-command", Nothing), parent)
+         SubCommandCommand = New SubCommandCommandSource(Me, Me)
+         Command.AddCommand(SubCommandCommand.Command)
+         Command.Handler = CommandHandler.Create(Function (context As InvocationContext) As Integer
+                CurrentCommandSource = Me
+                CurrentParseResult = context.ParseResult
+                Return 0
+                   End Function)
+   End Sub
+
+   Public Property SubCommandCommand As SubCommandCommandSource
+
+End Class
+Public Class SubCommandCommandSource
+   Inherits CommandSourceBase
+   Public Sub New(root As RootCommandSource, parent As CommandSourceBase)
+      MyBase.New(New Command(Nothing, Nothing), parent)
+         Command.Handler = CommandHandler.Create(Function () As Integer
+                root.CurrentCommandSource = Me
+                Return 0
+                   End Function)
+   End Sub
+
+
+End Class

@@ -40,7 +40,7 @@ End Namespace
         {
             return syntaxTree.GetRoot()
                               .DescendantNodes()
-                              .OfType<ClassStatementSyntax>();
+                              .OfType<ClassBlockSyntax>();
         }
 
         public override IEnumerable<SyntaxNode> GetMethodNodes(SyntaxTree syntaxTree)

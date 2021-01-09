@@ -1,7 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 // From RoslynSource
 namespace StarFruit.FluentDomSourceGen.Tests

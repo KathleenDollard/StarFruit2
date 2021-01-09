@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -69,7 +70,7 @@ namespace FluentDom.Generator
         => expression switch
         {
             Assign x => $"{x.LeftHand.VBString()} = {x.Expression.VBString()}",
-            LocalDeclaration x => $"Dim {x.LocalName} As {x.TypeRep.VBString()} = {x.RightHand.VBString()}",
+            LocalDeclaration x => x.VBString(),
             MethodCall x => $"{x.Name}({x.ArgumentStore.VBString()})",
             NewObject x => $"New {x.TypeRep.VBString()}({x.ArgumentStore.VBString()})",
             This => "Me",
@@ -83,6 +84,14 @@ namespace FluentDom.Generator
             As x => $"TryCast({x.Expression.VBString()}, {x.TypeRep.VBString()})", // NOTE: This TryString in VB, although nullable value types are handled differently
             _ => throw new NotImplementedException($"Not implemented expression type in {nameof(VBString)}(IExpression) in {nameof(VBGeneratorExtensions)}"),
         };
+
+        public static string VBString(this LocalDeclaration localDeclaration)
+        {
+            return $"Dim {localDeclaration.LocalName} {AsClause(localDeclaration.TypeRep)}= {localDeclaration.RightHand.VBString()}";
+
+            static string AsClause(TypeRep typeRep) 
+                => typeRep is null ? "" : $"As {typeRep.VBString()} ";
+        }
 
         public static string VBString(this Return expression)
           => $"Return {expression.ReturnExpression.VBString()}";
@@ -102,7 +111,7 @@ namespace FluentDom.Generator
             return typeRep is null
                        ? ""
                        : typeRep.GenericTypeArguments.Any()
-                           ? $"{typeRep.Name}(Of {string.Join(", ", typeRep.GenericTypeArguments.Select(x => x.VBString()))})"
+                           ? $"{EscapedName(typeRep)}(Of {string.Join(", ", typeRep.GenericTypeArguments.Select(x => x.VBString()))})"
                            : typeRep.Name.StartsWith("@")
                                ? typeRep.Name
                                : typeRep.Name switch
@@ -122,8 +131,10 @@ namespace FluentDom.Generator
                                    "System.UInt16" => "UShort",
                                    "System.Object" => "Object",
                                    "System.String" => "String",
-                                   _ => typeRep.Name
+                                   _ => EscapedName(typeRep)
                                };
+            static string EscapedName(TypeRep typeRep)
+                => IsKeyword(typeRep.Name) ? $"[{typeRep.Name}]" : typeRep.Name;
         }
 
         public static string VBString(this ParameterStore parameterStore)
@@ -141,11 +152,27 @@ namespace FluentDom.Generator
         public static string VBString(this MultilineLambda lambda)
         {
             // We do not have the generator here, so we just fake the spacing
-            return $@"({lambda.ParameterStore.VBString()}) =>
-             {{  
-                {string.Join("\n                ", lambda.StatementStore.Select(x => x.VBString() + ";"))}
-             }}";
+            return $@"{lambdaDeclaration(lambda)}
+                {string.Join("\n                ", lambda.StatementStore.Select(x => x.VBString()))}
+                   End {SubOrFunction(lambda)}";
 
+            static string lambdaDeclaration(MultilineLambda lambda)
+            {
+                return $"{SubOrFunction(lambda)} ({lambda.ParameterStore.VBString()}){AsClause(lambda)}";
+            }
+
+            static string SubOrFunction(MultilineLambda lambda)
+                => lambda.ReturnTypeStore is null
+                        ? "Sub"
+                        : "Function";
+            static string AsClause(MultilineLambda lambda)
+                => lambda.ReturnTypeStore is null
+                        ? ""
+                        : $" As {lambda.ReturnTypeStore.VBString()}";
         }
+
+        private static bool IsKeyword(string id)
+            => SyntaxFacts.GetKeywordKind(id) != SyntaxKind.None;
+
     }
 }

@@ -5,16 +5,15 @@
 using StarFruit2;
 using StarFruit2.Common;
 using System;
-using System.IO;
 
-namespace TwoLayerCli
+namespace StarFruit.FromClass
 {
     /// <summary>
     /// This is the entry point, the end user types the executable name
     /// </summary>
     public partial class CliRoot : ICliRoot
     {
-        /// <summary> </summary>
+        /// <summary> </summary>                    
         /// <param name="ctorParam">This is a constructor parameter</param>
         public CliRoot(bool ctorParam) { }
 

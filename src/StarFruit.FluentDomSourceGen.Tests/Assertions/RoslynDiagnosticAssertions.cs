@@ -33,6 +33,8 @@ Compilation issue ({compilationId}):
             }
             return new AndConstraint<RoslynGenerationDiagnosticAssertions>(this);
 
+     
+
         }
 
     }

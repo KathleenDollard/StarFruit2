@@ -1,0 +1,31 @@
+Imports StarFruit2
+Imports System.CommandLine
+Imports StarFruit2.Common
+Imports System.CommandLine.Invocation
+Imports System.CommandLine.Parsing
+
+Public Class MyCommandCommandSource
+   Inherits RootCommandSource(Of MyCommandCommandSource)
+   Public Sub New()
+      Me.New(Nothing, Nothing)
+   End Sub
+   Public Sub New(root As RootCommandSource, parent As CommandSourceBase)
+      MyBase.New(New Command(Nothing, Nothing), parent)
+         Argument1Argument = GetArgument1()
+         Command.Add(Argument1Argument)
+         Command.Handler = CommandHandler.Create(Function (context As InvocationContext) As Integer
+                CurrentCommandSource = Me
+                CurrentParseResult = context.ParseResult
+                Return 0
+                   End Function)
+   End Sub
+
+   Public Property Argument1Argument As Argument(Of String)
+
+   Public  Function GetArgument1() As Argument(Of String)
+      Dim argument As Argument(Of String) = New Argument(Of String)(Nothing)
+      argument.Description = Nothing
+      argument.IsHidden = False
+      Return argument
+End Function
+End Class

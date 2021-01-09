@@ -30,6 +30,7 @@ namespace FluentDom
 
         public static MultilineLambda MultilineLambda()
             => new MultilineLambda();
+
         public static NewObject NewObject(TypeRep typeRep)
            => new NewObject(typeRep, new IExpression[] { });
 

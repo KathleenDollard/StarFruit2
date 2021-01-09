@@ -1,9 +1,7 @@
 ﻿using StarFruit2.Common;
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
-using System.Text;
 
 namespace StarFruit2.StarFruitSurface
 {
