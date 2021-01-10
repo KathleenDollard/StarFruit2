@@ -6,7 +6,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20478.1" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20574.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,3 +22,4 @@
   </ItemGroup>-->
 
 </Project>
+
