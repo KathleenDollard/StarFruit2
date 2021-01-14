@@ -1,16 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
-using System.Collections.Generic;
 using System.Linq;
-using FluentDom;
 using System;
 using RoslynSourceGenSupport.VisualBasic;
+using RoslynSourceGenSupport;
 
 namespace StarFruit2.Generate
 {
-    public class VBSyntaxReceiver : SyntaxReceiverBase
+    public class VBSyntaxReceiver : CandidateSyntaxVisitor
     {
-
         /// <summary>
         /// Called for every syntax node in the compilation, we can inspect the 
         /// nodes and save any information useful for generation
@@ -43,7 +41,7 @@ namespace StarFruit2.Generate
         /// <returns></returns>
         private bool AddPocoTypes(SyntaxNode syntaxNode)
         {
-            var memberAccessSyntax = syntaxNode.CallToMethodOnClass("CommandSource");
+            var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
             return AddCandidateIfNotNull(memberAccessSyntax?.Name.GenericArgumentsFromName().FirstOrDefault());
         }
 
@@ -54,10 +52,8 @@ namespace StarFruit2.Generate
         /// <param name="syntaxNode"></param>
         /// <returns></returns>
         private bool AddInterfaceMarkedTypes(SyntaxNode syntaxNode)
-            => AddCandidateIfNotNull(syntaxNode.ClassWithBaseOrInterface("ICliRoot"));
+            => AddCandidateIfNotNull(syntaxNode.IfClassWithBaseOrInterface("ICliRoot"));
 
-        // This allows specifying a simple POCO CLI root class as the CLI root
-        // by stating hte generic in CommandSource static methods
         /// <summary>
         /// This allows specifying the CLI root via a marker interface
         /// It is not clear that this is still needed.
@@ -66,12 +62,12 @@ namespace StarFruit2.Generate
         /// <returns></returns>
         private bool AddCalledMethods(SyntaxNode syntaxNode)
         {
-            var memberAccessSyntax = syntaxNode.CallToMethodOnClass("CommandSource");
+            var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
             if (memberAccessSyntax is not null
                 && !memberAccessSyntax.Name.GenericArgumentsFromName().Any())
             {
                 var argument = memberAccessSyntax.ArgumentsOnMethod().FirstOrDefault();
-                switch (argument.GetExpression() )
+                switch (argument.GetExpression())
                 {
                     case NameOfExpressionSyntax s:
                         var rootIdentifier = s.Argument switch

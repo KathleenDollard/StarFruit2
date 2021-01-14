@@ -37,7 +37,7 @@ namespace StarFruit.FluentDomSourceGen.Tests
         public override SyntaxTree ParseToSyntaxTree(string source)
             => VisualBasicSyntaxTree.ParseText(source);
 
-        public override Compilation CreatCompilation(string compilationName, SyntaxTree syntaxTree, IEnumerable<MetadataReference> references, OutputKind outputKind)
+        public override Compilation CreateCompilation(string compilationName, SyntaxTree syntaxTree, IEnumerable<MetadataReference> references, OutputKind outputKind)
             => VisualBasicCompilation.Create(compilationName, new SyntaxTree[] { syntaxTree }, references, new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
 

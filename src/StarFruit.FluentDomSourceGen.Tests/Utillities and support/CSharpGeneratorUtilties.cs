@@ -37,7 +37,7 @@ namespace StarFruit.FluentDomSourceGen.Tests
         public override SyntaxTree ParseToSyntaxTree(string source)
             => CSharpSyntaxTree.ParseText(source);
 
-        public override Compilation CreatCompilation(string compilationName, SyntaxTree syntaxTree, IEnumerable<MetadataReference> references, OutputKind outputKind)
+        public override Compilation CreateCompilation(string compilationName, SyntaxTree syntaxTree, IEnumerable<MetadataReference> references, OutputKind outputKind)
             => CSharpCompilation.Create(compilationName, new SyntaxTree[] { syntaxTree }, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
         public override GeneratorDriver CreateGeneratorDriver(ISourceGenerator generator)

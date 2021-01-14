@@ -2,6 +2,7 @@
 using FluentAssertions.Execution;
 using FluentDom.Generator;
 using Microsoft.CodeAnalysis;
+using RoslynSourceGenSupport;
 using StarFruit2.Generate;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace StarFruit.FluentDomSourceGen.Tests
                  ? new VBGeneratorUtilities()
                  : new CSharpGeneratorUtilities();
 
-        public static SyntaxReceiverBase Receiver(bool useVB)
+        public static CandidateSyntaxVisitor Receiver(bool useVB)
             => useVB
                 ? new VBSyntaxReceiver()
                 : new CSharpSyntaxReceiver();
@@ -51,7 +52,7 @@ namespace StarFruit.FluentDomSourceGen.Tests
         public abstract IEnumerable<SyntaxNode>? StatementsForMethod(string source, string methodName);
         public abstract IEnumerable<SyntaxNode> ClassDeclarations(string source);
         public abstract SyntaxTree ParseToSyntaxTree(string source);
-        public abstract Compilation CreatCompilation(string compilationName, SyntaxTree syntaxTree, IEnumerable<MetadataReference> references, OutputKind outputKind);
+        public abstract Compilation CreateCompilation(string compilationName, SyntaxTree syntaxTree, IEnumerable<MetadataReference> references, OutputKind outputKind);
         public abstract GeneratorDriver CreateGeneratorDriver(ISourceGenerator generator);
         public abstract ISourceGenerator CreateGenerator();
 
@@ -112,10 +113,10 @@ namespace StarFruit.FluentDomSourceGen.Tests
             return cliRootCompilation;
         }
 
-        public virtual SyntaxReceiverBase FindCandidatesWithSyntaxReceiver(string inputFileName)
+        public virtual CandidateSyntaxVisitor FindCandidatesWithSyntaxReceiver(string inputFileName)
             => FindCandidatesWithSyntaxReceiverSource(File.ReadAllText(inputFileName));
 
-        public virtual SyntaxReceiverBase FindCandidatesWithSyntaxReceiverSource(string source)
+        public virtual CandidateSyntaxVisitor FindCandidatesWithSyntaxReceiverSource(string source)
         {
             var _ = source ?? throw new ArgumentException("Source cannot be null", "source");
             var syntaxTree = ParseToSyntaxTree(source);
@@ -157,7 +158,7 @@ namespace StarFruit.FluentDomSourceGen.Tests
             }
 
             var kind = isExe ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary;
-            return CreatCompilation(compilationName, syntaxTree, references, kind);
+            return CreateCompilation(compilationName, syntaxTree, references, kind);
         }
     }
 }

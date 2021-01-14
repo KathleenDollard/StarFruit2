@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 
-namespace StarFruit2.Generate
+namespace RoslynSourceGenSupport
 {
-    public abstract class SyntaxReceiverBase : ISyntaxReceiver
+    public abstract class CandidateSyntaxVisitor : ISyntaxReceiver
     {
         public List<string> Usings { get; } = new();
         public List<SyntaxNode> Candidates { get; } = new();

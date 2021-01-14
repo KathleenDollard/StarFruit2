@@ -1,10 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Linq;
 using RoslynSourceGenSupport.CSharp;
+using RoslynSourceGenSupport;
 
 namespace StarFruit2.Generate
 {
-    public class CSharpSyntaxReceiver : SyntaxReceiverBase
+    public class CSharpSyntaxReceiver : CandidateSyntaxVisitor
     {
         /// <summary>
         /// Called for every syntax node in the compilation, we can inspect the 
@@ -38,7 +39,7 @@ namespace StarFruit2.Generate
         /// <returns></returns>
         private bool AddPocoTypes(SyntaxNode syntaxNode)
         {
-            var memberAccessSyntax = syntaxNode.CallToMethodOnClass("CommandSource");
+            var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
             return AddCandidateIfNotNull(memberAccessSyntax?.Name.GenericArgumentsFromName().FirstOrDefault());
         }
 
@@ -49,7 +50,7 @@ namespace StarFruit2.Generate
         /// <param name="syntaxNode"></param>
         /// <returns></returns>
         private bool AddInterfaceMarkedTypes(SyntaxNode syntaxNode)
-            => AddCandidateIfNotNull(syntaxNode.ClassWithBaseOrInterface("ICliRoot"));
+            => AddCandidateIfNotNull(syntaxNode.IfClassWithBaseOrInterface("ICliRoot"));
 
         /// <summary>
         /// This allows specifying a simple POCO CLI root class as the CLI 
@@ -59,12 +60,12 @@ namespace StarFruit2.Generate
         /// <returns></returns>
         private bool AddCalledMethods(SyntaxNode syntaxNode)
         {
-            var memberAccessSyntax = syntaxNode.CallToMethodOnClass("CommandSource");
+            var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
             if (memberAccessSyntax is not null
                 && !memberAccessSyntax.Name.GenericArgumentsFromName().Any())
             {
                 var argument = memberAccessSyntax.ArgumentsOnMethod().FirstOrDefault();
-                var nameOfInvocation = argument.Expression.CallToMethod("nameof");
+                var nameOfInvocation = argument.Expression.IfCallToMethod("nameof");
                 var namedMethodSyntax = nameOfInvocation?.ArgumentList.Arguments.First().Expression;
                 return AddCandidateIfNotNull(namedMethodSyntax);
             }

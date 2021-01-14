@@ -10,6 +10,7 @@ using VB = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Utils = StarFruit.FluentDomSourceGen.Tests.SourceGeneratorUtilities;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
+using RoslynSourceGenSupport;
 
 namespace StarFruit.FluentDomSourceGen.Tests
 {
@@ -178,7 +179,7 @@ End Namespace";
         }
 
 
-        private static SyntaxReceiverBase VisitSyntaxNodes(SyntaxReceiverBase receiver, IEnumerable<SyntaxNode> classDeclarations)
+        private static CandidateSyntaxVisitor VisitSyntaxNodes(CandidateSyntaxVisitor receiver, IEnumerable<SyntaxNode> classDeclarations)
         {
             foreach (var classDeclaration in classDeclarations)
             {

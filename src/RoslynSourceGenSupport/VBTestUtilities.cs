@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace RoslynSourceGenSupport
 {
-    public class CSharpTestUtilities : TestUtilitiesBase
+    public class VBTestUtilities : TestUtilitiesBase
     {
         public override SyntaxTree ParseToSyntaxTree(string source)
           => CSharpSyntaxTree.ParseText(source);

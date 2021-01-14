@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FluentDom\FluentDom.csproj" />
+    <ProjectReference Include="..\RoslynSourceGenSupport\RoslynSourceGenSupport.csproj" />
   </ItemGroup>
 
 

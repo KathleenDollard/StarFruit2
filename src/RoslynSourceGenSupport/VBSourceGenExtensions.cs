@@ -1,24 +1,24 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RoslynSourceGenSupport.CSharp
+namespace RoslynSourceGenSupport.VisualBasic
 {
-    public static class CSharpExtensions
+    public static class VBSourceGenExtensions
     {
-        public static IEnumerable<UsingDirectiveSyntax> GetUsings(this SyntaxNode? syntaxNode)
+        public static IEnumerable<SimpleImportsClauseSyntax> GetUsings(this SyntaxNode? syntaxNode)
         {
             if (syntaxNode is null)
-                return new UsingDirectiveSyntax[] { };
+                return new SimpleImportsClauseSyntax[] { };
 
             var compilationUnit = syntaxNode.Ancestors()
                                             .OfType<CompilationUnitSyntax>()
                                             .FirstOrDefault();
-            return compilationUnit.Usings;
+            return compilationUnit.Imports.SelectMany(x => x.ImportsClauses).OfType<SimpleImportsClauseSyntax>();
         }
 
-        public static MemberAccessExpressionSyntax? CallToMethodOnClass(this SyntaxNode? syntaxNode, string className)
+        public static MemberAccessExpressionSyntax? IfCallToMethodOnClass(this SyntaxNode? syntaxNode, string className)
         {
             if (syntaxNode is InvocationExpressionSyntax invocationSyntax)
                 if (invocationSyntax.Expression is MemberAccessExpressionSyntax memberAccessSyntax)
@@ -28,7 +28,7 @@ namespace RoslynSourceGenSupport.CSharp
             return null;
         }
 
-        public static InvocationExpressionSyntax? CallToMethod(this SyntaxNode? syntaxNode, string methodName)
+        public static InvocationExpressionSyntax? IfCallToMethod(this SyntaxNode? syntaxNode, string methodName)
         {
             if (syntaxNode is InvocationExpressionSyntax invocationSyntax)
                 if (invocationSyntax.Expression is IdentifierNameSyntax nameIdentifier)
@@ -42,15 +42,14 @@ namespace RoslynSourceGenSupport.CSharp
                     ? genericName.TypeArgumentList.Arguments.ToList()
                     : (IEnumerable<TypeSyntax>)(new TypeSyntax[] { });
 
-        public static ClassDeclarationSyntax? ClassWithBaseOrInterface(this SyntaxNode syntaxNode, string name)
+        public static ClassBlockSyntax? IfClassWithBaseOrInterface(this SyntaxNode syntaxNode, string name)
         {
-            if (syntaxNode is ClassDeclarationSyntax classDeclaration
-                               && classDeclaration.BaseList is not null
-                               && classDeclaration.BaseList.DescendantNodes()
-                                                           .OfType<IdentifierNameSyntax>()
-                                                           .Any(x => x.Identifier.ValueText == name))
+            if (syntaxNode is ClassBlockSyntax classBlock)
+               if ( classBlock.ChildNodes()     
+                    .OfType<InheritsOrImplementsStatementSyntax>()
+                    .Any(x => true))
             {
-                return classDeclaration;
+                return classBlock;
             }
             return null;
         }
