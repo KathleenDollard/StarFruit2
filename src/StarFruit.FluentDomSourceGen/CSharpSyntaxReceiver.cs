@@ -7,7 +7,9 @@ namespace StarFruit2.Generate
 {
     public class CSharpSyntaxReceiver : CandidateSyntaxVisitor
     {
-        /// <summary>
+        //private readonly CSharpRoslynUtilities utilties = new();
+
+            /// <summary>
         /// Called for every syntax node in the compilation, we can inspect the 
         /// nodes and save any information useful for generation
         /// </summary>
@@ -40,7 +42,7 @@ namespace StarFruit2.Generate
         private bool AddPocoTypes(SyntaxNode syntaxNode)
         {
             var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
-            return AddCandidateIfNotNull(memberAccessSyntax?.Name.GenericArgumentsFromName().FirstOrDefault());
+            return AddCandidateIfNotNull(memberAccessSyntax?.Name.GetGenericArguments().FirstOrDefault());
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace StarFruit2.Generate
         {
             var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
             if (memberAccessSyntax is not null
-                && !memberAccessSyntax.Name.GenericArgumentsFromName().Any())
+                && !memberAccessSyntax.Name.GetGenericArguments().Any())
             {
                 var argument = memberAccessSyntax.ArgumentsOnMethod().FirstOrDefault();
                 var nameOfInvocation = argument.Expression.IfCallToMethod("nameof");

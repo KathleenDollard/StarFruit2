@@ -8,16 +8,11 @@ namespace RoslynSourceGenSupport.CSharp
     public static class CSharpSourceGenExtensions
     {
         public static IEnumerable<UsingDirectiveSyntax> GetUsings(this SyntaxNode? syntaxNode)
-        {
-            if (syntaxNode is null)
-                return new UsingDirectiveSyntax[] { };
+            => RoslynUtilitiesBase.Pick(false).GetUsings(syntaxNode).OfType<UsingDirectiveSyntax>();
 
-            var compilationUnit = syntaxNode.Ancestors()
-                                            .OfType<CompilationUnitSyntax>()
-                                            .FirstOrDefault();
-            return compilationUnit.Usings;
-        }
-
+        public static IEnumerable<TypeSyntax> GetGenericArguments(this SyntaxNode? syntaxNode)
+            => RoslynUtilitiesBase.Pick(false).GetGenericArguments(syntaxNode).OfType<TypeSyntax>(); 
+       
         public static MemberAccessExpressionSyntax? IfCallToMethodOnClass(this SyntaxNode? syntaxNode, string className)
         {
             if (syntaxNode is InvocationExpressionSyntax invocationSyntax)
@@ -36,11 +31,6 @@ namespace RoslynSourceGenSupport.CSharp
                         return invocationSyntax;
             return null;
         }
-
-        public static IEnumerable<TypeSyntax> GenericArgumentsFromName(this SyntaxNode? syntaxNode)
-            => syntaxNode is GenericNameSyntax genericName
-                    ? genericName.TypeArgumentList.Arguments.ToList()
-                    : (IEnumerable<TypeSyntax>)(new TypeSyntax[] { });
 
         public static ClassDeclarationSyntax? IfClassWithBaseOrInterface(this SyntaxNode syntaxNode, string name)
         {

@@ -1,15 +1,10 @@
-﻿using ApprovalTests;
-using ApprovalTests.Namers;
-using ApprovalTests.Reporters;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using MsCSharp = Microsoft.CodeAnalysis.CSharp;
 using CSharpSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
-using MsVB = Microsoft.CodeAnalysis.VisualBasic;
 using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using RoslynSourceGenSupport.CSharp;
 using RoslynSourceGenSupport.VisualBasic;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -21,13 +16,13 @@ namespace RoslynSourceGenSupport.Tests
 {
     public class CSharpExtensionTests
     {
-        public TestUtilitiesBase TestUtilities(bool useVB)
+        public RoslynUtilitiesBase TestUtilities(bool useVB)
            => useVB
-                 ? new CSharpTestUtilities()
-                 : new VBTestUtilities();
+                 ? new CSharpRoslynUtilities()
+                 : new VBRoslynUtilities();
 
         public IEnumerable<SyntaxToken> FindIdentifierTokens(bool useVB, SyntaxTree syntaxTree, string name)
-            => TestUtilities(useVB).TokensWithName(SyntaxTreeForTest(useVB), name);
+            => TestUtilities(useVB).TokensWithName(SyntaxTreeForTest(useVB).GetRoot(), name);
 
         public SyntaxNode? FindClassDeclarationWithIdentifier(bool useVB, SyntaxTree syntaxTree, string name)
             => FindIdentifierTokens(useVB, syntaxTree, name)
@@ -36,10 +31,11 @@ namespace RoslynSourceGenSupport.Tests
                     .FirstOrDefault();
 
         public SyntaxNode? FindMethodDeclarationWithIdentifier(bool useVB, SyntaxTree syntaxTree, string name)
-            => FindIdentifierTokens(useVB, syntaxTree, name)
-                    .Select(x => x.Parent)
-                    .Where(x => IsMethodDeclaration(useVB, x))
-                    .FirstOrDefault();
+        {
+            var nodes = FindIdentifierTokens(useVB, syntaxTree, name).Select(x => x.Parent).ToList();
+            var methods = nodes.Where(x => IsMethodDeclaration(useVB, x)).ToList();
+            return methods.FirstOrDefault();
+        }
 
         public bool IsClassDeclaration(bool useVB, SyntaxNode? syntaxNode)
             => syntaxNode is null
@@ -80,7 +76,13 @@ public class X
 
 public class XX
 {{
-   public string YY {{ get ; }}
+    public void WW()
+    {{
+        var d = new X();
+        var x = d.X(42);
+    }}
+
+   public string YY {{ get; }}
 
    public int ZZ(int a1)
    {{
@@ -117,7 +119,7 @@ public class XX
         public void Can_find_usings(bool useVB)
         {
             var usingList = new string[] { "A", "A.B" };
-            var identifiers = FindIdentifierTokens(useVB,SyntaxTreeForTest(useVB), "a1");
+            var identifiers = FindIdentifierTokens(useVB, SyntaxTreeForTest(useVB), "a1");
             identifiers.Should().HaveCount(3);
 
             var usingsLists = identifiers.Select(x => GetUsingsForTest(useVB, x)).ToArray();
@@ -132,10 +134,18 @@ public class XX
         [InlineData(false)]
         public void IfCallToMethodOnClass_finds_method(bool useVB)
         {
-            SyntaxNode? syntaxNode = FindMethodDeclarationWithIdentifier(useVB, SyntaxTreeForTest(useVB), "Z");
-            syntaxNode.Should().NotBeNull();
+            var syntaxTree = SyntaxTreeForTest(useVB);
+            SyntaxNode? methodDeclarationNode = FindMethodDeclarationWithIdentifier(useVB, syntaxTree, "Z");
+            methodDeclarationNode.Should().NotBeNull();
+            SyntaxNode? otherClass = FindClassDeclarationWithIdentifier(useVB, syntaxTree, "XX");
+            otherClass.Should().NotBeNull();
+            SyntaxNode? methodInvocation = otherClass.DescendantNodes()
+                                                     .OfType<CSharpSyntax.InvocationExpressionSyntax>()
+                                                     .Where(x => x.Expression.ToString() == "")
+                                                     .FirstOrDefault();
+            methodDeclarationNode.Should().NotBeNull();
 
-            var foundNode = GetCallToMethodOnClassForTest(useVB, syntaxNode!, "X");
+            var foundNode = GetCallToMethodOnClassForTest(useVB, methodDeclarationNode!, "d.X");
 
             foundNode.Should().NotBeNull();
         }
