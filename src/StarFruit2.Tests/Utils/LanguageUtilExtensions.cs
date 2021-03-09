@@ -70,8 +70,8 @@ namespace StarFruit2.Tests
                                  .FirstOrDefault();
             _ = cliSyntax ?? throw new InvalidOperationException("No matching syntax node found");
 
-            var semanticModels = new Dictionary<ISymbol, SemanticModel>();
-            var symbol = RoslynHelpers.GetSymbol(cliSyntax, compilation, semanticModels);
+            var (symbols, semanticModels) = RoslynHelpers.GetSymbolsAndSemanticModels(compilation, cliSyntax);
+            var symbol = symbols.FirstOrDefault();
             _ = symbol ?? throw new InvalidOperationException("No matching symbol found");
 
             return RoslynDescriptorFactory.GetCliDescriptor( symbol, semanticModels[symbol]);

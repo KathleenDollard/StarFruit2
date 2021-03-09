@@ -106,8 +106,8 @@ namespace StarFruit2.Tests
             {
                 return null;
             }
-            var semanticModels = new Dictionary<ISymbol, SemanticModel>();
-            var symbol = RoslynHelpers.GetSymbol(rootCommand, compilation, semanticModels);
+            var (symbols, semanticModels) = RoslynHelpers.GetSymbolsAndSemanticModels(compilation, rootCommand );
+            var symbol = symbols.FirstOrDefault();
             return symbol is null
                    ? null
                    : RoslynDescriptorFactory.GetCliDescriptor( symbol, semanticModels[symbol]);

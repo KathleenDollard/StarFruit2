@@ -7,9 +7,20 @@ namespace StarFruit2.Generate
 {
     public class RoslynHelpers
     {
-        public static ISymbol? GetSymbol(SyntaxNode syntaxNode,
-                                         Compilation compilation,
-                                         Dictionary<ISymbol, SemanticModel> semanticModels)
+        public static (IEnumerable<ISymbol> symbols, Dictionary<ISymbol, SemanticModel> semanticModelLookup) GetSymbolsAndSemanticModels(
+                                          Compilation compilation, params SyntaxNode[] syntaxNodes)
+        {
+            Dictionary<ISymbol, SemanticModel> semanticModels = new();
+            var symbols = syntaxNodes.Select(x => RoslynHelpers.GetSymbol(x, compilation, semanticModels))
+                                     .Where(symbol => symbol is not null)
+                                     .Distinct();
+            return (symbols, semanticModels)!;
+
+        }
+
+        private static ISymbol? GetSymbol(SyntaxNode syntaxNode,
+                                         Compilation compilation, 
+                                         Dictionary<ISymbol, SemanticModel > semanticModels)
         {
             var _ = compilation ?? throw new ArgumentException("Compilation cannot be null", "compilation");
             var semanticModel = compilation.GetSemanticModel(syntaxNode.SyntaxTree);
@@ -20,6 +31,7 @@ namespace StarFruit2.Generate
             {
                 semanticModels[symbol] = semanticModel;
             }
+
             return symbol;
 
             static ISymbol? SymbolFromIdentifier(SyntaxNode syntaxNode, SemanticModel semanticModel)
@@ -30,6 +42,8 @@ namespace StarFruit2.Generate
                         : symbolInfo.Symbol;
             }
         }
+
+ 
 
         //public static ISymbol? GetSymbol(SyntaxNode syntaxNode,
         //                                           Compilation compilation,

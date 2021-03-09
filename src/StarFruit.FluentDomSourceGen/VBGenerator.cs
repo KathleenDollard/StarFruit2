@@ -27,12 +27,7 @@ namespace StarFruit2.Generate
                 if (context.SyntaxReceiver is not VBSyntaxReceiver receiver)
                     return;
 
-                Dictionary<ISymbol, SemanticModel> semanticModels = new();
-                // semanticModels updated in GetSymbol
-                var symbols = receiver.Candidates
-                                      .Select(x => RoslynHelpers.GetSymbol(x, context.Compilation, semanticModels))
-                                      .Where(symbol => symbol is not null)
-                                      .Distinct();
+                var (symbols, semanticModels) = RoslynHelpers.GetSymbolsAndSemanticModels(context.Compilation, receiver.Candidates.ToArray());
 
                 var cliDescriptors = symbols.Select(symbol => RoslynDescriptorFactory.GetCliDescriptor( symbol!, semanticModels[symbol!]))
                                             .ToList();
