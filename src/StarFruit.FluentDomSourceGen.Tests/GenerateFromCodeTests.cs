@@ -75,7 +75,7 @@ Namespace Tests
     End Class
 End Namespace";
 
-        private const string csMultipleGenericAndInterfaceIndicators = @"
+        private const string csInterfaceIndicators = @"
 using StarFruit2;
 using StarFruit2.Common;
 using System.Threading.Tasks;
@@ -106,7 +106,7 @@ namespace Tests
     }
 }";
 
-        private const string vbMultipleGenericAndInterfaceIndicators = @"
+        private const string vbInterfaceIndicators = @"
 Imports StarFruit2
 Imports StarFruit2.Common
 Imports System.Threading.Tasks
@@ -135,6 +135,39 @@ Namespace Tests
     End Class
 End Namespace
 ";
+
+
+        private const string csWithSubCommands = @"
+using StarFruit2;
+using StarFruit2.Common;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace Tests
+{
+    public class Program
+    {
+       static int Main(string[] args)
+       {
+          var x = CommandSource.Create<CliRoot>();
+          CommandSource.Run<CliRoot>(args);
+          return 0;
+       }
+    }
+
+    public class CliRoot : ICliRoot
+    {
+        public string A { get; set; }
+    }
+
+    public class SubCommand : CliRoot
+    {
+        public string B { get; set; }
+    }   
+}";
+
+        private const string vbWithSubCommands = @"";
+
 
         [Theory]
         [InlineData(true, commandSource)]
@@ -165,13 +198,41 @@ End Namespace
         [UseReporter(typeof(VisualStudioReporter))]
         public void CliRoot_creates_a_single_CommandSource_set_for_multiple_indicators_of_root(bool useVB, string generatedCodeName)
         {
-            generatedCodeName = $"CliRoot{generatedCodeName}";
-            var extension = SourceGeneratorUtilities.Extension(useVB );
-
             var sourceCode = useVB
-                                ? vbMultipleGenericAndInterfaceIndicators
-                                : csMultipleGenericAndInterfaceIndicators;
+                                ? vbInterfaceIndicators
+                                : csInterfaceIndicators;
+            generatedCodeName = $"CliRoot{generatedCodeName}";
+
+            var extension = Utils.Extension(useVB );
+
             var cliRootCompilation = Utils.LanguageUtils(useVB).GetCliRootCompilation(sourceCode )
+                ?? throw new InvalidOperationException();
+
+            var outputPairs = Utils.LanguageUtils(useVB).Generate(cliRootCompilation, out var outputCompilation, out var generationDiagnostics);
+
+            var matchingPairs = outputPairs.Where(x => x.compilationName.EndsWith($"{generatedCodeName}.generated.{extension}"));
+            matchingPairs.Should().HaveCount(1);
+            generationDiagnostics.Should().NotHaveErrors($"{generatedCodeName} - Generation diagnostics");
+            outputCompilation.Should().NotHaveErrors($"{generatedCodeName} - Generation compilation");
+        }
+
+        [Theory]
+        //[InlineData(true, commandSource)]
+        //[InlineData(true, commandSourcesult)]
+        [InlineData(false, commandSource)]
+        [InlineData(false, commandSourcesult)]
+        [UseApprovalSubdirectory("Approvals")]
+        [UseReporter(typeof(VisualStudioReporter))]
+        public void Generator_creates_CliRoot_with_subCommands(bool useVB, string generatedCodeName)
+        {
+            var sourceCode = useVB
+                                ? vbWithSubCommands
+                                : csWithSubCommands;
+            generatedCodeName = $"CliRoot{generatedCodeName}";
+
+            var extension = Utils.Extension(useVB);
+
+            var cliRootCompilation = Utils.LanguageUtils(useVB).GetCliRootCompilation(sourceCode)
                 ?? throw new InvalidOperationException();
 
             var outputPairs = Utils.LanguageUtils(useVB).Generate(cliRootCompilation, out var outputCompilation, out var generationDiagnostics);

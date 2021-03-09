@@ -110,7 +110,7 @@ namespace StarFruit2
 
         public static async Task<int> RunAsync<TCli>(string[] args)
         {
-            return await RunAsync<TCli>(string.Join("", args));
+            return await RunAsync<TCli>(string.Join(" ", args));
         }
 
         public static async Task<int> RunAsync<TCli>(string args)
@@ -120,7 +120,7 @@ namespace StarFruit2
 
         public static int Run<TCli>(string[] args)
         {
-            return Run<TCli>(string.Join("", args));
+            return Run<TCli>(string.Join(" ", args));
         }
 
         public static int Run<TCli>(string args)

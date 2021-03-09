@@ -14,7 +14,7 @@
     <Product>StarFruit2</Product>   
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
-    <Version>0.0.1-beta0001AB</Version>
+    <Version>0.0.1-beta0001AC</Version>
     <OutputPath>..\..\artifacts</OutputPath>
   </PropertyGroup>
 

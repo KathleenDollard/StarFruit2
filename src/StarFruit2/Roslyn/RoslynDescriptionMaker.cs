@@ -77,12 +77,22 @@ namespace Starfruit2
                                                                         INamedTypeSymbol parentSymbol)
         {
             IEnumerable<ISymbol> members = config.GetSubCommandMembers(parentSymbol);
-            return members.Select(s => s switch
+            var subCommands = new List<CommandDescriptor >();
+            foreach (var member in members)
+            {
+                subCommands .Add(CreateSubCommand(member, parent));
+            }
+            return subCommands;
+
+            CommandDescriptor CreateSubCommand(ISymbol symbol, CommandDescriptor parent)
+            {
+                return symbol switch
                 {
                     IMethodSymbol x => CreateCommandDescriptor(parent, x),
                     INamedTypeSymbol x => CreateCommandDescriptor(parent, x),
                     _ => throw new NotImplementedException($"Not implemented for member in {nameof(RoslynDescriptionMaker)}.{nameof(GetSubCommands)}")
-                });
+                };
+            }
         }
 
         protected virtual CommandDescriptor CreateCommandDescriptor<TCommandSymbol>(ISymbolDescriptor? parent,

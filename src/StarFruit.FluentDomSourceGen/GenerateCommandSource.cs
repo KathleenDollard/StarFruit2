@@ -60,7 +60,7 @@ namespace StarFruit2.Generate
                            .Parameter("parent", "CommandSourceBase")
                            .BaseCall(NewObject("Command", Value(cmd.CliName), Value(cmd.Description)), VariableReference("parent"))
                            .Statements(cmd.GetOptionsAndArgs(), CtorOptionsAndArgs())
-                           .Statements(cmd.SubCommands, CtorSubCommands())
+                           .Statements(cmd.SubCommands, CtorSubCommands(parent is null))
                            .Statements(Assign("Command.Handler", MethodCall("CommandHandler.Create",
                                          GetCommandHandler(parent is null))));
 
@@ -102,10 +102,10 @@ namespace StarFruit2.Generate
                 o => MethodCall($"Command.Add", o.PropertyName())
             }.ToArray();
 
-        protected virtual Func<CommandDescriptor, IExpression>[] CtorSubCommands()
+        protected virtual Func<CommandDescriptor, IExpression>[] CtorSubCommands(bool isRoot)
             => new List<Func<CommandDescriptor, IExpression>>
             {
-                o => Assign(o.PropertyName(), NewObject($"{o.CommandSourceClassName()}", This(), This())),
+                o => Assign(o.PropertyName(), NewObject($"{o.CommandSourceClassName()}", isRoot ? This() : VariableReference("root"), This())),
                 o => MethodCall($"Command.AddCommand",$"{o.PropertyName()}.Command")
             }.ToArray();
 
