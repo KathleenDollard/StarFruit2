@@ -41,7 +41,7 @@ namespace StarFruit2.Generate
         /// <returns></returns>
         private bool AddPocoTypes(SyntaxNode syntaxNode)
         {
-            var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
+            var memberAccessSyntax = syntaxNode.IfCallToStaticMethodOnClass("CommandSource");
             return AddCandidateIfNotNull(memberAccessSyntax?.Name.GetGenericArguments().FirstOrDefault());
         }
 
@@ -62,7 +62,7 @@ namespace StarFruit2.Generate
         /// <returns></returns>
         private bool AddCalledMethods(SyntaxNode syntaxNode)
         {
-            var memberAccessSyntax = syntaxNode.IfCallToMethodOnClass("CommandSource");
+            var memberAccessSyntax = syntaxNode.IfCallToStaticMethodOnClass("CommandSource");
             if (memberAccessSyntax is not null
                 && !memberAccessSyntax.Name.GetGenericArguments().Any())
             {

@@ -13,7 +13,7 @@ namespace RoslynSourceGenSupport.CSharp
         public static IEnumerable<TypeSyntax> GetGenericArguments(this SyntaxNode? syntaxNode)
             => RoslynUtilitiesBase.Pick(false).GetGenericArguments(syntaxNode).OfType<TypeSyntax>(); 
        
-        public static MemberAccessExpressionSyntax? IfCallToMethodOnClass(this SyntaxNode? syntaxNode, string className)
+        public static MemberAccessExpressionSyntax? IfCallToStaticMethodOnClass(this SyntaxNode? syntaxNode, string className)
         {
             if (syntaxNode is InvocationExpressionSyntax invocationSyntax)
                 if (invocationSyntax.Expression is MemberAccessExpressionSyntax memberAccessSyntax)
